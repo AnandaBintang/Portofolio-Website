@@ -33,6 +33,15 @@ export default function Projects() {
       githubLink: "#",
     },
     {
+      title: "Pilang Village Archive Management",
+      description:
+        "A digital archive management system for Pilang Village to organize and manage village documents and records efficiently.",
+      image: "/masarip.png",
+      tags: ["PHP", "Laravel", "MySQL", "Document Management", "Admin Panel"],
+      demoLink: "https://masarip.online",
+      githubLink: "#",
+    },
+    {
       title: "Attendance System",
       description:
         "A location-based attendance system with geofencing technology for remote workers, featuring image capture for verification.",
