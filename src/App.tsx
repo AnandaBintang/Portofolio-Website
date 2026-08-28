@@ -13,7 +13,6 @@ import {
   MapPin,
   Waveform as WaveformIcon,
   List,
-  X,
 } from "@phosphor-icons/react";
 import {
   PLAYABLE_TRACKS,
@@ -26,6 +25,7 @@ import {
 import { StickyAudioDeck } from "./components/StickyAudioDeck";
 import { PlayerBar } from "./components/PlayerBar";
 import { SectionTransitionCurtain } from "./components/SectionTransitionCurtain";
+import { FullscreenMenuOverlay } from "./components/FullscreenMenuOverlay";
 import { audio } from "./lib/audioEngine";
 
 interface TransitionState {
@@ -40,6 +40,7 @@ const SECTIONS_CONFIG = [
     id: "prologue",
     navLabel: "PROLOGUE",
     mobileShort: "00",
+    chapterNumber: "CH 00",
     name: "THE ACOUSTIC PROLOGUE",
     subtitle: "// PROFILE, SPECIALIZATION & RESIDENCY",
     accent: "#e8a045",
@@ -48,6 +49,7 @@ const SECTIONS_CONFIG = [
     id: "projects-area",
     navLabel: "DISCOGRAPHY",
     mobileShort: "01",
+    chapterNumber: "CH 01",
     name: "STUDIO DISCOGRAPHY",
     subtitle: "// 4 MASTER PRODUCTION RELEASES",
     accent: "#4a9eff",
@@ -56,6 +58,7 @@ const SECTIONS_CONFIG = [
     id: "experience-area",
     navLabel: "SESSION LOGS",
     mobileShort: "02",
+    chapterNumber: "CH 02",
     name: "STUDIO MASTER LOGS",
     subtitle: "// CHRONOLOGICAL PRODUCTION SESSIONS",
     accent: "#f472b6",
@@ -64,6 +67,7 @@ const SECTIONS_CONFIG = [
     id: "frequencies-area",
     navLabel: "STUDIO SETUP",
     mobileShort: "03",
+    chapterNumber: "CH 03",
     name: "FREQUENCY BANDS",
     subtitle: "// 6 CALIBRATED EQUALIZER TIERS",
     accent: "#2dd4bf",
@@ -74,7 +78,7 @@ export default function App() {
   const [activeSectionIdx, setActiveSectionIdx] = useState(0);
   const [activeTrackIdx, setActiveTrackIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
-  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const [menuOpen, setMenuOpen] = useState(false);
   const [transitionState, setTransitionState] = useState<TransitionState>({
     isTransitioning: false,
     name: "",
@@ -100,14 +104,15 @@ export default function App() {
       if (
         targetIdx < 0 ||
         targetIdx >= SECTIONS_CONFIG.length ||
-        targetIdx === activeSectionIdx ||
+        (targetIdx === activeSectionIdx && !menuOpen) ||
         isTransitioningRef.current
       ) {
+        setMenuOpen(false);
         return;
       }
 
       isTransitioningRef.current = true;
-      setMobileMenuOpen(false);
+      setMenuOpen(false);
       const targetMeta = SECTIONS_CONFIG[targetIdx];
 
       audio.sfx("rewind");
@@ -134,14 +139,24 @@ export default function App() {
         wheelAccumulatorRef.current = 0;
       }, 700);
     },
-    [activeSectionIdx]
+    [activeSectionIdx, menuOpen]
   );
+
+  // Keyboard shortcut listener (ESC to close menu, Space to play/pause)
+  useEffect(() => {
+    const handleKeyDown = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && menuOpen) {
+        setMenuOpen(false);
+      }
+    };
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [menuOpen]);
 
   // Wheel listener: checks if container reached bottom/top to trigger section wipe
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
-      if (isTransitioningRef.current) {
-        e.preventDefault();
+      if (isTransitioningRef.current || menuOpen) {
         return;
       }
 
@@ -176,8 +191,7 @@ export default function App() {
     };
 
     const handleTouchMove = (e: TouchEvent) => {
-      if (isTransitioningRef.current) {
-        e.preventDefault();
+      if (isTransitioningRef.current || menuOpen) {
         return;
       }
       const container = scrollContainerRef.current;
@@ -209,7 +223,7 @@ export default function App() {
       window.removeEventListener("touchstart", handleTouchStart);
       window.removeEventListener("touchmove", handleTouchMove);
     };
-  }, [activeSectionIdx, goToSection]);
+  }, [activeSectionIdx, goToSection, menuOpen]);
 
   const handlePrevTrack = () => {
     audio.sfx("prev");
@@ -236,6 +250,20 @@ export default function App() {
       {/* Film Grain Texture */}
       <div className="grain" />
 
+      {/* ── Fullscreen Interactive Kinetic Menu Overlay ── */}
+      <FullscreenMenuOverlay
+        isOpen={menuOpen}
+        onClose={() => setMenuOpen(false)}
+        sections={SECTIONS_CONFIG}
+        activeSectionIdx={activeSectionIdx}
+        onSelectSection={goToSection}
+        isPlaying={isPlaying}
+        onTogglePlay={() => {
+          audio.sfx("click");
+          audio.toggle();
+        }}
+      />
+
       {/* ── Fullscreen Tape Shutter Section Transition ── */}
       <SectionTransitionCurtain
         isTransitioning={transitionState.isTransitioning}
@@ -244,7 +272,7 @@ export default function App() {
         accentColor={transitionState.accent}
       />
 
-      {/* ── Fixed Master Header (Fully Responsive on Mobile / Tablet / Desktop) ── */}
+      {/* ── Fixed Master Header ── */}
       <header className="shrink-0 z-40 w-full border-b border-[#332d26] bg-[#0f0d0b]/95 backdrop-blur-md">
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 h-16 md:h-18 flex items-center justify-between gap-3">
           
@@ -266,74 +294,43 @@ export default function App() {
             </div>
           </div>
 
-          {/* Desktop & Tablet Navigation Bar */}
-          <nav className="hidden md:flex items-center gap-1.5 sm:gap-2">
-            {SECTIONS_CONFIG.map((sec, i) => (
-              <button
-                key={sec.id}
-                onClick={() => goToSection(i)}
-                className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer whitespace-nowrap ${
-                  i === activeSectionIdx
-                    ? "font-bold text-black shadow-md scale-105"
-                    : "text-[#a89880] hover:text-[#f0ebe3] hover:bg-[#1c1916]"
-                }`}
-                style={i === activeSectionIdx ? { background: sec.accent } : {}}
-              >
-                {sec.navLabel}
-              </button>
-            ))}
-          </nav>
-
-          {/* Mobile Right Controls: Audio Status + Menu Toggle */}
-          <div className="flex items-center gap-2 md:hidden">
-            <button
-              onClick={() => setMobileMenuOpen((p) => !p)}
-              className="p-2 rounded-lg bg-[#1c1916] border border-[#332d26] text-[#a89880] hover:text-[#f0ebe3] active:scale-95 transition-all cursor-pointer"
-              aria-label="Toggle Navigation Menu"
-            >
-              {mobileMenuOpen ? <X size={18} /> : <List size={18} />}
-            </button>
+          {/* Center: Active Stage Quick Indicator */}
+          <div className="hidden sm:flex items-center gap-2 px-3 py-1 rounded-full bg-[#141210] border border-[#332d26] text-xs font-mono">
+            <span
+              className="w-2 h-2 rounded-full animate-pulse"
+              style={{ background: currentSectionConfig.accent }}
+            />
+            <span className="text-[#5c5248]">{currentSectionConfig.chapterNumber} :</span>
+            <span className="text-[#f0ebe3] font-bold">{currentSectionConfig.navLabel}</span>
           </div>
 
-          {/* Desktop Live Audio Status */}
-          <div className="hidden xl:flex items-center gap-3 text-xs font-mono text-[#5c5248] shrink-0">
-            <span className="flex items-center gap-1.5">
+          {/* Right Controls: Fullscreen Menu Button + Live Status */}
+          <div className="flex items-center gap-3">
+            <div className="hidden xl:flex items-center gap-2 text-xs font-mono text-[#5c5248] pr-2 border-r border-[#2a2520]">
               <span
                 className="w-2 h-2 rounded-full transition-colors"
                 style={{ background: isPlaying ? "#1db954" : "#5c5248" }}
               />
               {isPlaying ? "AUDIO LIVE" : "BGM READY"}
-            </span>
+            </div>
+
+            {/* Kinetic Fullscreen Menu Trigger */}
+            <button
+              onClick={() => {
+                audio.sfx("click");
+                setMenuOpen(true);
+              }}
+              className="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-full bg-[#1c1916] border border-[#4a4035] hover:border-[#e8a045] text-[#f0ebe3] text-xs font-mono font-bold active:scale-95 transition-all cursor-pointer shadow-md group"
+            >
+              <List size={16} className="text-[#e8a045] group-hover:rotate-90 transition-transform" />
+              <span>CHAPTERS MENU</span>
+            </button>
           </div>
 
         </div>
-
-        {/* Mobile Dropdown Menu Drawer */}
-        {mobileMenuOpen && (
-          <div className="md:hidden border-t border-[#332d26] bg-[#141210]/98 p-3 space-y-1 animate-[fadeIn_0.2s_ease-out]">
-            {SECTIONS_CONFIG.map((sec, i) => (
-              <button
-                key={sec.id}
-                onClick={() => goToSection(i)}
-                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-mono transition-all cursor-pointer ${
-                  i === activeSectionIdx
-                    ? "font-bold text-black"
-                    : "text-[#a89880] hover:bg-[#1c1916] hover:text-[#f0ebe3]"
-                }`}
-                style={i === activeSectionIdx ? { background: sec.accent } : {}}
-              >
-                <div className="flex items-center gap-2.5">
-                  <span className="opacity-60">{sec.mobileShort}</span>
-                  <span>{sec.navLabel}</span>
-                </div>
-                {i === activeSectionIdx && <span className="text-[10px]">● ACTIVE</span>}
-              </button>
-            ))}
-          </div>
-        )}
       </header>
 
-      {/* ── Active Pinned Section Stage (Scrollable inside, isolated per section) ── */}
+      {/* ── Active Pinned Section Stage ── */}
       <main
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto scrollable relative pb-32"
