@@ -96,9 +96,17 @@ export default function App() {
   const transitionLockUntilRef = useRef<number>(0);
   const activeSectionIdxRef = useRef<number>(0);
 
+  // Two-Step Boundary Guard State
+  // The user MUST first reach and stop at the boundary before a subsequent distinct swipe/wheel triggers the jump
+  const hasSettledAtBottomRef = useRef(false);
+  const hasSettledAtTopRef = useRef(false);
+  const lastScrollActivityTimeRef = useRef(0);
+
   // Keep ref in sync with state
   useEffect(() => {
     activeSectionIdxRef.current = activeSectionIdx;
+    hasSettledAtBottomRef.current = false;
+    hasSettledAtTopRef.current = true; // when entering new section from top, top is settled
   }, [activeSectionIdx]);
 
   const currentTrack: Track = PLAYABLE_TRACKS[activeTrackIdx] || PLAYABLE_TRACKS[0];
@@ -136,6 +144,8 @@ export default function App() {
 
     // Sync scroll progress via Lenis onScroll
     lenis.on("scroll", (e: { scroll: number; limit: number }) => {
+      lastScrollActivityTimeRef.current = Date.now();
+
       if (isTransitioningRef.current || Date.now() < transitionLockUntilRef.current) {
         if (e.scroll !== 0) lenis.scrollTo(0, { immediate: true });
         return;
@@ -144,6 +154,17 @@ export default function App() {
       const ratio = e.limit > 0 ? Math.min(1, Math.max(0, e.scroll / e.limit)) : 0;
       const totalProg = activeSectionIdxRef.current * 25 + ratio * 25;
       setScrollProgress(Math.min(100, Math.max(0, totalProg)));
+
+      // Track whether the user has naturally scrolled all the way to the top or bottom
+      const atBottom = e.limit > 0 && e.scroll >= e.limit - 4;
+      const atTop = e.scroll <= 4;
+
+      if (!atBottom) {
+        hasSettledAtBottomRef.current = false;
+      }
+      if (!atTop) {
+        hasSettledAtTopRef.current = false;
+      }
     });
 
     return () => {
@@ -221,7 +242,9 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [menuOpen]);
 
-  // Robust Native Wheel Listener attached directly to scroll container
+  // Two-Step Boundary Guard Wheel Listener
+  // First momentum scroll will only bring user to end of section (clamps at bottom).
+  // ONLY after user is already stopped at bottom, a NEW distinct scroll down will trigger transition.
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -240,25 +263,49 @@ export default function App() {
         container.scrollHeight - container.scrollTop <= container.clientHeight + 4;
       const atTop = container.scrollTop <= 4;
 
-      if (e.deltaY > 0 && atBottom) {
-        accumulatedDeltaY += e.deltaY;
-
-        if (accumulatedDeltaY > 140) {
-          accumulatedDeltaY = 0;
-          const cur = activeSectionIdxRef.current;
-          if (cur < SECTIONS_CONFIG.length - 1) {
-            goToSection(cur + 1); // Strictly next section only (+1)
+      if (e.deltaY > 0) {
+        if (atBottom) {
+          // If this is the same momentum run that just reached bottom, clamp & wait for next distinct gesture
+          if (!hasSettledAtBottomRef.current) {
+            hasSettledAtBottomRef.current = true;
+            accumulatedDeltaY = 0;
+            return; // Clamp at bottom, DO NOT transition yet
           }
+
+          // User was already settled at bottom and has initiated a new scroll down gesture
+          accumulatedDeltaY += e.deltaY;
+          if (accumulatedDeltaY > 150) {
+            accumulatedDeltaY = 0;
+            hasSettledAtBottomRef.current = false;
+            const cur = activeSectionIdxRef.current;
+            if (cur < SECTIONS_CONFIG.length - 1) {
+              goToSection(cur + 1); // Jump to next section
+            }
+          }
+        } else {
+          hasSettledAtBottomRef.current = false;
         }
-      } else if (e.deltaY < 0 && atTop) {
-        accumulatedDeltaY += e.deltaY;
-
-        if (accumulatedDeltaY < -140) {
-          accumulatedDeltaY = 0;
-          const cur = activeSectionIdxRef.current;
-          if (cur > 0) {
-            goToSection(cur - 1); // Strictly previous section only (-1)
+      } else if (e.deltaY < 0) {
+        if (atTop) {
+          // If this is the same momentum run that just reached top, clamp & wait
+          if (!hasSettledAtTopRef.current) {
+            hasSettledAtTopRef.current = true;
+            accumulatedDeltaY = 0;
+            return; // Clamp at top, DO NOT transition yet
           }
+
+          // User was already settled at top and has initiated a new scroll up gesture
+          accumulatedDeltaY += e.deltaY;
+          if (accumulatedDeltaY < -150) {
+            accumulatedDeltaY = 0;
+            hasSettledAtTopRef.current = false;
+            const cur = activeSectionIdxRef.current;
+            if (cur > 0) {
+              goToSection(cur - 1); // Jump to previous section
+            }
+          }
+        } else {
+          hasSettledAtTopRef.current = false;
         }
       } else {
         accumulatedDeltaY = 0;
@@ -267,7 +314,7 @@ export default function App() {
       if (wheelDebounceTimeout) clearTimeout(wheelDebounceTimeout);
       wheelDebounceTimeout = setTimeout(() => {
         accumulatedDeltaY = 0;
-      }, 200);
+      }, 250);
     };
 
     const onTouchStart = (e: TouchEvent) => {
@@ -286,17 +333,39 @@ export default function App() {
         container.scrollHeight - container.scrollTop <= container.clientHeight + 6;
       const atTop = container.scrollTop <= 6;
 
-      if (diffY > 90 && atBottom) {
-        touchStartYRef.current = currentY;
-        const cur = activeSectionIdxRef.current;
-        if (cur < SECTIONS_CONFIG.length - 1) {
-          goToSection(cur + 1);
+      if (diffY > 0) {
+        if (atBottom) {
+          if (!hasSettledAtBottomRef.current) {
+            hasSettledAtBottomRef.current = true;
+            return;
+          }
+          if (diffY > 90) {
+            touchStartYRef.current = currentY;
+            hasSettledAtBottomRef.current = false;
+            const cur = activeSectionIdxRef.current;
+            if (cur < SECTIONS_CONFIG.length - 1) {
+              goToSection(cur + 1);
+            }
+          }
+        } else {
+          hasSettledAtBottomRef.current = false;
         }
-      } else if (diffY < -90 && atTop) {
-        touchStartYRef.current = currentY;
-        const cur = activeSectionIdxRef.current;
-        if (cur > 0) {
-          goToSection(cur - 1);
+      } else if (diffY < 0) {
+        if (atTop) {
+          if (!hasSettledAtTopRef.current) {
+            hasSettledAtTopRef.current = true;
+            return;
+          }
+          if (diffY < -90) {
+            touchStartYRef.current = currentY;
+            hasSettledAtTopRef.current = false;
+            const cur = activeSectionIdxRef.current;
+            if (cur > 0) {
+              goToSection(cur - 1);
+            }
+          }
+        } else {
+          hasSettledAtTopRef.current = false;
         }
       }
     };
