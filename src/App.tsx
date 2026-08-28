@@ -130,7 +130,7 @@ export default function App() {
     computeAndSetProgress(activeSectionIdx, el.scrollTop, el.scrollHeight, el.clientHeight);
   };
 
-  // Fullscreen Needle Drop Transition between pinned sections (strictly 1 section jump)
+  // Fullscreen Needle Drop Transition with calm pacing & mechanical reveal
   const goToSection = useCallback(
     (targetIdx: number) => {
       const now = Date.now();
@@ -146,15 +146,15 @@ export default function App() {
         return;
       }
 
-      // Lock for 1500ms (covers 0ms instant cover + 900ms turntable spin + 600ms reveal)
+      // Lock for 2300ms for a peaceful, unhurried analog experience
       isTransitioningRef.current = true;
-      transitionLockUntilRef.current = now + 1500;
+      transitionLockUntilRef.current = now + 2300;
       setMenuOpen(false);
 
       const targetMeta = SECTIONS_CONFIG[targetIdx];
       audio.sfx("rewind");
 
-      // 1. INSTANT COVER: Shutter is displayed immediately at t=0
+      // 1. INSTANT COVER: Mechanical shutter snaps shut at t=0
       setTransitionState({
         isTransitioning: true,
         name: targetMeta.name,
@@ -162,7 +162,7 @@ export default function App() {
         accent: targetMeta.accent,
       });
 
-      // 2. STAGE SWITCH: Update content behind the opaque vinyl shutter at t=400ms
+      // 2. STAGE SWITCH: Update content behind the opaque vinyl shutter at t=600ms
       setTimeout(() => {
         setActiveSectionIdx(targetIdx);
         activeSectionIdxRef.current = targetIdx;
@@ -170,23 +170,23 @@ export default function App() {
           scrollContainerRef.current.scrollTop = 0;
         }
         setScrollProgress(targetIdx * 25);
-      }, 400);
+      }, 600);
 
-      // 3. ZERO SCROLL GUARANTEE at t=700ms
+      // 3. ZERO SCROLL GUARANTEE at t=1000ms
       setTimeout(() => {
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollTop = 0;
         }
-      }, 700);
+      }, 1000);
 
-      // 4. SMOOTH CINEMATIC REVEAL: Lift tonearm and fade out shutter at t=950ms
+      // 4. CALM MECHANICAL REVEAL: Needle lifts and shutter panels split open at t=1400ms
       setTimeout(() => {
         setTransitionState((prev) => ({ ...prev, isTransitioning: false }));
         isTransitioningRef.current = false;
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollTop = 0;
         }
-      }, 950);
+      }, 1400);
     },
     [menuOpen]
   );
