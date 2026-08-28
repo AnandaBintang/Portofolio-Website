@@ -1,4 +1,5 @@
 import { useEffect, useRef, useState, useCallback } from "react";
+import Lenis from "lenis";
 import {
   CaretRight,
   ArrowUpRight,
@@ -26,6 +27,7 @@ import { StickyAudioDeck } from "./components/StickyAudioDeck";
 import { PlayerBar } from "./components/PlayerBar";
 import { SectionTransitionCurtain } from "./components/SectionTransitionCurtain";
 import { FullscreenMenuOverlay } from "./components/FullscreenMenuOverlay";
+import { CustomMusicCursor } from "./components/CustomMusicCursor";
 import { audio } from "./lib/audioEngine";
 
 interface TransitionState {
@@ -89,6 +91,7 @@ export default function App() {
 
   const isTransitioningRef = useRef(false);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
+  const lenisRef = useRef<Lenis | null>(null);
   const touchStartYRef = useRef(0);
   const transitionLockUntilRef = useRef<number>(0);
   const activeSectionIdxRef = useRef<number>(0);
@@ -105,29 +108,49 @@ export default function App() {
     return audio.onStateChange(setIsPlaying);
   }, []);
 
-  // Recalculate continuous scroll percentage (0 to 100%)
-  const computeAndSetProgress = useCallback(
-    (sectionIdx: number, scrollTop: number, scrollHeight: number, clientHeight: number) => {
-      const maxScrollInStage = scrollHeight - clientHeight;
-      const stageRatio =
-        maxScrollInStage > 0 ? Math.min(1, Math.max(0, scrollTop / maxScrollInStage)) : 0;
+  // Initialize Lenis with Heavy Awwwards-tier smooth damping inside active container
+  useEffect(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
 
-      const totalProg = sectionIdx * 25 + stageRatio * 25;
-      setScrollProgress(Math.min(100, Math.max(0, totalProg)));
-    },
-    []
-  );
+    const lenis = new Lenis({
+      wrapper: container,
+      content: container.firstElementChild as HTMLElement,
+      duration: 1.4, // Heavy inertia duration
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Exponential deceleration
+      orientation: "vertical",
+      gestureOrientation: "vertical",
+      smoothWheel: true,
+      wheelMultiplier: 0.85, // Luxurious heavy scroll feel
+      touchMultiplier: 1.2,
+    });
 
-  const handleContainerScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    if (isTransitioningRef.current || Date.now() < transitionLockUntilRef.current) {
-      if (e.currentTarget.scrollTop !== 0) {
-        e.currentTarget.scrollTop = 0;
+    lenisRef.current = lenis;
+
+    const raf = (time: number) => {
+      lenis.raf(time);
+      requestAnimationFrame(raf);
+    };
+
+    const rafId = requestAnimationFrame(raf);
+
+    // Sync scroll progress via Lenis onScroll
+    lenis.on("scroll", (e: { scroll: number; limit: number }) => {
+      if (isTransitioningRef.current || Date.now() < transitionLockUntilRef.current) {
+        if (e.scroll !== 0) lenis.scrollTo(0, { immediate: true });
+        return;
       }
-      return;
-    }
-    const el = e.currentTarget;
-    computeAndSetProgress(activeSectionIdx, el.scrollTop, el.scrollHeight, el.clientHeight);
-  };
+
+      const ratio = e.limit > 0 ? Math.min(1, Math.max(0, e.scroll / e.limit)) : 0;
+      const totalProg = activeSectionIdxRef.current * 25 + ratio * 25;
+      setScrollProgress(Math.min(100, Math.max(0, totalProg)));
+    });
+
+    return () => {
+      lenis.destroy();
+      cancelAnimationFrame(rafId);
+    };
+  }, [activeSectionIdx]);
 
   // Fullscreen Needle Drop Transition with self-contained autonomous sequence
   const goToSection = useCallback(
@@ -144,7 +167,7 @@ export default function App() {
         return;
       }
 
-      // Lock for 2200ms to guarantee zero scroll pollution during the entire autonomous sequence
+      // Lock for 2200ms
       isTransitioningRef.current = true;
       transitionLockUntilRef.current = now + 2200;
       setMenuOpen(false);
@@ -160,10 +183,13 @@ export default function App() {
         accent: targetMeta.accent,
       });
 
-      // 2. STAGE SWITCH: Update content behind the opaque vinyl curtain at t=700ms (during reading pause)
+      // 2. STAGE SWITCH: Update content behind the opaque vinyl curtain at t=700ms
       setTimeout(() => {
         setActiveSectionIdx(targetIdx);
         activeSectionIdxRef.current = targetIdx;
+        if (lenisRef.current) {
+          lenisRef.current.scrollTo(0, { immediate: true });
+        }
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollTop = 0;
         }
@@ -176,6 +202,9 @@ export default function App() {
   const handleAnimationComplete = useCallback(() => {
     setTransitionState((prev) => ({ ...prev, isTransitioning: false }));
     isTransitioningRef.current = false;
+    if (lenisRef.current) {
+      lenisRef.current.scrollTo(0, { immediate: true });
+    }
     if (scrollContainerRef.current) {
       scrollContainerRef.current.scrollTop = 0;
     }
@@ -204,7 +233,6 @@ export default function App() {
       const now = Date.now();
       if (isTransitioningRef.current || now < transitionLockUntilRef.current || menuOpen) {
         e.preventDefault();
-        container.scrollTop = 0;
         return;
       }
 
@@ -213,10 +241,9 @@ export default function App() {
       const atTop = container.scrollTop <= 4;
 
       if (e.deltaY > 0 && atBottom) {
-        e.preventDefault();
         accumulatedDeltaY += e.deltaY;
 
-        if (accumulatedDeltaY > 120) {
+        if (accumulatedDeltaY > 140) {
           accumulatedDeltaY = 0;
           const cur = activeSectionIdxRef.current;
           if (cur < SECTIONS_CONFIG.length - 1) {
@@ -224,10 +251,9 @@ export default function App() {
           }
         }
       } else if (e.deltaY < 0 && atTop) {
-        e.preventDefault();
         accumulatedDeltaY += e.deltaY;
 
-        if (accumulatedDeltaY < -120) {
+        if (accumulatedDeltaY < -140) {
           accumulatedDeltaY = 0;
           const cur = activeSectionIdxRef.current;
           if (cur > 0) {
@@ -251,8 +277,6 @@ export default function App() {
     const onTouchMove = (e: TouchEvent) => {
       const now = Date.now();
       if (isTransitioningRef.current || now < transitionLockUntilRef.current || menuOpen) {
-        e.preventDefault();
-        container.scrollTop = 0;
         return;
       }
 
@@ -262,15 +286,13 @@ export default function App() {
         container.scrollHeight - container.scrollTop <= container.clientHeight + 6;
       const atTop = container.scrollTop <= 6;
 
-      if (diffY > 80 && atBottom) {
-        e.preventDefault();
+      if (diffY > 90 && atBottom) {
         touchStartYRef.current = currentY;
         const cur = activeSectionIdxRef.current;
         if (cur < SECTIONS_CONFIG.length - 1) {
           goToSection(cur + 1);
         }
-      } else if (diffY < -80 && atTop) {
-        e.preventDefault();
+      } else if (diffY < -90 && atTop) {
         touchStartYRef.current = currentY;
         const cur = activeSectionIdxRef.current;
         if (cur > 0) {
@@ -316,6 +338,12 @@ export default function App() {
     >
       {/* Film Grain Texture */}
       <div className="grain" />
+
+      {/* ── Custom Interactive Music Stylus & Vinyl Cursor ── */}
+      <CustomMusicCursor
+        accentColor={currentSectionConfig.accent}
+        isPlaying={isPlaying}
+      />
 
       {/* ── Fullscreen Interactive Kinetic Menu Overlay ── */}
       <FullscreenMenuOverlay
@@ -398,10 +426,9 @@ export default function App() {
         </div>
       </header>
 
-      {/* ── Active Pinned Section Stage ── */}
+      {/* ── Active Pinned Section Stage (Driven by Lenis Smooth Scroll) ── */}
       <main
         ref={scrollContainerRef}
-        onScroll={handleContainerScroll}
         className="flex-1 overflow-y-auto scrollable relative pb-32"
       >
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-8 md:py-10 min-h-full">
