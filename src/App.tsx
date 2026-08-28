@@ -91,6 +91,10 @@ export default function App() {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const wheelAccumulatorRef = useRef(0);
   const touchStartYRef = useRef(0);
+  const targetScrollProgressRef = useRef(0);
+  const currentScrollProgressRef = useRef(0);
+  const rafProgressRef = useRef<number | null>(null);
+  const lastSectionChangeTimeRef = useRef(0);
 
   const currentTrack: Track = PLAYABLE_TRACKS[activeTrackIdx] || PLAYABLE_TRACKS[0];
 
@@ -99,33 +103,57 @@ export default function App() {
     return audio.onStateChange(setIsPlaying);
   }, []);
 
-  // Update total scroll percentage across the 4 chapters
+  // Smooth Interpolated Lerp Progress Loop (Ultra-smooth 60/120fps trackline)
+  useEffect(() => {
+    const updateProgressLerp = () => {
+      // Lerp: current = current + (target - current) * 0.12
+      currentScrollProgressRef.current +=
+        (targetScrollProgressRef.current - currentScrollProgressRef.current) * 0.14;
+
+      setScrollProgress(currentScrollProgressRef.current);
+      rafProgressRef.current = requestAnimationFrame(updateProgressLerp);
+    };
+
+    rafProgressRef.current = requestAnimationFrame(updateProgressLerp);
+
+    return () => {
+      if (rafProgressRef.current) cancelAnimationFrame(rafProgressRef.current);
+    };
+  }, []);
+
+  // Update target scroll percentage across the 4 chapters
   const updateScrollProgress = useCallback(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
 
     const maxScrollInStage = container.scrollHeight - container.clientHeight;
-    const stageScrollRatio = maxScrollInStage > 0 ? container.scrollTop / maxScrollInStage : 0;
+    const stageScrollRatio =
+      maxScrollInStage > 0 ? container.scrollTop / maxScrollInStage : 0;
 
-    // Total progress = (activeSectionIdx * 25%) + (stageScrollRatio * 25%)
-    const totalProgress = (activeSectionIdx * 25) + (stageScrollRatio * 25);
-    setScrollProgress(Math.min(100, Math.max(0, totalProgress)));
+    // Total target progress = (activeSectionIdx * 25%) + (stageScrollRatio * 25%)
+    const rawProgress = activeSectionIdx * 25 + stageScrollRatio * 25;
+    targetScrollProgressRef.current = Math.min(100, Math.max(0, rawProgress));
   }, [activeSectionIdx]);
 
-  // Fullscreen transition shutter between pinned sections
+  // Fullscreen transition shutter between pinned sections (strictly 1 section jump)
   const goToSection = useCallback(
     (targetIdx: number) => {
+      const now = Date.now();
+      // Strict cooldown lock of 850ms to prevent multi-section skips
       if (
         targetIdx < 0 ||
         targetIdx >= SECTIONS_CONFIG.length ||
         (targetIdx === activeSectionIdx && !menuOpen) ||
-        isTransitioningRef.current
+        isTransitioningRef.current ||
+        now - lastSectionChangeTimeRef.current < 850
       ) {
         setMenuOpen(false);
         return;
       }
 
       isTransitioningRef.current = true;
+      lastSectionChangeTimeRef.current = now;
+      wheelAccumulatorRef.current = 0;
       setMenuOpen(false);
       const targetMeta = SECTIONS_CONFIG[targetIdx];
 
@@ -144,7 +172,7 @@ export default function App() {
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollTop = 0;
         }
-        setScrollProgress(targetIdx * 25);
+        targetScrollProgressRef.current = targetIdx * 25;
       }, 300);
 
       // Open shutter
@@ -168,7 +196,7 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [menuOpen]);
 
-  // Wheel & Touch listener for bottom-boundary section transitions
+  // Wheel & Touch listener for bottom-boundary section transitions (Strictly 1 section at a time)
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (isTransitioningRef.current || menuOpen) {
@@ -184,14 +212,17 @@ export default function App() {
 
       if (e.deltaY > 0 && atBottom) {
         wheelAccumulatorRef.current += e.deltaY;
-        if (wheelAccumulatorRef.current > 70) {
+        // Higher threshold + strict cooldown ensures single-step transition
+        if (wheelAccumulatorRef.current > 180) {
+          wheelAccumulatorRef.current = 0;
           if (activeSectionIdx < SECTIONS_CONFIG.length - 1) {
             goToSection(activeSectionIdx + 1);
           }
         }
       } else if (e.deltaY < 0 && atTop) {
         wheelAccumulatorRef.current += e.deltaY;
-        if (wheelAccumulatorRef.current < -70) {
+        if (wheelAccumulatorRef.current < -180) {
+          wheelAccumulatorRef.current = 0;
           if (activeSectionIdx > 0) {
             goToSection(activeSectionIdx - 1);
           }
@@ -218,11 +249,13 @@ export default function App() {
         container.scrollHeight - container.scrollTop <= container.clientHeight + 6;
       const atTop = container.scrollTop <= 6;
 
-      if (diffY > 60 && atBottom) {
+      if (diffY > 90 && atBottom) {
+        touchStartYRef.current = currentY;
         if (activeSectionIdx < SECTIONS_CONFIG.length - 1) {
           goToSection(activeSectionIdx + 1);
         }
-      } else if (diffY < -60 && atTop) {
+      } else if (diffY < -90 && atTop) {
+        touchStartYRef.current = currentY;
         if (activeSectionIdx > 0) {
           goToSection(activeSectionIdx - 1);
         }
@@ -805,7 +838,7 @@ export default function App() {
         </div>
       </main>
 
-      {/* ── Persistent Bottom Music Player Bar with Realtime Scroll Percentage ── */}
+      {/* ── Persistent Bottom Music Player Bar with Realtime Interpolated Scroll Percentage ── */}
       <PlayerBar
         currentTrack={currentTrack}
         scrollProgress={scrollProgress}
