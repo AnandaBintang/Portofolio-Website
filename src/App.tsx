@@ -119,6 +119,13 @@ export default function App() {
   );
 
   const handleContainerScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    // If locked during transition, force container to top (0) to eliminate inertia pollution
+    if (isTransitioningRef.current || Date.now() < transitionLockUntilRef.current) {
+      if (e.currentTarget.scrollTop !== 0) {
+        e.currentTarget.scrollTop = 0;
+      }
+      return;
+    }
     const el = e.currentTarget;
     computeAndSetProgress(activeSectionIdx, el.scrollTop, el.scrollHeight, el.clientHeight);
   };
@@ -154,7 +161,7 @@ export default function App() {
         accent: targetMeta.accent,
       });
 
-      // Switch stage content at midpoint of shutter closure
+      // Switch stage content at midpoint of shutter closure and strictly zero scroll position
       setTimeout(() => {
         setActiveSectionIdx(targetIdx);
         activeSectionIdxRef.current = targetIdx;
@@ -164,10 +171,20 @@ export default function App() {
         setScrollProgress(targetIdx * 25);
       }, 350);
 
+      // Extra guarantee: reset scroll when shutter opens
+      setTimeout(() => {
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = 0;
+        }
+      }, 500);
+
       // Open shutter back
       setTimeout(() => {
         setTransitionState((prev) => ({ ...prev, isTransitioning: false }));
         isTransitioningRef.current = false;
+        if (scrollContainerRef.current) {
+          scrollContainerRef.current.scrollTop = 0;
+        }
       }, 750);
     },
     [menuOpen]
@@ -194,9 +211,10 @@ export default function App() {
 
     const onWheel = (e: WheelEvent) => {
       const now = Date.now();
-      // If locked or menu is open, swallow wheel momentum entirely
+      // If locked or menu is open, swallow wheel momentum entirely & zero scroll
       if (isTransitioningRef.current || now < transitionLockUntilRef.current || menuOpen) {
         e.preventDefault();
+        container.scrollTop = 0;
         return;
       }
 
@@ -244,6 +262,7 @@ export default function App() {
       const now = Date.now();
       if (isTransitioningRef.current || now < transitionLockUntilRef.current || menuOpen) {
         e.preventDefault();
+        container.scrollTop = 0;
         return;
       }
 
