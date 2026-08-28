@@ -18,91 +18,95 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
   const cardRef = useRef<HTMLDivElement | null>(null);
   const vinylDiscRef = useRef<HTMLDivElement | null>(null);
   const tonearmRef = useRef<HTMLDivElement | null>(null);
+  const wasActiveRef = useRef(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
-    const ctx = gsap.context(() => {
-      if (isTransitioning) {
-        // Instantly mount the solid dark monolithic curtain (no split leaks, no background bleed)
-        gsap.set(containerRef.current, {
-          display: "flex",
-          opacity: 1,
-          pointerEvents: "auto",
-        });
+    if (isTransitioning) {
+      wasActiveRef.current = true;
+      // 1. Instantly display & lock the solid backdrop
+      containerRef.current.style.display = "flex";
+      containerRef.current.style.pointerEvents = "auto";
 
+      const ctx = gsap.context(() => {
         const tl = gsap.timeline();
 
-        // 1. Solid Curtain Fades In quickly and smoothly
+        // 2. Solid Curtain Fades In quickly
         tl.fromTo(
           containerRef.current,
           { opacity: 0 },
-          { opacity: 1, duration: 0.25, ease: "power2.out" }
+          { opacity: 1, duration: 0.2, ease: "power2.out" }
         )
-          // 2. Entire Turntable + Needle + Complete Typography enters together as one unified piece
+          // 3. Entire Turntable + Typography enters together
           .fromTo(
             cardRef.current,
-            { opacity: 0, scale: 0.9, y: 20 },
-            { opacity: 1, scale: 1, y: 0, duration: 0.45, ease: "power3.out" },
+            { opacity: 0, scale: 0.88, y: 25 },
+            { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "power3.out" },
             0.05
           )
-          // 3. Continuous Vinyl 45 RPM Spin
+          // 4. Continuous Vinyl Spin
           .fromTo(
             vinylDiscRef.current,
             { rotate: 0 },
-            { rotate: 1440, duration: 3, ease: "power1.inOut" },
+            { rotate: 1800, duration: 4, ease: "power1.inOut" },
             0
           )
-          // 4. Tonearm Drops onto the spinning vinyl grooves
+          // 5. Tonearm Drops onto the spinning vinyl grooves
           .fromTo(
             tonearmRef.current,
-            { rotate: -35, transformOrigin: "top right" },
-            { rotate: 2, duration: 0.45, ease: "back.out(1.2)" },
-            0.15
+            { rotate: -38, transformOrigin: "top right" },
+            { rotate: 2, duration: 0.45, ease: "back.out(1.3)" },
+            0.1
           );
-      } else {
-        // Symmetrical Exit Sequence: Needle lifts, card slides gracefully, curtain reveals new section
+      }, containerRef);
+
+      return () => ctx.revert();
+    } else if (wasActiveRef.current) {
+      // ONLY RUN OUTGOING ANIMATION IF IT WAS ACTUALLY ACTIVE
+      const ctx = gsap.context(() => {
         const tl = gsap.timeline({
           onComplete: () => {
             if (containerRef.current) {
               containerRef.current.style.display = "none";
               containerRef.current.style.pointerEvents = "none";
             }
+            wasActiveRef.current = false;
           },
         });
 
-        // Step A: Tonearm physically lifts off record
+        // Step 1: CLEAR NEEDLE LIFT (Tonearm swings up dramatically from record)
         tl.to(tonearmRef.current, {
-          rotate: -35,
-          duration: 0.35,
-          ease: "power2.inOut",
+          rotate: -40,
+          duration: 0.5,
+          ease: "power3.inOut",
         })
-          // Step B: Entire turntable and text smoothly fade & move slightly up
+          // Step 2: Turntable card slides slightly up and scales down gracefully
           .to(
             cardRef.current,
             {
               opacity: 0,
-              scale: 0.95,
-              y: -15,
-              duration: 0.35,
+              scale: 0.9,
+              y: -20,
+              duration: 0.45,
               ease: "power2.in",
             },
-            "-=0.15"
+            "-=0.2"
           )
-          // Step C: Solid curtain reveals the fresh section underneath
+          // Step 3: Dark backdrop smoothly fades away revealing the target section
           .to(
             containerRef.current,
             {
               opacity: 0,
-              duration: 0.35,
+              duration: 0.45,
               ease: "power2.out",
             },
-            "-=0.1"
+            "-=0.15"
           );
-      }
-    }, containerRef);
+      }, containerRef);
 
-    return () => ctx.revert();
+      return () => ctx.revert();
+    }
   }, [isTransitioning]);
 
   return (
@@ -110,8 +114,8 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
       ref={containerRef}
       className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#090807] select-none overflow-hidden"
       style={{
-        display: isTransitioning ? "flex" : "none",
-        opacity: isTransitioning ? 1 : 0,
+        display: "none",
+        opacity: 0,
       }}
     >
       {/* 100% Opaque Solid Base to isolate section underneath */}
