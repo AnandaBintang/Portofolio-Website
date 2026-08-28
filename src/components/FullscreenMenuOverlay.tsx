@@ -33,62 +33,60 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
   const [hoveredIdx, setHoveredIdx] = useState<number | null>(null);
   const [shouldRender, setShouldRender] = useState(isOpen);
   const overlayRef = useRef<HTMLDivElement | null>(null);
-  const curtainTopRef = useRef<HTMLDivElement | null>(null);
-  const curtainBottomRef = useRef<HTMLDivElement | null>(null);
   const contentRef = useRef<HTMLDivElement | null>(null);
   const itemsRef = useRef<(HTMLDivElement | null)[]>([]);
   const deckRef = useRef<HTMLDivElement | null>(null);
+  const backdropRef = useRef<HTMLDivElement | null>(null);
 
-  // Animate Open / Close with analog cassette shutter & kinetic stagger
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true);
-      const ctx = gsap.context(() => {
-        const tl = gsap.timeline();
+      // Small timeout to allow DOM mounting before GSAP animation
+      const timer = setTimeout(() => {
+        if (!overlayRef.current) return;
+        const ctx = gsap.context(() => {
+          const tl = gsap.timeline();
 
-        // Stage 1: Dual curtain shutter wipe close
-        tl.fromTo(
-          curtainTopRef.current,
-          { yPercent: -100 },
-          { yPercent: 0, duration: 0.45, ease: "power3.inOut" }
-        )
-          .fromTo(
-            curtainBottomRef.current,
-            { yPercent: 100 },
-            { yPercent: 0, duration: 0.45, ease: "power3.inOut" },
-            "<"
+          // Stage 1: Full-screen curtain wipe from bottom to top
+          tl.fromTo(
+            backdropRef.current,
+            { yPercent: 100, opacity: 1 },
+            { yPercent: 0, duration: 0.5, ease: "power4.out" }
           )
-          // Stage 2: Fade in container & content elements
-          .fromTo(
-            contentRef.current,
-            { opacity: 0, scale: 0.96 },
-            { opacity: 1, scale: 1, duration: 0.35, ease: "power2.out" },
-            "-=0.15"
-          )
-          // Stage 3: Kinetic stagger for chapter headlines
-          .fromTo(
-            itemsRef.current.filter(Boolean),
-            { opacity: 0, x: -40, filter: "blur(4px)" },
-            {
-              opacity: 1,
-              x: 0,
-              filter: "blur(0px)",
-              stagger: 0.08,
-              duration: 0.5,
-              ease: "power3.out",
-            },
-            "-=0.2"
-          )
-          // Stage 4: Vinyl deck spring in
-          .fromTo(
-            deckRef.current,
-            { opacity: 0, scale: 0.85, rotate: -15 },
-            { opacity: 1, scale: 1, rotate: 0, duration: 0.6, ease: "back.out(1.5)" },
-            "-=0.35"
-          );
-      }, overlayRef);
+            // Stage 2: Fade in content wrapper
+            .fromTo(
+              contentRef.current,
+              { opacity: 0, scale: 0.95 },
+              { opacity: 1, scale: 1, duration: 0.35, ease: "power2.out" },
+              "-=0.25"
+            )
+            // Stage 3: Kinetic stagger for chapter headlines
+            .fromTo(
+              itemsRef.current.filter(Boolean),
+              { opacity: 0, x: -50, filter: "blur(6px)" },
+              {
+                opacity: 1,
+                x: 0,
+                filter: "blur(0px)",
+                stagger: 0.08,
+                duration: 0.5,
+                ease: "power3.out",
+              },
+              "-=0.2"
+            )
+            // Stage 4: Vinyl deck rotate & scale in
+            .fromTo(
+              deckRef.current,
+              { opacity: 0, scale: 0.8, rotate: -15 },
+              { opacity: 1, scale: 1, rotate: 0, duration: 0.55, ease: "back.out(1.4)" },
+              "-=0.3"
+            );
+        }, overlayRef);
 
-      return () => ctx.revert();
+        return () => ctx.revert();
+      }, 10);
+
+      return () => clearTimeout(timer);
     } else if (shouldRender) {
       const ctx = gsap.context(() => {
         const tl = gsap.timeline({
@@ -100,19 +98,13 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
         tl.to(contentRef.current, {
           opacity: 0,
           scale: 0.96,
-          duration: 0.25,
+          duration: 0.2,
           ease: "power2.in",
-        })
-          .to(
-            curtainTopRef.current,
-            { yPercent: -100, duration: 0.4, ease: "power3.inOut" },
-            "-=0.1"
-          )
-          .to(
-            curtainBottomRef.current,
-            { yPercent: 100, duration: 0.4, ease: "power3.inOut" },
-            "<"
-          );
+        }).to(
+          backdropRef.current,
+          { yPercent: 100, duration: 0.4, ease: "power4.in" },
+          "-=0.08"
+        );
       }, overlayRef);
 
       return () => ctx.revert();
@@ -131,14 +123,10 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
       ref={overlayRef}
       className="fixed inset-0 z-50 overflow-hidden select-none"
     >
-      {/* Shutter Curtain Top & Bottom (Analog split curtain animation) */}
+      {/* Full Seamless Backdrop Curtain (No split line in the center) */}
       <div
-        ref={curtainTopRef}
-        className="absolute top-0 left-0 right-0 h-1/2 bg-[#0c0a08] border-b border-[#332d26] z-10"
-      />
-      <div
-        ref={curtainBottomRef}
-        className="absolute bottom-0 left-0 right-0 h-1/2 bg-[#0c0a08] border-t border-[#332d26] z-10"
+        ref={backdropRef}
+        className="absolute inset-0 bg-[#0c0a08] z-10 shadow-2xl"
       />
 
       {/* Main Content Container inside Shutter */}
@@ -287,38 +275,38 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
                 <Waveform isPlaying={isPlaying} barCount={24} height={24} accent={currentHoverAccent} />
               </div>
 
-              <button
-                onClick={onTogglePlay}
-                className="w-full py-3 rounded-xl border border-[#4a4035] bg-[#1c1916] hover:bg-[#242018] text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98"
-              >
-                {isPlaying ? (
-                  <>
-                    <Pause size={14} weight="fill" className="text-[#1db954]" />
-                    <span>PAUSE AMBIENT AUDIO</span>
-                  </>
-                ) : (
-                  <>
-                    <Play size={14} weight="fill" style={{ color: currentHoverAccent }} />
-                    <span>ENGAGE AMBIENT AUDIO</span>
-                  </>
-                )}
-              </button>
-            </div>
+            <button
+              onClick={onTogglePlay}
+              className="w-full py-3 rounded-xl border border-[#4a4035] bg-[#1c1916] hover:bg-[#242018] text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98"
+            >
+              {isPlaying ? (
+                <>
+                  <Pause size={14} weight="fill" className="text-[#1db954]" />
+                  <span>PAUSE AMBIENT AUDIO</span>
+                </>
+              ) : (
+                <>
+                  <Play size={14} weight="fill" style={{ color: currentHoverAccent }} />
+                  <span>ENGAGE AMBIENT AUDIO</span>
+                </>
+              )}
+            </button>
           </div>
-
         </div>
 
-        {/* Bottom Metadata Bar */}
-        <div className="border-t border-[#332d26] pt-6 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[#5c5248] relative z-10">
-          <div>
-            <span>KEYBOARD SHORTCUTS: </span>
-            <span className="text-[#a89880]">ESC to Close · SPACE to Play/Pause</span>
-          </div>
-          <div className="flex items-center gap-4">
-            <span>ANANDA BINTANG · 2026 ARCHIVE</span>
-          </div>
+      </div>
+
+      {/* Bottom Metadata Bar */}
+      <div className="border-t border-[#332d26] pt-6 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[#5c5248] relative z-10">
+        <div>
+          <span>KEYBOARD SHORTCUTS: </span>
+          <span className="text-[#a89880]">ESC to Close · SPACE to Play/Pause</span>
+        </div>
+        <div className="flex items-center gap-4">
+          <span>ANANDA BINTANG · 2026 ARCHIVE</span>
         </div>
       </div>
     </div>
-  );
+  </div>
+);
 };
