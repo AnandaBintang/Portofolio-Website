@@ -32,13 +32,13 @@ export const CustomMusicCursor: React.FC<CustomMusicCursorProps> = ({
         if (ringRef.current) ringRef.current.style.opacity = "1";
       }
 
-      // Snappy position for the primary center dot
+      // Snappy position for the center stylus dot
       if (dotRef.current) {
         gsap.to(dotRef.current, {
           x: e.clientX,
           y: e.clientY,
-          duration: 0.08,
-          ease: "power2.out",
+          duration: 0.05,
+          ease: "none",
         });
       }
 
@@ -74,9 +74,9 @@ export const CustomMusicCursor: React.FC<CustomMusicCursorProps> = ({
     // Smooth Heavy Inertia Lerp for the outer Vinyl Disc Ring
     let rafId: number;
     const lerpRing = () => {
-      // High inertia weight: ring lags behind mouse smoothly (Awwwards feel)
-      ringPos.current.x += (mousePos.current.x - ringPos.current.x) * 0.12;
-      ringPos.current.y += (mousePos.current.y - ringPos.current.y) * 0.12;
+      // Smooth Awwwards trailing lerp
+      ringPos.current.x += (mousePos.current.x - ringPos.current.x) * 0.14;
+      ringPos.current.y += (mousePos.current.y - ringPos.current.y) * 0.14;
 
       if (ringRef.current) {
         gsap.set(ringRef.current, {
@@ -102,20 +102,20 @@ export const CustomMusicCursor: React.FC<CustomMusicCursorProps> = ({
       {/* Center Stylus Dot / Needle Tip */}
       <div
         ref={dotRef}
-        className="fixed top-0 left-0 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[100] transition-opacity duration-300 opacity-0"
+        className="fixed top-0 left-0 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[100] transition-opacity duration-200 opacity-0"
         style={{ willChange: "transform" }}
       >
         <div
-          className={`rounded-full transition-all duration-300 ${
+          className={`rounded-full transition-all duration-200 ${
             hoverState === "pointer"
-              ? "w-2.5 h-2.5 bg-black"
+              ? "w-2 h-2 bg-white"
               : hoverState === "text"
-              ? "w-1.5 h-6 bg-white rounded-none"
-              : "w-2 h-2"
+              ? "w-1 h-5 bg-white rounded-none"
+              : "w-2.5 h-2.5"
           }`}
           style={{
-            background: hoverState === "pointer" ? "#000" : accentColor,
-            boxShadow: `0 0 12px ${accentColor}`,
+            background: hoverState === "pointer" ? "#ffffff" : accentColor,
+            boxShadow: `0 0 10px ${accentColor}`,
           }}
         />
       </div>
@@ -128,21 +128,21 @@ export const CustomMusicCursor: React.FC<CustomMusicCursorProps> = ({
       >
         <div
           ref={vinylRef}
-          className={`rounded-full border transition-all duration-500 flex items-center justify-center ${
+          className={`rounded-full border transition-all duration-300 flex items-center justify-center ${
             hoverState === "pointer"
-              ? "w-16 h-16 bg-[#141210]/90 border-2 scale-110 shadow-2xl"
+              ? "w-16 h-16 bg-[#141210]/95 border-2 scale-110 shadow-2xl backdrop-blur-sm"
               : hoverState === "text"
-              ? "w-12 h-12 border-dashed opacity-40 scale-75"
-              : "w-9 h-9 border-opacity-40"
+              ? "w-10 h-10 border-dashed opacity-40 scale-75"
+              : "w-8 h-8 border-opacity-40"
           }`}
           style={{
             borderColor: accentColor,
-            boxShadow: hoverState === "pointer" ? `0 0 30px ${accentColor}50` : "none",
+            boxShadow: hoverState === "pointer" ? `0 0 25px ${accentColor}50` : "none",
           }}
         >
           {/* Rotating Vinyl Grooves on Hover or Audio Playback */}
           <div
-            className={`w-full h-full rounded-full border border-dashed border-white/20 absolute inset-0 transition-transform ${
+            className={`w-full h-full rounded-full border border-dashed border-white/25 absolute inset-0 transition-transform ${
               isPlaying ? "animate-[spin_4s_linear_infinite]" : ""
             }`}
           />
