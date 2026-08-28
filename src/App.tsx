@@ -12,6 +12,8 @@ import {
   Briefcase,
   MapPin,
   Waveform as WaveformIcon,
+  List,
+  X,
 } from "@phosphor-icons/react";
 import {
   PLAYABLE_TRACKS,
@@ -37,6 +39,7 @@ const SECTIONS_CONFIG = [
   {
     id: "prologue",
     navLabel: "PROLOGUE",
+    mobileShort: "00",
     name: "THE ACOUSTIC PROLOGUE",
     subtitle: "// PROFILE, SPECIALIZATION & RESIDENCY",
     accent: "#e8a045",
@@ -44,6 +47,7 @@ const SECTIONS_CONFIG = [
   {
     id: "projects-area",
     navLabel: "DISCOGRAPHY",
+    mobileShort: "01",
     name: "STUDIO DISCOGRAPHY",
     subtitle: "// 4 MASTER PRODUCTION RELEASES",
     accent: "#4a9eff",
@@ -51,6 +55,7 @@ const SECTIONS_CONFIG = [
   {
     id: "experience-area",
     navLabel: "SESSION LOGS",
+    mobileShort: "02",
     name: "STUDIO MASTER LOGS",
     subtitle: "// CHRONOLOGICAL PRODUCTION SESSIONS",
     accent: "#f472b6",
@@ -58,6 +63,7 @@ const SECTIONS_CONFIG = [
   {
     id: "frequencies-area",
     navLabel: "STUDIO SETUP",
+    mobileShort: "03",
     name: "FREQUENCY BANDS",
     subtitle: "// 6 CALIBRATED EQUALIZER TIERS",
     accent: "#2dd4bf",
@@ -68,6 +74,7 @@ export default function App() {
   const [activeSectionIdx, setActiveSectionIdx] = useState(0);
   const [activeTrackIdx, setActiveTrackIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [transitionState, setTransitionState] = useState<TransitionState>({
     isTransitioning: false,
     name: "",
@@ -100,6 +107,7 @@ export default function App() {
       }
 
       isTransitioningRef.current = true;
+      setMobileMenuOpen(false);
       const targetMeta = SECTIONS_CONFIG[targetIdx];
 
       audio.sfx("rewind");
@@ -236,35 +244,35 @@ export default function App() {
         accentColor={transitionState.accent}
       />
 
-      {/* ── Fixed Master Header ── */}
-      <header className="shrink-0 z-40 w-full border-b border-[#332d26] bg-[#0f0d0b]/90 backdrop-blur-md">
-        <div className="max-w-[1400px] mx-auto px-4 md:px-8 h-18 flex items-center justify-between gap-4">
+      {/* ── Fixed Master Header (Fully Responsive on Mobile / Tablet / Desktop) ── */}
+      <header className="shrink-0 z-40 w-full border-b border-[#332d26] bg-[#0f0d0b]/95 backdrop-blur-md">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-8 h-16 md:h-18 flex items-center justify-between gap-3">
           
           {/* Brand Identity */}
           <div
             onClick={() => goToSection(0)}
-            className="flex items-center gap-3 cursor-pointer select-none group shrink-0"
+            className="flex items-center gap-2.5 sm:gap-3 cursor-pointer select-none group shrink-0 min-w-0"
           >
-            <div className="w-8 h-8 rounded-full border border-[#4a4035] bg-[#1c1916] flex items-center justify-center text-white">
-              <span className="w-2.5 h-2.5 rounded-full bg-[#e8a045] animate-pulse" />
+            <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[#4a4035] bg-[#1c1916] flex items-center justify-center text-white shrink-0">
+              <span className="w-2 h-2 sm:w-2.5 sm:h-2.5 rounded-full bg-[#e8a045] animate-pulse" />
             </div>
-            <div>
-              <span className="block font-bold text-sm text-[#f0ebe3] group-hover:text-[#e8a045] transition-colors">
-                {PROFILE.name.toUpperCase()}
+            <div className="min-w-0">
+              <span className="block font-bold text-xs sm:text-sm text-[#f0ebe3] group-hover:text-[#e8a045] transition-colors truncate">
+                {PROFILE.callsign.toUpperCase()}
               </span>
-              <span className="text-[10px] font-mono text-[#5c5248] tracking-widest block uppercase">
-                {PROFILE.coordinates} · {PROFILE.title.toUpperCase()}
+              <span className="text-[9px] sm:text-[10px] font-mono text-[#5c5248] tracking-wider block uppercase truncate">
+                {PROFILE.title.toUpperCase()}
               </span>
             </div>
           </div>
 
-          {/* Section Pinned Stage Tabs */}
-          <nav className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1">
+          {/* Desktop & Tablet Navigation Bar */}
+          <nav className="hidden md:flex items-center gap-1.5 sm:gap-2">
             {SECTIONS_CONFIG.map((sec, i) => (
               <button
                 key={sec.id}
                 onClick={() => goToSection(i)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer whitespace-nowrap ${
+                className={`px-3 sm:px-3.5 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer whitespace-nowrap ${
                   i === activeSectionIdx
                     ? "font-bold text-black shadow-md scale-105"
                     : "text-[#a89880] hover:text-[#f0ebe3] hover:bg-[#1c1916]"
@@ -276,7 +284,18 @@ export default function App() {
             ))}
           </nav>
 
-          {/* Live Audio Status */}
+          {/* Mobile Right Controls: Audio Status + Menu Toggle */}
+          <div className="flex items-center gap-2 md:hidden">
+            <button
+              onClick={() => setMobileMenuOpen((p) => !p)}
+              className="p-2 rounded-lg bg-[#1c1916] border border-[#332d26] text-[#a89880] hover:text-[#f0ebe3] active:scale-95 transition-all cursor-pointer"
+              aria-label="Toggle Navigation Menu"
+            >
+              {mobileMenuOpen ? <X size={18} /> : <List size={18} />}
+            </button>
+          </div>
+
+          {/* Desktop Live Audio Status */}
           <div className="hidden xl:flex items-center gap-3 text-xs font-mono text-[#5c5248] shrink-0">
             <span className="flex items-center gap-1.5">
               <span
@@ -288,6 +307,30 @@ export default function App() {
           </div>
 
         </div>
+
+        {/* Mobile Dropdown Menu Drawer */}
+        {mobileMenuOpen && (
+          <div className="md:hidden border-t border-[#332d26] bg-[#141210]/98 p-3 space-y-1 animate-[fadeIn_0.2s_ease-out]">
+            {SECTIONS_CONFIG.map((sec, i) => (
+              <button
+                key={sec.id}
+                onClick={() => goToSection(i)}
+                className={`w-full flex items-center justify-between px-4 py-2.5 rounded-xl text-xs font-mono transition-all cursor-pointer ${
+                  i === activeSectionIdx
+                    ? "font-bold text-black"
+                    : "text-[#a89880] hover:bg-[#1c1916] hover:text-[#f0ebe3]"
+                }`}
+                style={i === activeSectionIdx ? { background: sec.accent } : {}}
+              >
+                <div className="flex items-center gap-2.5">
+                  <span className="opacity-60">{sec.mobileShort}</span>
+                  <span>{sec.navLabel}</span>
+                </div>
+                {i === activeSectionIdx && <span className="text-[10px]">● ACTIVE</span>}
+              </button>
+            ))}
+          </div>
+        )}
       </header>
 
       {/* ── Active Pinned Section Stage (Scrollable inside, isolated per section) ── */}
@@ -295,28 +338,28 @@ export default function App() {
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto scrollable relative pb-32"
       >
-        <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-10 min-h-full">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-8 md:py-10 min-h-full">
 
           {/* ════════════════════════════════════════════════════════════════════
               STAGE 0: PROLOGUE (CINEMATIC HERO & ARTIST PROFILE)
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 0 && (
-            <div className="space-y-12 animate-[fadeIn_0.5s_ease-out]">
+            <div className="space-y-10 md:space-y-12 animate-[fadeIn_0.5s_ease-out]">
               {/* Top Meta Bar */}
-              <div className="flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[#5c5248] pb-4 border-b border-[#2a2520]">
+              <div className="flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[#5c5248] pb-4 border-b border-[#2a2520]">
                 <div className="flex items-center gap-2">
-                  <span className="w-2 h-2 rounded-full bg-[#1db954] animate-ping" />
-                  <span className="text-[#1db954] font-medium tracking-wide">ACTIVE ON PRODUCTION PLATFORMS</span>
+                  <span className="w-2 h-2 rounded-full bg-[#1db954] animate-ping shrink-0" />
+                  <span className="text-[#1db954] font-medium tracking-wide">ACTIVE PRODUCTION RESIDENCY</span>
                   <span className="text-[#332d26]">/</span>
-                  <span>PT HM SAMPOERNA (WEEKEND INC.)</span>
+                  <span className="truncate">WEEKEND INC. (SAMPOERNA)</span>
                 </div>
-                <div>
+                <div className="hidden sm:block">
                   <span>SYSTEM LATENCY: SUB-100MS OPTIMIZED</span>
                 </div>
               </div>
 
               {/* Hero Main Grid: Photo + Typography */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-center py-6">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-center py-4 md:py-6">
                 
                 {/* Left: Headline & Bio */}
                 <div className="lg:col-span-8 space-y-6">
@@ -325,30 +368,30 @@ export default function App() {
                     <span>THE INVISIBLE SIGNAL CHAIN</span>
                   </div>
 
-                  <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-[#f0ebe3] leading-[1.02]">
+                  <h1 className="text-3xl sm:text-5xl md:text-7xl font-bold tracking-tight text-[#f0ebe3] leading-[1.05]">
                     ARCHITECTING <br />
                     <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e8a045] via-[#f0ebe3] to-[#a89880]">
                       INVISIBLE ENGINES.
                     </span>
                   </h1>
 
-                  <p className="text-lg sm:text-xl text-[#a89880] leading-relaxed max-w-2xl font-normal">
+                  <p className="text-base sm:text-lg text-[#a89880] leading-relaxed max-w-2xl font-normal">
                     {PROFILE.subheadline}
                   </p>
 
                   {/* Action CTAs */}
-                  <div className="flex flex-wrap items-center gap-4 pt-4">
+                  <div className="flex flex-wrap items-center gap-3 sm:gap-4 pt-2">
                     <button
                       onClick={() => goToSection(1)}
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#e8a045] text-black font-semibold text-xs font-mono hover:bg-[#f0b055] transition-all cursor-pointer shadow-lg active:scale-95"
+                      className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 rounded-full bg-[#e8a045] text-black font-semibold text-xs font-mono hover:bg-[#f0b055] transition-all cursor-pointer shadow-lg active:scale-95"
                     >
-                      <span>ENTER DISCOGRAPHY (SECTION 02)</span>
+                      <span>ENTER DISCOGRAPHY</span>
                       <ArrowDown size={14} weight="bold" />
                     </button>
 
                     <a
                       href={`mailto:${PROFILE.email}`}
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#1c1916] border border-[#4a4035] text-[#f0ebe3] font-mono text-xs hover:border-[#e8a045] transition-all cursor-pointer"
+                      className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 rounded-full bg-[#1c1916] border border-[#4a4035] text-[#f0ebe3] font-mono text-xs hover:border-[#e8a045] transition-all cursor-pointer"
                     >
                       <EnvelopeSimple size={14} />
                       <span>TRANSMIT MESSAGE</span>
@@ -358,17 +401,17 @@ export default function App() {
                       href={PROFILE.github}
                       target="_blank"
                       rel="noopener noreferrer"
-                      className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#1c1916] border border-[#332d26] text-[#a89880] hover:text-[#f0ebe3] font-mono text-xs transition-all"
+                      className="inline-flex items-center gap-2 px-5 sm:px-6 py-3 rounded-full bg-[#1c1916] border border-[#332d26] text-[#a89880] hover:text-[#f0ebe3] font-mono text-xs transition-all"
                     >
                       <GithubLogo size={15} weight="fill" />
-                      <span>GITHUB REPOSITORIES</span>
+                      <span>GITHUB</span>
                     </a>
                   </div>
                 </div>
 
                 {/* Right: Personal Profile Card */}
                 <div className="lg:col-span-4 flex justify-center">
-                  <div className="w-full max-w-[340px] bg-[#141210] border border-[#332d26] rounded-2xl p-5 shadow-2xl space-y-4 relative group">
+                  <div className="w-full max-w-[320px] sm:max-w-[340px] bg-[#141210] border border-[#332d26] rounded-2xl p-5 shadow-2xl space-y-4 relative group">
                     <div className="relative aspect-square w-full rounded-xl overflow-hidden border border-[#4a4035] bg-[#1c1916]">
                       <img
                         src={PROFILE.avatarUrl}
@@ -409,7 +452,7 @@ export default function App() {
               </div>
 
               {/* Bottom Transition Helper */}
-              <div className="pt-6 border-t border-[#262630]/60 flex items-center justify-between text-xs font-mono text-[#5c5248]">
+              <div className="pt-6 border-t border-[#262630]/60 flex flex-col sm:flex-row items-center justify-between gap-3 text-xs font-mono text-[#5c5248]">
                 <div className="flex items-center gap-2 text-[#e8a045]">
                   <Sparkle size={14} />
                   <span>PLAYABLE DISCOGRAPHY AHEAD</span>
@@ -429,7 +472,7 @@ export default function App() {
               STAGE 1: THE DISCOGRAPHY / PLAYABLE PROJECT TRACKS
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 1 && (
-            <div className="space-y-12 animate-[fadeIn_0.5s_ease-out]">
+            <div className="space-y-10 md:space-y-12 animate-[fadeIn_0.5s_ease-out]">
               {/* Section Header */}
               <div className="space-y-3 pb-6 border-b border-[#2a2520]">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#4a9eff]">
@@ -445,7 +488,7 @@ export default function App() {
               </div>
 
               {/* Two Column Layout: Sticky Deck + Track Card */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
                 
                 {/* Left: Sticky Turntable Deck */}
                 <div className="lg:col-span-5 hidden lg:block sticky top-6">
@@ -457,7 +500,7 @@ export default function App() {
                 </div>
 
                 {/* Right: Interactive Track Details */}
-                <div className="lg:col-span-7 space-y-8">
+                <div className="lg:col-span-7 space-y-6 sm:space-y-8">
                   {/* Track Switcher Pills */}
                   <div className="flex flex-wrap gap-2 pb-2">
                     {PLAYABLE_TRACKS.map((t, tIdx) => (
@@ -467,7 +510,7 @@ export default function App() {
                           audio.sfx("click");
                           setActiveTrackIdx(tIdx);
                         }}
-                        className={`px-4 py-2 rounded-xl text-xs font-mono transition-all cursor-pointer flex items-center gap-2 ${
+                        className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs font-mono transition-all cursor-pointer flex items-center gap-2 ${
                           tIdx === activeTrackIdx
                             ? "bg-[#242018] text-white border border-[#4a4035] shadow-lg font-bold"
                             : "bg-[#141210] text-[#a89880] border border-[#2a2520] hover:bg-[#1c1916]"
@@ -483,12 +526,12 @@ export default function App() {
                   {(() => {
                     const project = PROJECTS[currentTrack.id];
                     return (
-                      <div className="bg-[#141210] border border-[#332d26] rounded-2xl p-6 sm:p-8 space-y-6 shadow-2xl">
+                      <div className="bg-[#141210] border border-[#332d26] rounded-2xl p-5 sm:p-8 space-y-6 shadow-2xl">
                         <div className="space-y-1">
                           <span className="text-xs font-mono" style={{ color: currentTrack.artAccent }}>
                             {currentTrack.storyChapter} · {currentTrack.bpm} BPM
                           </span>
-                          <h3 className="text-3xl sm:text-4xl font-bold tracking-tight text-[#f0ebe3]">
+                          <h3 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#f0ebe3]">
                             {currentTrack.title}
                           </h3>
                           <p className="text-sm font-mono text-[#a89880]">{project.tagline}</p>
@@ -511,7 +554,7 @@ export default function App() {
                             {project.deliverables.map((deliv, dIdx) => (
                               <div
                                 key={dIdx}
-                                className="flex items-start gap-3 p-3.5 rounded-xl bg-[#1c1916] border border-[#2a2520] text-xs sm:text-sm text-[#f0ebe3]"
+                                className="flex items-start gap-3 p-3 sm:p-3.5 rounded-xl bg-[#1c1916] border border-[#2a2520] text-xs sm:text-sm text-[#f0ebe3]"
                               >
                                 <span
                                   className="font-mono font-bold shrink-0 mt-0.5"
@@ -582,7 +625,7 @@ export default function App() {
               STAGE 2: STUDIO MASTER LOGS (EXPERIENCE & EDUCATION)
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 2 && (
-            <div className="space-y-12 animate-[fadeIn_0.5s_ease-out]">
+            <div className="space-y-10 md:space-y-12 animate-[fadeIn_0.5s_ease-out]">
               <div className="space-y-3 pb-6 border-b border-[#2a2520]">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#f472b6]">
                   <Briefcase size={14} />
@@ -602,7 +645,7 @@ export default function App() {
                   {SESSIONS.map((session, i) => (
                     <div
                       key={i}
-                      className={`bg-[#141210] border rounded-2xl p-6 sm:p-8 transition-all shadow-xl ${
+                      className={`bg-[#141210] border rounded-2xl p-5 sm:p-8 transition-all shadow-xl ${
                         session.active ? "border-[#f472b6]/50" : "border-[#332d26]"
                       }`}
                     >
@@ -611,7 +654,7 @@ export default function App() {
                           <span className="text-xs font-mono text-[#f472b6] font-bold block mb-1">
                             {session.tapeId} · {session.period}
                           </span>
-                          <h3 className="text-xl sm:text-2xl font-bold text-[#f0ebe3]">
+                          <h3 className="text-lg sm:text-2xl font-bold text-[#f0ebe3]">
                             {session.role} @ {session.company}
                           </h3>
                           <p className="text-xs font-mono text-[#a89880] mt-0.5">
@@ -699,7 +742,7 @@ export default function App() {
               STAGE 3: STUDIO SETUP (FREQUENCY BANDS / SKILLS)
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 3 && (
-            <div className="space-y-12 animate-[fadeIn_0.5s_ease-out]">
+            <div className="space-y-10 md:space-y-12 animate-[fadeIn_0.5s_ease-out]">
               <div className="space-y-3 pb-6 border-b border-[#2a2520]">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#2dd4bf]">
                   <Cpu size={14} />
@@ -713,7 +756,7 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-5 sm:gap-6">
                 {SKILLS.map((cat, i) => (
                   <div
                     key={i}
