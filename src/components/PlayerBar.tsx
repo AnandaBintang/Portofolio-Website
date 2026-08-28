@@ -1,5 +1,5 @@
 import React, { useEffect, useRef, useState } from "react";
-import { TRACKS, type Track } from "../data/tracks";
+import { PLAYABLE_TRACKS, type Track } from "../data/tracks";
 import { audio } from "../lib/audioEngine";
 import { Waveform } from "./Waveform";
 import { Cassette } from "./Cassette";
@@ -12,7 +12,6 @@ interface PlayerBarProps {
   currentIdx: number;
 }
 
-// Icons as simple SVG components (no library needed at this size)
 const IconPrev = () => (
   <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
     <path d="M6 6h2v12H6zm3.5 6 8.5 6V6z" />
@@ -56,60 +55,78 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
     return audio.onStateChange(setIsPlaying);
   }, []);
 
-  // Simulate progress bar crawl while playing
+  // Progress crawl
   useEffect(() => {
     if (isPlaying) {
       progRef.current = setInterval(() => {
-        setProgress(p => (p >= 100 ? 0 : p + 0.15));
+        setProgress((p) => (p >= 100 ? 0 : p + 0.15));
       }, 80);
     } else {
       if (progRef.current) clearInterval(progRef.current);
     }
-    return () => { if (progRef.current) clearInterval(progRef.current); };
+    return () => {
+      if (progRef.current) clearInterval(progRef.current);
+    };
   }, [isPlaying]);
 
-  // Reset progress on track change
-  useEffect(() => { setProgress(0); }, [currentTrack.id]);
+  useEffect(() => {
+    setProgress(0);
+  }, [currentTrack.id]);
 
   const handlePlayPause = () => {
     audio.sfx("click");
     audio.toggle();
   };
-  const handlePrev = () => { audio.sfx("prev"); onPrev(); };
-  const handleNext = () => { audio.sfx("next"); onNext(); };
+
+  const handlePrev = () => {
+    onPrev();
+  };
+
+  const handleNext = () => {
+    onNext();
+  };
 
   return (
     <>
-      {/* Playlist drawer */}
+      {/* Playlist Drawer */}
       {showPlaylist && (
         <div
-          className="fixed bottom-[88px] right-4 w-72 bg-[#1c1916] border border-[#332d26] rounded-xl shadow-2xl z-50 overflow-hidden"
-          style={{ backdropFilter: "blur(20px)" }}
+          className="fixed bottom-[96px] right-4 sm:right-8 w-80 bg-[#141210] border border-[#332d26] rounded-2xl shadow-2xl z-50 overflow-hidden"
+          style={{ backdropFilter: "blur(24px)" }}
         >
-          <div className="px-4 py-3 border-b border-[#332d26] flex items-center justify-between">
-            <span className="text-xs font-mono text-[#a89880] uppercase tracking-widest">Playlist</span>
-            <button onClick={() => setShowPlaylist(false)} className="text-[#5c5248] hover:text-[#f0ebe3] transition-colors text-lg leading-none cursor-pointer">
+          <div className="px-5 py-4 border-b border-[#332d26] flex items-center justify-between">
+            <span className="text-xs font-mono text-[#a89880] uppercase tracking-widest font-bold">
+              STUDIO PLAYLIST (4 TRACKS)
+            </span>
+            <button
+              onClick={() => setShowPlaylist(false)}
+              className="text-[#5c5248] hover:text-[#f0ebe3] transition-colors text-lg leading-none cursor-pointer"
+            >
               ×
             </button>
           </div>
-          <div className="max-h-80 overflow-y-auto scrollable py-2">
-            {TRACKS.map((track, idx) => (
+          <div className="max-h-80 overflow-y-auto scrollable p-2 space-y-1">
+            {PLAYABLE_TRACKS.map((track, idx) => (
               <button
                 key={track.id}
-                onClick={() => { audio.sfx("click"); onTrackSelect(idx); setShowPlaylist(false); }}
-                className={`w-full flex items-center gap-3 px-4 py-2.5 text-left transition-colors cursor-pointer ${
+                onClick={() => {
+                  audio.sfx("click");
+                  onTrackSelect(idx);
+                  setShowPlaylist(false);
+                }}
+                className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left transition-all cursor-pointer ${
                   idx === currentIdx
-                    ? "bg-[#2a2520] text-[#e8a045]"
-                    : "text-[#a89880] hover:bg-[#242018] hover:text-[#f0ebe3]"
+                    ? "bg-[#242018] text-[#e8a045] border border-[#4a4035]"
+                    : "text-[#a89880] hover:bg-[#1c1916] hover:text-[#f0ebe3]"
                 }`}
               >
-                <span className="text-xs font-mono w-6 shrink-0 opacity-50">{track.trackNo}</span>
-                <div className="min-w-0">
-                  <p className="text-sm font-medium truncate">{track.title}</p>
-                  <p className="text-xs opacity-60 truncate">{track.artist}</p>
+                <span className="text-xs font-mono w-5 shrink-0 opacity-60">{track.trackNo}</span>
+                <div className="min-w-0 flex-1">
+                  <p className="text-sm font-semibold truncate text-[#f0ebe3]">{track.title}</p>
+                  <p className="text-xs text-[#5c5248] truncate">{track.artist}</p>
                 </div>
                 {idx === currentIdx && isPlaying && (
-                  <span className="ml-auto shrink-0 w-2 h-2 rounded-full bg-[#1db954] pulse" />
+                  <span className="shrink-0 w-2 h-2 rounded-full bg-[#1db954] pulse" />
                 )}
               </button>
             ))}
@@ -117,53 +134,57 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         </div>
       )}
 
-      {/* Player bar */}
+      {/* Sticky Player Bar */}
       <div
         className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#332d26]"
         style={{
           height: "88px",
-          background: "rgba(15,13,11,0.92)",
+          background: "rgba(15,13,11,0.95)",
           backdropFilter: "blur(24px)",
         }}
       >
-        {/* Progress bar on very top of player */}
-        <div className="w-full h-0.5 bg-[#332d26]">
+        {/* Realtime Progress Crawl */}
+        <div className="w-full h-0.5 bg-[#2a2520]">
           <div
             className="h-full transition-none"
             style={{
               width: `${progress}%`,
-              background: "linear-gradient(90deg, #e8a045, #1db954)",
+              background: `linear-gradient(90deg, ${currentTrack.artAccent}, #1db954)`,
             }}
           />
         </div>
 
-        <div className="max-w-screen-xl mx-auto h-full px-4 flex items-center gap-4">
-
-          {/* Left: cassette + track info */}
-          <div className="flex items-center gap-3 w-0 flex-1 min-w-0 lg:w-64 lg:flex-none">
+        <div className="max-w-[1400px] mx-auto h-full px-4 md:px-8 flex items-center justify-between gap-4">
+          
+          {/* Left: Cassette Graphic & Current Track Metadata */}
+          <div className="flex items-center gap-3.5 w-0 flex-1 min-w-0 lg:w-72 lg:flex-none">
             <div className="shrink-0 hidden sm:block">
-              <Cassette isPlaying={isPlaying} accentColor={currentTrack.artAccent} size={56} />
+              <Cassette isPlaying={isPlaying} accentColor={currentTrack.artAccent} size={54} />
             </div>
             <div className="min-w-0">
-              <p className="text-sm font-semibold truncate text-[#f0ebe3] leading-tight">{currentTrack.title}</p>
+              <p className="text-sm font-bold truncate text-[#f0ebe3] leading-tight">
+                {currentTrack.title}
+              </p>
               <p className="text-xs text-[#a89880] truncate mt-0.5">{currentTrack.artist}</p>
-              <p className="text-[10px] font-mono text-[#5c5248] truncate">{currentTrack.album}</p>
+              <p className="text-[10px] font-mono text-[#5c5248] truncate">{currentTrack.storyChapter}</p>
             </div>
           </div>
 
-          {/* Center: controls + waveform */}
-          <div className="flex flex-col items-center gap-1.5 flex-1">
-            {/* Track metadata mini pills */}
-            <div className="hidden md:flex items-center gap-2 text-[10px] font-mono text-[#5c5248]">
-              <span className="bg-[#242018] px-2 py-0.5 rounded border border-[#332d26]">{currentTrack.trackNo}</span>
+          {/* Center: Playhead Controls & Status */}
+          <div className="flex flex-col items-center gap-1.5 flex-1 max-w-md">
+            <div className="hidden sm:flex items-center gap-2 text-[10px] font-mono text-[#5c5248]">
+              <span className="bg-[#1c1916] px-2 py-0.5 rounded border border-[#332d26] text-[#e8a045]">
+                {currentTrack.trackNo}
+              </span>
               <span>{currentTrack.genre}</span>
-              {currentTrack.bpm !== "—" && <><span>·</span><span>{currentTrack.bpm} BPM</span></>}
+              <span>·</span>
+              <span>{currentTrack.bpm} BPM</span>
             </div>
-            {/* Controls */}
-            <div className="flex items-center gap-4">
+
+            <div className="flex items-center gap-5">
               <button
                 onClick={handlePrev}
-                className="text-[#a89880] hover:text-[#f0ebe3] active:scale-90 transition-all cursor-pointer"
+                className="text-[#a89880] hover:text-[#f0ebe3] active:scale-90 transition-all cursor-pointer p-1"
                 title="Previous track"
               >
                 <IconPrev />
@@ -171,7 +192,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
 
               <button
                 onClick={handlePlayPause}
-                className="w-10 h-10 rounded-full flex items-center justify-center active:scale-90 transition-all cursor-pointer"
+                className="w-10 h-10 rounded-full flex items-center justify-center active:scale-95 transition-all cursor-pointer shadow-lg"
                 style={{
                   background: isPlaying
                     ? "radial-gradient(circle, #1db954 0%, #17a847 100%)"
@@ -180,7 +201,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                     ? "0 0 20px rgba(29,185,84,0.4)"
                     : `0 0 20px ${currentTrack.artAccent}40`,
                 }}
-                title={isPlaying ? "Pause" : "Play lo-fi atmosphere"}
+                title={isPlaying ? "Pause ambient tape" : "Play ambient tape"}
               >
                 <span className="text-black">
                   {isPlaying ? <IconPause /> : <IconPlay />}
@@ -189,7 +210,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
 
               <button
                 onClick={handleNext}
-                className="text-[#a89880] hover:text-[#f0ebe3] active:scale-90 transition-all cursor-pointer"
+                className="text-[#a89880] hover:text-[#f0ebe3] active:scale-90 transition-all cursor-pointer p-1"
                 title="Next track"
               >
                 <IconNext />
@@ -197,20 +218,23 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
             </div>
           </div>
 
-          {/* Right: waveform + playlist */}
-          <div className="flex items-center gap-3 w-0 flex-1 min-w-0 lg:w-64 lg:flex-none justify-end">
-            <div className="hidden md:block w-32 h-8 opacity-80">
-              <Waveform isPlaying={isPlaying} barCount={20} height={32} accent={currentTrack.artAccent} />
+          {/* Right: Realtime Mini Waveform & Playlist Toggle */}
+          <div className="flex items-center gap-3.5 w-0 flex-1 min-w-0 lg:w-72 lg:flex-none justify-end">
+            <div className="hidden md:block w-36 h-8 opacity-80">
+              <Waveform isPlaying={isPlaying} barCount={22} height={32} accent={currentTrack.artAccent} />
             </div>
 
             <button
-              onClick={() => { audio.sfx("click"); setShowPlaylist(p => !p); }}
-              className={`p-2 rounded-lg transition-all cursor-pointer ${
+              onClick={() => {
+                audio.sfx("click");
+                setShowPlaylist((p) => !p);
+              }}
+              className={`p-2.5 rounded-xl border transition-all cursor-pointer ${
                 showPlaylist
-                  ? "bg-[#2a2520] text-[#e8a045]"
-                  : "text-[#5c5248] hover:text-[#a89880] hover:bg-[#242018]"
+                  ? "bg-[#242018] border-[#e8a045] text-[#e8a045]"
+                  : "bg-[#141210] border-[#332d26] text-[#5c5248] hover:text-[#a89880] hover:border-[#4a4035]"
               }`}
-              title="Playlist"
+              title="Open Playlist"
             >
               <IconList />
             </button>

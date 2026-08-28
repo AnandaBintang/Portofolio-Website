@@ -1,22 +1,18 @@
-// Lo-Fi Spotify Portfolio - Track Data
-// Every "track" is a portfolio section.
+// Lo-Fi Spotify Portfolio - Track Data & Portfolio Information
 
 export type TrackId =
-  | "home"
   | "ayo-kasir"
   | "ayo-qoncierge"
   | "moneymate"
-  | "ecommerce"
-  | "frequencies"
-  | "sessions";
+  | "ecommerce";
 
 export interface Track {
   id: TrackId;
   trackNo: string;
-  storyChapter: string;   // Label storyline tematik musik
+  storyChapter: string;
   title: string;
-  artist: string;         // role / context
-  album: string;          // project category or "Artist Info"
+  artist: string;
+  album: string;
   duration: string;
   bpm: string;
   genre: string;
@@ -24,27 +20,14 @@ export interface Track {
   artAccent: string;
 }
 
-export const TRACKS: Track[] = [
-  {
-    id: "home",
-    trackNo: "00",
-    storyChapter: "PROLOGUE: THE ACOUSTIC CORE",
-    title: "Ananda Bintang Saputra",
-    artist: "Backend Engineer",
-    album: "Artist Profile",
-    duration: "∞",
-    bpm: "120",
-    genre: "Microservices / Clean Arch",
-    artGradient: "from-[#2a1f14] via-[#1c1510] to-[#0f0d0b]",
-    artAccent: "#e8a045",
-  },
+export const PLAYABLE_TRACKS: Track[] = [
   {
     id: "ayo-kasir",
     trackNo: "01",
-    storyChapter: "SIDE A: HIGH-SCALE SYMPHONY",
+    storyChapter: "SIDE A · TRACK 01",
     title: "AYO Kasir by SRC",
     artist: "Enterprise POS Platform",
-    album: "Weekend Inc. - PT HM Sampoerna",
+    album: "Weekend Inc. · PT HM Sampoerna",
     duration: "4:12",
     bpm: "140",
     genre: "B2B Microservices",
@@ -54,10 +37,10 @@ export const TRACKS: Track[] = [
   {
     id: "ayo-qoncierge",
     trackNo: "02",
-    storyChapter: "SIDE A: CLEAN HARMONICS",
+    storyChapter: "SIDE A · TRACK 02",
     title: "AYO Qoncierge by SRC",
     artist: "Staff & Coaching Platform",
-    album: "Weekend Inc. - PT HM Sampoerna",
+    album: "Weekend Inc. · PT HM Sampoerna",
     duration: "3:45",
     bpm: "128",
     genre: "B2C Clean Architecture",
@@ -67,10 +50,10 @@ export const TRACKS: Track[] = [
   {
     id: "moneymate",
     trackNo: "03",
-    storyChapter: "SIDE B: SYNTHESIZED ALGORITHMS",
+    storyChapter: "SIDE B · TRACK 03",
     title: "MoneyMate",
     artist: "Financial Engine & Web App",
-    album: "Personal Project",
+    album: "Personal Flagship Project",
     duration: "3:20",
     bpm: "116",
     genre: "AI-Powered Finance App",
@@ -80,7 +63,7 @@ export const TRACKS: Track[] = [
   {
     id: "ecommerce",
     trackNo: "04",
-    storyChapter: "SIDE B: HIGH-THROUGHPUT GROOVE",
+    storyChapter: "SIDE B · TRACK 04",
     title: "E-Commerce & Top-up Platform",
     artist: "Digital Commerce Engine",
     album: "Freelance Work",
@@ -90,36 +73,11 @@ export const TRACKS: Track[] = [
     artGradient: "from-[#2a1f10] via-[#1c1508] to-[#100d05]",
     artAccent: "#fbbf24",
   },
-  {
-    id: "frequencies",
-    trackNo: "05",
-    storyChapter: "INTERLUDE: FREQUENCY BANDS",
-    title: "Core Frequencies",
-    artist: "Technical Skills & Stack",
-    album: "Studio Setup",
-    duration: "—",
-    bpm: "—",
-    genre: "Full Stack / Infrastructure",
-    artGradient: "from-[#1a2020] via-[#101818] to-[#080f0f]",
-    artAccent: "#2dd4bf",
-  },
-  {
-    id: "sessions",
-    trackNo: "06",
-    storyChapter: "OUTRO: MASTER RECORDINGS",
-    title: "Session History",
-    artist: "Work Experience & Education",
-    album: "The Logbook",
-    duration: "—",
-    bpm: "—",
-    genre: "Professional Journey",
-    artGradient: "from-[#201a2a] via-[#15101c] to-[#0d0810]",
-    artAccent: "#f472b6",
-  },
 ];
 
 export const PROJECTS = {
   "ayo-kasir": {
+    tagline: "Enterprise Point-of-Sale & Retail Microservices",
     description:
       "Comprehensive digital retail ecosystem connecting wholesale partners, convenience stores, and end customers for PT HM Sampoerna. Handles high-volume POS transactions, inventory synchronization, and multi-channel order management under microservices architecture.",
     stack: ["Laravel", "PHP", "Microservices", "PostgreSQL", "AWS EC2/S3", "Jenkins CI/CD", "Payment Gateway"],
@@ -131,9 +89,10 @@ export const PROJECTS = {
       "Collaborated in Agile/Scrum environment across sprint planning and retrospectives",
     ],
     liveUrl: "https://ayo.src.id",
-    scale: "Enterprise / PT HM Sampoerna",
+    scale: "Enterprise Retail / PT HM Sampoerna",
   },
   "ayo-qoncierge": {
+    tagline: "Enterprise Staff & Coaching Operations Platform",
     description:
       "B2C & B2B operational platform managing field coaches, staff roles, and enterprise service delivery for PT HM Sampoerna. Designed for strict role-based access, auditability, and high maintainability through clean architecture patterns.",
     stack: ["Laravel", "Node.js", "Clean Architecture", "PostgreSQL", "REST API", "CI/CD", "Docker"],
@@ -143,9 +102,10 @@ export const PROJECTS = {
       "Integrated structured audit logging to track all critical business mutations",
       "Maintained clean API contracts across frontend and third-party consumers",
     ],
-    scale: "Enterprise / Multi-Role Operations",
+    scale: "Enterprise Operations",
   },
   moneymate: {
+    tagline: "AI Vision Scan & Realtime Carry-Over Financial Engine",
     description:
       "Full-stack personal finance application with React/Vite frontend and Express.js backend. Features JWT token revocation, Firebase Google OAuth, AI-powered receipt scanning via Gemini Vision, realtime carry-over budget calculation, and automated daily web push notifications.",
     stack: ["React", "Node.js", "Express.js", "Knex.js", "MySQL", "Google Gemini AI", "Firebase Auth", "Web Push VAPID", "Docker"],
@@ -157,9 +117,10 @@ export const PROJECTS = {
     ],
     liveUrl: "https://moneymate-abp.netlify.app/",
     githubUrl: "https://github.com/MoneyMate-ABP/moneymate-api",
-    scale: "Live Production App",
+    scale: "Live Production Web App",
   },
   ecommerce: {
+    tagline: "High-Throughput Digital Commerce & Webhook Ledger",
     description:
       "Full-featured digital commerce and gaming top-up platform with automated order fulfillment, secure payment gateway webhooks, product inventory control, and a comprehensive admin dashboard for business reconciliation.",
     stack: ["PHP", "Laravel", "MySQL", "PostgreSQL", "Payment Gateway Webhooks", "REST API"],
@@ -175,94 +136,105 @@ export const PROJECTS = {
 export const SKILLS = [
   {
     category: "Languages",
-    icon: "{ }",
-    items: ["JavaScript", "TypeScript", "PHP", "SQL", "Bash"],
+    band: "BAND 01",
+    freq: "20Hz - 200Hz",
+    items: ["JavaScript (ES6+)", "TypeScript", "PHP 8.x", "SQL", "Bash Scripting"],
   },
   {
-    category: "Frameworks",
-    icon: "⚙",
-    items: ["Laravel", "Express.js", "Node.js", "CodeIgniter", "Knex.js"],
+    category: "Frameworks & Runtimes",
+    band: "BAND 02",
+    freq: "200Hz - 800Hz",
+    items: ["Laravel", "Node.js", "Express.js", "Knex.js", "CodeIgniter"],
   },
   {
-    category: "Databases",
-    icon: "▦",
-    items: ["PostgreSQL", "MySQL", "Redis (basic)"],
+    category: "Databases & Storage",
+    band: "BAND 03",
+    freq: "800Hz - 2kHz",
+    items: ["PostgreSQL", "MySQL", "Redis Caching", "Index Optimization", "N+1 Elimination"],
   },
   {
-    category: "Cloud & DevOps",
-    icon: "☁",
-    items: ["AWS (EC2, S3, RDS, Lambda)", "Docker", "Docker Compose", "Jenkins CI/CD", "Nginx"],
+    category: "Cloud & Infrastructure",
+    band: "BAND 04",
+    freq: "2kHz - 6kHz",
+    items: ["AWS (EC2, S3, RDS, Lambda)", "Docker & Compose", "Jenkins CI/CD", "Nginx", "Linux Administration"],
   },
   {
-    category: "Architecture",
-    icon: "◈",
-    items: ["RESTful API Design", "Microservices", "Clean Architecture", "Service Layer Pattern", "N+1 Optimization"],
+    category: "Architecture & Design",
+    band: "BAND 05",
+    freq: "6kHz - 12kHz",
+    items: ["RESTful API Architecture", "Microservices Patterns", "Clean Architecture", "Service Layer Pattern", "Domain-Driven Design"],
   },
   {
     category: "Engineering Quality",
-    icon: "✓",
-    items: ["Husky + Commitlint", "Diff-based Linting", "Structured Logging", "JWT & Auth Security", "Rate Limiting & HPP"],
+    band: "BAND 06",
+    freq: "12kHz - 20kHz",
+    items: ["Husky & Commitlint", "Diff-based Linting", "Structured Logging", "JWT Session Revocation", "Rate Limiting & HPP"],
   },
 ];
 
 export const SESSIONS = [
   {
-    no: "01",
+    tapeId: "TAPE 01",
     period: "July 2025 - Present",
     role: "Backend Engineer",
     company: "Weekend Inc.",
     client: "PT HM Sampoerna",
     location: "Jakarta (Hybrid)",
+    status: "CURRENT RESIDENCY",
     highlights: [
-      "Contributing to AYO KASIR & AYO QONCIERGE - enterprise B2B & B2C platforms",
-      "Microservices architecture with Laravel as core backend framework",
-      "N+1 resolution, structured logging, CI/CD pipelines with Jenkins",
-      "Agile/Scrum across sprint planning, stand-ups, and retrospectives",
+      "Contributing to enterprise-scale B2B & B2C platforms for PT HM Sampoerna, including AYO KASIR and AYO QONCIERGE",
+      "Architected core backend modules for staff management, coach management, and POS inventory synchronization",
+      "Optimized relational query performance by refactoring complex joins and eliminating N+1 query bottlenecks",
+      "Implemented structured observability logs, audit trails, and unified error handling across microservices",
+      "Configured automated pre-commit diff linting pipelines with Husky and Commitlint across multi-repo environments",
     ],
     tags: ["Laravel", "Microservices", "AWS", "Jenkins", "PostgreSQL"],
     active: true,
   },
   {
-    no: "02",
+    tapeId: "TAPE 02",
     period: "Oct 2023 - July 2025",
     role: "Web Developer",
     company: "Freelance",
-    client: null,
+    client: "Various Businesses",
     location: "Sidoarjo / Remote",
+    status: "COMPLETED",
     highlights: [
-      "Built bespoke backend systems for varied business clients",
-      "E-commerce platform serving 1,000+ active users",
-      "SQL query optimization and index tuning for high-traffic read operations",
+      "Architected bespoke backend systems and REST APIs for varied commercial and retail clients",
+      "Engineered full-featured e-commerce platform serving 1,000+ active users with instant payment gateway reconciliation",
+      "Tuned database execution times and established indexed views for high-traffic financial ledgers",
     ],
-    tags: ["PHP", "Laravel", "MySQL", "REST API"],
+    tags: ["PHP", "Laravel", "MySQL", "REST API", "Payment Webhooks"],
     active: false,
   },
   {
-    no: "03",
+    tapeId: "TAPE 03",
     period: "Nov 2023 - Sep 2024",
     role: "Assistant Mentor",
     company: "Google Developer Student Club",
     client: "Telkom University",
     location: "Bandung",
+    status: "COMPLETED",
     highlights: [
-      "Mentored 50+ students in web development and backend engineering",
-      "Led practical workshops on REST API design, relational databases, and Git",
+      "Mentored 50+ computer science students in web development and scalable backend fundamentals",
+      "Conducted hands-on technical workshops covering REST API design, relational database modeling, and Git workflows",
     ],
-    tags: ["Mentoring", "REST API", "Backend Fundamentals"],
+    tags: ["Mentoring", "REST API", "Database Design", "Git Workflow"],
     active: false,
   },
   {
-    no: "04",
+    tapeId: "TAPE 04",
     period: "Mar 2023 - Oct 2023",
-    role: "Full Stack Developer",
+    role: "Full Stack Developer (Intern)",
     company: "Roleplay Studio",
-    client: null,
-    location: "Surabaya (Internship)",
+    client: "Studio Portfolio",
+    location: "Surabaya",
+    status: "COMPLETED",
     highlights: [
-      "Built interactive company profile websites with custom motion",
-      "Collaborated directly with UI/UX designers from design tokens to production code",
+      "Developed interactive company profile websites and web applications with rich layout discipline",
+      "Translated Figma design tokens into clean component code in close collaboration with UI/UX designers",
     ],
-    tags: ["JavaScript", "HTML/CSS", "Animations"],
+    tags: ["JavaScript", "HTML/CSS", "UI Interaction"],
     active: false,
   },
 ];
@@ -270,16 +242,29 @@ export const SESSIONS = [
 export const PROFILE = {
   name: "Ananda Bintang Saputra",
   callsign: "Ananda Bintang",
-  role: "Backend Engineer",
-  bio: "Building the systems people rely on without seeing. Microservices, optimized SQL data layers, clean REST APIs - engineered for scale, reliability, and zero surprises in production.",
+  title: "Backend Engineer",
+  avatarUrl: "https://ananda-bintang.netlify.app/ananda-bintang.png",
+  headline: "ARCHITECTING INVISIBLE ENGINES.",
+  subheadline:
+    "Backend Engineer specializing in enterprise microservices, high-throughput REST APIs, and database query optimization. Currently engineering core retail and operational platforms at Weekend Inc. for PT HM Sampoerna.",
   location: "Sidoarjo, East Java, Indonesia",
+  coordinates: "7°27'S 112°43'E",
   email: "anandabintang4@gmail.com",
   phone: "+62 853-3063-2334",
   github: "https://github.com/AnandaBintang",
-  instagram: "https://instagram.com",
+  instagram: "https://instagram.com/anandabintang4",
   education: {
     degree: "Associate Degree in Computer Science",
     school: "Telkom University",
     period: "Sep 2023 - Sep 2027",
+    highschool: "SMKS Antartika 2 Sidoarjo",
+    highschoolMajor: "Software Engineering",
+    highschoolPeriod: "Aug 2020 - Jun 2023",
   },
+  stats: [
+    { label: "CURRENT ENTERPRISE", value: "PT HM Sampoerna" },
+    { label: "PRIMARY STACK", value: "Laravel / Node.js" },
+    { label: "ARCHITECTURE", value: "Clean Microservices" },
+    { label: "DATABASE FOCUS", value: "PostgreSQL / MySQL" },
+  ],
 };
