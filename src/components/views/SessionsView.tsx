@@ -1,6 +1,5 @@
 import React from "react";
-import { SESSIONS, PROFILE } from "../../data/tracks";
-import type { Track } from "../../data/tracks";
+import { SESSIONS, PROFILE, type Track } from "../../data/tracks";
 
 interface SessionsViewProps {
   track: Track;
@@ -8,72 +7,98 @@ interface SessionsViewProps {
 
 export const SessionsView: React.FC<SessionsViewProps> = ({ track }) => {
   return (
-    <div className="w-full h-full scrollable">
-      <div className="max-w-4xl mx-auto px-6 py-12">
+    <div style={{ minHeight: "100%", paddingTop: 40, paddingBottom: 40 }}>
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 24px" }}>
 
-        {/* Header */}
-        <div className="mb-10">
-          <p className="text-[10px] font-mono text-[#5c5248] uppercase tracking-widest mb-1">{track.trackNo} / LOGBOOK</p>
-          <h1 className="text-3xl sm:text-4xl font-bold text-[#f0ebe3] mb-1">{track.title}</h1>
-          <p className="text-sm font-mono text-[#5c5248]">{track.artist} - {track.album}</p>
+        {/* ── Header ── */}
+        <div style={{ marginBottom: 40 }}>
+          <p style={{ fontSize: 11, fontFamily: "Space Mono, monospace", color: "#5c5248", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 8 }}>
+            {track.trackNo} / LOGBOOK
+          </p>
+          <h1 style={{ fontSize: "clamp(1.8rem, 4vw, 3rem)", fontWeight: 800, color: "#f0ebe3", marginBottom: 4 }}>
+            {track.title}
+          </h1>
+          <p style={{ fontSize: 12, fontFamily: "Space Mono, monospace", color: "#5c5248" }}>
+            {track.artist} - {track.album}
+          </p>
         </div>
 
-        {/* Timeline */}
-        <div className="space-y-4">
+        {/* ── Timeline Sessions ── */}
+        <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 32 }}>
           {SESSIONS.map((session, i) => (
             <div
               key={i}
-              className={`bg-[#1c1916] border rounded-xl p-6 transition-all ${
-                session.active
-                  ? "border-[#4a4035]"
-                  : "border-[#332d26]"
-              }`}
+              style={{
+                background: "#1c1916",
+                border: `1px solid ${session.active ? "#4a4035" : "#332d26"}`,
+                borderRadius: 14,
+                padding: 24,
+              }}
             >
-              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-                <div className="flex items-center gap-3">
+              <div style={{ display: "flex", flexWrap: "wrap", justifyContent: "space-between", alignItems: "flex-start", gap: 12, marginBottom: 16 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 12 }}>
                   <span
-                    className="text-xs font-mono px-2 py-0.5 rounded border"
                     style={{
+                      fontSize: 11,
+                      fontFamily: "Space Mono, monospace",
+                      padding: "3px 10px",
+                      borderRadius: 6,
+                      border: `1px solid ${track.artAccent}40`,
+                      background: `${track.artAccent}10`,
                       color: track.artAccent,
-                      borderColor: track.artAccent + "40",
-                      background: track.artAccent + "10",
                     }}
                   >
                     REC {session.no}
                   </span>
                   <div>
-                    <p className="font-semibold text-[#f0ebe3]">{session.role}</p>
-                    <p className="text-sm text-[#a89880]">
+                    <h3 style={{ fontSize: 16, fontWeight: 700, color: "#f0ebe3", marginBottom: 2 }}>
+                      {session.role}
+                    </h3>
+                    <p style={{ fontSize: 13, color: "#a89880" }}>
                       {session.company}
-                      {session.client && <span className="text-[#5c5248]"> for {session.client}</span>}
+                      {session.client && <span style={{ color: "#5c5248" }}> for {session.client}</span>}
                     </p>
                   </div>
                 </div>
-                <div className="text-right">
-                  <p className="text-xs font-mono text-[#5c5248]">{session.period}</p>
-                  <p className="text-xs text-[#5c5248]">{session.location}</p>
+
+                <div style={{ textAlign: "right" }}>
+                  <p style={{ fontSize: 11, fontFamily: "Space Mono, monospace", color: "#5c5248" }}>{session.period}</p>
+                  <p style={{ fontSize: 12, color: "#5c5248" }}>{session.location}</p>
                 </div>
               </div>
 
               {session.active && (
-                <div className="flex items-center gap-2 mb-3">
-                  <span className="w-2 h-2 rounded-full bg-[#1db954] pulse" />
-                  <span className="text-xs font-mono text-[#1db954]">CURRENTLY ACTIVE</span>
+                <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 12 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: "50%", background: "#1db954" }} className="pulse" />
+                  <span style={{ fontSize: 11, fontFamily: "Space Mono, monospace", color: "#1db954", fontWeight: 700 }}>
+                    CURRENTLY ACTIVE
+                  </span>
                 </div>
               )}
 
-              <ul className="space-y-1.5">
+              <ul style={{ display: "flex", flexDirection: "column", gap: 8, marginBottom: 16 }}>
                 {session.highlights.map((h, j) => (
-                  <li key={j} className="text-sm text-[#a89880] flex items-start gap-2">
-                    <span style={{ color: track.artAccent }} className="mt-1 shrink-0 text-xs">-</span>
+                  <li key={j} style={{ display: "flex", alignItems: "flex-start", gap: 8, fontSize: 13, color: "#a89880", lineHeight: 1.6 }}>
+                    <span style={{ color: track.artAccent, flexShrink: 0 }}>•</span>
                     <span>{h}</span>
                   </li>
                 ))}
               </ul>
 
-              <div className="flex flex-wrap gap-1.5 mt-4 pt-4 border-t border-[#332d26]">
+              <div style={{ display: "flex", flexWrap: "wrap", gap: 6, paddingTop: 16, borderTop: "1px solid #332d26" }}>
                 {session.tags.map((tag, j) => (
-                  <span key={j} className="text-[10px] font-mono px-2.5 py-1 rounded bg-[#242018] border border-[#332d26] text-[#a89880]">
+                  <span
+                    key={j}
+                    style={{
+                      fontSize: 10,
+                      fontFamily: "Space Mono, monospace",
+                      padding: "3px 10px",
+                      borderRadius: 6,
+                      background: "#242018",
+                      border: "1px solid #332d26",
+                      color: "#a89880",
+                    }}
+                  >
                     {tag}
                   </span>
                 ))}
@@ -82,19 +107,21 @@ export const SessionsView: React.FC<SessionsViewProps> = ({ track }) => {
           ))}
         </div>
 
-        {/* Education */}
-        <div className="mt-8 bg-[#1c1916] border border-[#332d26] rounded-xl p-6">
-          <p className="text-[10px] font-mono text-[#5c5248] uppercase tracking-widest mb-4">ACADEMIC FOUNDATION</p>
-          <div className="flex items-start gap-4">
-            <div className="flex-1">
-              <p className="font-semibold text-[#f0ebe3]">{PROFILE.education.school}</p>
-              <p className="text-sm text-[#a89880]">{PROFILE.education.degree}</p>
-              <p className="text-xs font-mono text-[#5c5248] mt-1">{PROFILE.education.period}</p>
+        {/* ── Education Foundation ── */}
+        <div style={{ background: "#1c1916", border: "1px solid #332d26", borderRadius: 14, padding: 24 }}>
+          <p style={{ fontSize: 10, fontFamily: "Space Mono, monospace", color: "#5c5248", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 16 }}>
+            ACADEMIC FOUNDATION
+          </p>
+          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit, minmax(220px, 1fr))", gap: 20 }}>
+            <div>
+              <p style={{ fontSize: 15, fontWeight: 700, color: "#f0ebe3" }}>{PROFILE.education.school}</p>
+              <p style={{ fontSize: 13, color: "#a89880", marginTop: 2 }}>{PROFILE.education.degree}</p>
+              <p style={{ fontSize: 11, fontFamily: "Space Mono, monospace", color: "#5c5248", marginTop: 4 }}>{PROFILE.education.period}</p>
             </div>
             <div>
-              <p className="font-semibold text-[#f0ebe3]">SMKS Antartika 2</p>
-              <p className="text-sm text-[#a89880]">Software Engineering</p>
-              <p className="text-xs font-mono text-[#5c5248] mt-1">Aug 2020 - Jun 2023</p>
+              <p style={{ fontSize: 15, fontWeight: 700, color: "#f0ebe3" }}>SMKS Antartika 2</p>
+              <p style={{ fontSize: 13, color: "#a89880", marginTop: 2 }}>Software Engineering</p>
+              <p style={{ fontSize: 11, fontFamily: "Space Mono, monospace", color: "#5c5248", marginTop: 4 }}>Aug 2020 - Jun 2023</p>
             </div>
           </div>
         </div>

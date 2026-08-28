@@ -3,67 +3,66 @@ import { PROJECTS } from "../../data/tracks";
 import { AlbumArt } from "../AlbumArt";
 import type { Track } from "../../data/tracks";
 
+type ProjectKey = keyof typeof PROJECTS;
+
 interface ProjectViewProps {
   track: Track;
   isPlaying: boolean;
 }
 
-type ProjectKey = keyof typeof PROJECTS;
-
 export const ProjectView: React.FC<ProjectViewProps> = ({ track, isPlaying }) => {
   const project = PROJECTS[track.id as ProjectKey];
   if (!project) return null;
 
-  return (
-    <div className="w-full h-full scrollable">
-      <div className="max-w-4xl mx-auto px-6 py-12">
+  const p = project as {
+    description: string;
+    stack: string[];
+    deliverables: string[];
+    scale?: string;
+    liveUrl?: string;
+    githubUrl?: string;
+  };
 
-        {/* Header */}
-        <div className="flex flex-col md:flex-row gap-8 mb-10">
-          <AlbumArt track={track} size={160} spinning={isPlaying} className="shrink-0 mx-auto md:mx-0 shadow-2xl" />
-          <div className="flex-1 flex flex-col justify-end">
-            <p className="text-[10px] font-mono text-[#5c5248] uppercase tracking-widest mb-1">{track.trackNo} / PROJECT</p>
-            <h1 className="text-3xl sm:text-4xl font-bold text-[#f0ebe3] leading-tight mb-1">
+  return (
+    <div style={{ minHeight: "100%", paddingTop: 40, paddingBottom: 40 }}>
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "0 24px" }}>
+
+        {/* ── Header ── */}
+        <div style={{ display: "flex", gap: 32, marginBottom: 40, flexWrap: "wrap", alignItems: "flex-end" }}>
+          <AlbumArt track={track} size={160} spinning={isPlaying} />
+          <div style={{ flex: 1, minWidth: 220 }}>
+            <p style={{ fontSize: 11, fontFamily: "Space Mono, monospace", color: "#5c5248", letterSpacing: "0.12em", textTransform: "uppercase", marginBottom: 8 }}>
+              {track.trackNo} / PROJECT
+            </p>
+            <h1 style={{ fontSize: "clamp(1.6rem, 4vw, 2.8rem)", fontWeight: 800, color: "#f0ebe3", lineHeight: 1.1, marginBottom: 6 }}>
               {track.title}
             </h1>
-            <p className="text-base font-medium mb-0.5" style={{ color: track.artAccent }}>
+            <p style={{ fontSize: 16, color: track.artAccent, fontWeight: 600, marginBottom: 4 }}>
               {track.artist}
             </p>
-            <p className="text-sm text-[#5c5248] font-mono mb-4">{track.album}</p>
-
-            {/* Quick stats */}
-            <div className="flex flex-wrap gap-2">
-              <span className="text-xs font-mono px-3 py-1 rounded-full border border-[#332d26] text-[#a89880]">
+            <p style={{ fontSize: 12, fontFamily: "Space Mono, monospace", color: "#5c5248", marginBottom: 20 }}>
+              {track.album}
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+              <span style={{ fontSize: 11, fontFamily: "Space Mono, monospace", padding: "4px 12px", borderRadius: 999, border: `1px solid ${track.artAccent}40`, color: track.artAccent }}>
                 {track.genre}
               </span>
-              {("scale" in project) && (
-                <span className="text-xs font-mono px-3 py-1 rounded-full border border-[#332d26] text-[#a89880]">
-                  {(project as { scale: string }).scale}
+              {p.scale && (
+                <span style={{ fontSize: 11, fontFamily: "Space Mono, monospace", padding: "4px 12px", borderRadius: 999, border: "1px solid #332d26", color: "#a89880" }}>
+                  {p.scale}
                 </span>
               )}
             </div>
-
-            {/* External links */}
-            <div className="flex gap-3 mt-4">
-              {("liveUrl" in project) && (project as { liveUrl?: string }).liveUrl && (
-                <a
-                  href={(project as { liveUrl: string }).liveUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-full text-xs font-bold text-black active:scale-95 transition-all"
-                  style={{ background: track.artAccent }}
-                >
+            <div style={{ display: "flex", gap: 10, marginTop: 20 }}>
+              {p.liveUrl && (
+                <a href={p.liveUrl} target="_blank" rel="noopener noreferrer"
+                  style={{ padding: "8px 20px", borderRadius: 999, background: track.artAccent, color: "#000", fontSize: 12, fontWeight: 700, textDecoration: "none" }}>
                   LIVE DEMO
                 </a>
               )}
-              {("githubUrl" in project) && (project as { githubUrl?: string }).githubUrl && (
-                <a
-                  href={(project as { githubUrl: string }).githubUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="px-4 py-2 rounded-full border text-xs font-mono text-[#a89880] hover:text-[#f0ebe3] transition-all"
-                  style={{ borderColor: track.artAccent + "50" }}
-                >
+              {p.githubUrl && (
+                <a href={p.githubUrl} target="_blank" rel="noopener noreferrer"
+                  style={{ padding: "8px 20px", borderRadius: 999, border: `1px solid ${track.artAccent}50`, color: "#a89880", fontSize: 12, fontFamily: "Space Mono, monospace", textDecoration: "none" }}>
                   SOURCE CODE
                 </a>
               )}
@@ -71,63 +70,67 @@ export const ProjectView: React.FC<ProjectViewProps> = ({ track, isPlaying }) =>
           </div>
         </div>
 
-        {/* Divider */}
-        <div className="h-px bg-[#332d26] mb-8" />
+        {/* ── Divider ── */}
+        <div style={{ height: 1, background: "#332d26", marginBottom: 32 }} />
 
-        {/* Description */}
-        <div className="mb-8">
-          <p className="text-[10px] font-mono text-[#5c5248] uppercase tracking-widest mb-3">ARCHITECTURAL OVERVIEW</p>
-          <p className="text-sm sm:text-base text-[#a89880] leading-relaxed">{project.description}</p>
+        {/* ── Description ── */}
+        <div style={{ marginBottom: 32 }}>
+          <p style={{ fontSize: 10, fontFamily: "Space Mono, monospace", color: "#5c5248", textTransform: "uppercase", letterSpacing: "0.15em", marginBottom: 12 }}>
+            ARCHITECTURAL OVERVIEW
+          </p>
+          <p style={{ fontSize: 15, color: "#a89880", lineHeight: 1.75 }}>{p.description}</p>
         </div>
 
-        {/* Two columns: deliverables + stack */}
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+        {/* ── Two column: deliverables + stack ── */}
+        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20 }}>
           {/* Deliverables */}
-          <div className="bg-[#1c1916] border border-[#332d26] rounded-xl p-5">
-            <p className="text-[10px] font-mono text-[#5c5248] uppercase tracking-widest mb-4">ENGINEERING DELIVERABLES</p>
-            <ul className="space-y-3">
-              {project.deliverables.map((d, i) => (
-                <li key={i} className="flex items-start gap-3 text-sm text-[#a89880]">
-                  <span className="font-mono mt-0.5 shrink-0" style={{ color: track.artAccent }}>
+          <div style={{ background: "#1c1916", border: "1px solid #332d26", borderRadius: 14, padding: 24 }}>
+            <p style={{ fontSize: 10, fontFamily: "Space Mono, monospace", color: "#5c5248", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 20 }}>
+              ENGINEERING DELIVERABLES
+            </p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 14 }}>
+              {p.deliverables.map((d, i) => (
+                <div key={i} style={{ display: "flex", gap: 12, alignItems: "flex-start" }}>
+                  <span style={{ fontFamily: "Space Mono, monospace", fontSize: 11, color: track.artAccent, flexShrink: 0, marginTop: 2 }}>
                     {String(i + 1).padStart(2, "0")}
                   </span>
-                  <span>{d}</span>
-                </li>
+                  <span style={{ fontSize: 13, color: "#a89880", lineHeight: 1.6 }}>{d}</span>
+                </div>
               ))}
-            </ul>
+            </div>
           </div>
 
-          {/* Tech Stack */}
-          <div className="bg-[#1c1916] border border-[#332d26] rounded-xl p-5">
-            <p className="text-[10px] font-mono text-[#5c5248] uppercase tracking-widest mb-4">STACK FREQUENCIES</p>
-            <div className="flex flex-wrap gap-2">
-              {project.stack.map((tech, i) => (
-                <span
-                  key={i}
-                  className="text-xs font-mono px-3 py-1.5 rounded-lg border text-[#f0ebe3]"
-                  style={{
-                    borderColor: track.artAccent + "40",
-                    background: track.artAccent + "10",
-                  }}
-                >
+          {/* Stack */}
+          <div style={{ background: "#1c1916", border: "1px solid #332d26", borderRadius: 14, padding: 24 }}>
+            <p style={{ fontSize: 10, fontFamily: "Space Mono, monospace", color: "#5c5248", textTransform: "uppercase", letterSpacing: "0.12em", marginBottom: 20 }}>
+              STACK FREQUENCIES
+            </p>
+            <div style={{ display: "flex", flexWrap: "wrap", gap: 8, marginBottom: 24 }}>
+              {p.stack.map((tech, i) => (
+                <span key={i} style={{
+                  fontSize: 12, fontFamily: "Space Mono, monospace",
+                  padding: "6px 14px", borderRadius: 8,
+                  border: `1px solid ${track.artAccent}35`,
+                  background: `${track.artAccent}0f`,
+                  color: "#f0ebe3",
+                }}>
                   {tech}
                 </span>
               ))}
             </div>
-
-            {/* Fake VU bars */}
-            <div className="mt-5 space-y-2">
-              {project.stack.slice(0, 4).map((tech, i) => (
-                <div key={i} className="flex items-center gap-2">
-                  <span className="text-[10px] font-mono text-[#5c5248] w-20 shrink-0 truncate">{tech}</span>
-                  <div className="flex-1 h-1.5 bg-[#242018] rounded-full overflow-hidden">
-                    <div
-                      className="h-full rounded-full"
-                      style={{
-                        width: `${75 + (i * 7) % 20}%`,
-                        background: `linear-gradient(90deg, ${track.artAccent}80, ${track.artAccent})`,
-                      }}
-                    />
+            {/* VU bars */}
+            <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
+              {p.stack.slice(0, 4).map((tech, i) => (
+                <div key={i} style={{ display: "flex", alignItems: "center", gap: 10 }}>
+                  <span style={{ fontSize: 10, fontFamily: "Space Mono, monospace", color: "#5c5248", width: 80, flexShrink: 0, overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                    {tech}
+                  </span>
+                  <div style={{ flex: 1, height: 4, background: "#242018", borderRadius: 999, overflow: "hidden" }}>
+                    <div style={{
+                      height: "100%", borderRadius: 999,
+                      width: `${72 + (i * 9 + 7) % 22}%`,
+                      background: `linear-gradient(90deg, ${track.artAccent}60, ${track.artAccent})`,
+                    }} />
                   </div>
                 </div>
               ))}
