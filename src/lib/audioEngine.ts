@@ -1,5 +1,5 @@
 // Lo-Fi Spotify Portfolio - Audio Engine
-// Generative lo-fi ambient synthesizer (chords + soft noise)
+// Generative lo-fi ambient synthesizer (chords + soft noise + tape shutter SFX)
 // Exposed as singleton: import { audio } from './audioEngine'
 
 type StateCallback = (playing: boolean) => void;
@@ -41,7 +41,6 @@ class AudioEngine {
   private playChord() {
     if (!this.ctx || !this.masterGain || !this.playing) return;
 
-    // Fade out old
     this.oscs.forEach(o => { try { o.stop(); o.disconnect(); } catch { /**/ } });
     this.oscs = [];
 
@@ -53,7 +52,7 @@ class AudioEngine {
       if (!this.ctx || !this.masterGain) return;
       const osc = this.ctx.createOscillator();
       const g   = this.ctx.createGain();
-      const detuneAmt = (Math.random() - 0.5) * 6; // slight cassette warble
+      const detuneAmt = (Math.random() - 0.5) * 6;
 
       osc.type = i < 2 ? "sine" : "triangle";
       osc.frequency.setValueAtTime(freq, now);
@@ -72,7 +71,6 @@ class AudioEngine {
       this.oscs.push(osc);
     });
 
-    // Subtle noise layer (tape hiss)
     if (this.ctx) {
       const bufSize = this.ctx.sampleRate * 0.5;
       const buf  = this.ctx.createBuffer(1, bufSize, this.ctx.sampleRate);
@@ -110,13 +108,35 @@ class AudioEngine {
     return this.playing;
   }
 
-  sfx(type: "click" | "prev" | "next") {
+  sfx(type: "click" | "prev" | "next" | "rewind") {
     try {
       if (!this.ctx) this.init();
       if (this.ctx?.state === "suspended") this.ctx.resume();
       if (!this.ctx || !this.masterGain) return;
 
       const now = this.ctx.currentTime;
+
+      if (type === "rewind") {
+        // Fast forward / tape rewind sweep effect
+        const sweepOsc = this.ctx.createOscillator();
+        const sweepGain = this.ctx.createGain();
+
+        sweepOsc.type = "sawtooth";
+        sweepOsc.frequency.setValueAtTime(150, now);
+        sweepOsc.frequency.exponentialRampToValueAtTime(1200, now + 0.35);
+        sweepOsc.frequency.exponentialRampToValueAtTime(300, now + 0.6);
+
+        sweepGain.gain.setValueAtTime(0.001, now);
+        sweepGain.gain.linearRampToValueAtTime(0.08, now + 0.2);
+        sweepGain.gain.exponentialRampToValueAtTime(0.001, now + 0.6);
+
+        sweepOsc.connect(sweepGain);
+        sweepGain.connect(this.masterGain);
+        sweepOsc.start(now);
+        sweepOsc.stop(now + 0.65);
+        return;
+      }
+
       const o = this.ctx.createOscillator();
       const g = this.ctx.createGain();
 
@@ -148,7 +168,7 @@ class AudioEngine {
         });
       }
     } catch {
-      // Graceful fallback for audio limitations
+      // Audio fallback
     }
   }
 

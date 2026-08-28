@@ -14,7 +14,7 @@ import {
   GraduationCap,
   Briefcase,
   MapPin,
-  Waveform as WaveformIcon
+  Waveform as WaveformIcon,
 } from "@phosphor-icons/react";
 import {
   PLAYABLE_TRACKS,
@@ -26,15 +26,54 @@ import {
 } from "./data/tracks";
 import { StickyAudioDeck } from "./components/StickyAudioDeck";
 import { PlayerBar } from "./components/PlayerBar";
+import { SectionTransitionCurtain } from "./components/SectionTransitionCurtain";
 import { audio } from "./lib/audioEngine";
 
 gsap.registerPlugin(ScrollTrigger);
+
+interface TransitionState {
+  isTransitioning: boolean;
+  name: string;
+  subtitle: string;
+  accent: string;
+}
+
+const SECTION_METADATA: Record<string, { name: string; subtitle: string; accent: string }> = {
+  prologue: {
+    name: "THE ACOUSTIC PROLOGUE",
+    subtitle: "// PROFILE, SPECIALIZATION & RESIDENCY",
+    accent: "#e8a045",
+  },
+  "projects-area": {
+    name: "STUDIO DISCOGRAPHY",
+    subtitle: "// 4 MASTER PRODUCTION RELEASES",
+    accent: "#4a9eff",
+  },
+  "experience-area": {
+    name: "STUDIO MASTER LOGS",
+    subtitle: "// CHRONOLOGICAL PRODUCTION SESSIONS",
+    accent: "#f472b6",
+  },
+  "frequencies-area": {
+    name: "FREQUENCY BANDS",
+    subtitle: "// 6 CALIBRATED EQUALIZER TIERS",
+    accent: "#2dd4bf",
+  },
+};
 
 export default function App() {
   const [activeTrackIdx, setActiveTrackIdx] = useState(0);
   const [isProjectsSectionInView, setIsProjectsSectionInView] = useState(false);
   const [isPlaying, setIsPlaying] = useState(false);
+  const [transitionState, setTransitionState] = useState<TransitionState>({
+    isTransitioning: false,
+    name: "",
+    subtitle: "",
+    accent: "#e8a045",
+  });
+
   const lenisRef = useRef<Lenis | null>(null);
+  const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
 
   const currentTrack: Track = PLAYABLE_TRACKS[activeTrackIdx] || PLAYABLE_TRACKS[0];
 
@@ -43,30 +82,57 @@ export default function App() {
     return audio.onStateChange(setIsPlaying);
   }, []);
 
-  // Smooth scroll helper
-  const scrollToId = (id: string) => {
-    audio.sfx("click");
-    const target = document.getElementById(id);
-    if (target) {
-      if (lenisRef.current) {
-        lenisRef.current.scrollTo(target, { offset: -80, duration: 1.2 });
-      } else {
-        const top = target.getBoundingClientRect().top + window.scrollY - 80;
-        window.scrollTo({ top, behavior: "smooth" });
-      }
+  // Fullscreen transition shutter trigger (Option 1: Cassette Tape Rewind & Shutter)
+  const triggerSectionTransition = (targetId: string, customName?: string, customSubtitle?: string, customAccent?: string) => {
+    const meta = SECTION_METADATA[targetId] || {
+      name: customName || "STUDIO SESSION",
+      subtitle: customSubtitle || "// SWITCHING TRACK & MASTER CHANNELS",
+      accent: customAccent || currentTrack.artAccent,
+    };
+
+    audio.sfx("rewind");
+
+    setTransitionState({
+      isTransitioning: true,
+      name: meta.name,
+      subtitle: meta.subtitle,
+      accent: meta.accent,
+    });
+
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
     }
+
+    // Smooth scroll during shutter closure
+    setTimeout(() => {
+      const target = document.getElementById(targetId);
+      if (target) {
+        if (lenisRef.current) {
+          lenisRef.current.scrollTo(target, { offset: -70, immediate: true });
+        } else {
+          target.scrollIntoView({ behavior: "auto", block: "start" });
+        }
+      }
+    }, 280);
+
+    // Open shutter back
+    transitionTimeoutRef.current = setTimeout(() => {
+      setTransitionState((prev) => ({ ...prev, isTransitioning: false }));
+    }, 650);
   };
 
   const handlePrevTrack = () => {
     audio.sfx("prev");
     const next = activeTrackIdx > 0 ? activeTrackIdx - 1 : PLAYABLE_TRACKS.length - 1;
-    scrollToId(`track-${next}`);
+    const targetTrack = PLAYABLE_TRACKS[next];
+    triggerSectionTransition(`track-${next}`, targetTrack.title, targetTrack.storyChapter, targetTrack.artAccent);
   };
 
   const handleNextTrack = () => {
     audio.sfx("next");
     const next = activeTrackIdx < PLAYABLE_TRACKS.length - 1 ? activeTrackIdx + 1 : 0;
-    scrollToId(`track-${next}`);
+    const targetTrack = PLAYABLE_TRACKS[next];
+    triggerSectionTransition(`track-${next}`, targetTrack.title, targetTrack.storyChapter, targetTrack.artAccent);
   };
 
   // Initialize Lenis + GSAP ScrollTrigger
@@ -145,6 +211,7 @@ export default function App() {
       trackTriggers.forEach((t) => t.kill());
       lenis.destroy();
       gsap.ticker.remove(updateTicker);
+      if (transitionTimeoutRef.current) clearTimeout(transitionTimeoutRef.current);
     };
   }, []);
 
@@ -161,13 +228,21 @@ export default function App() {
       {/* Film Grain Texture */}
       <div className="grain" />
 
+      {/* ── Fullscreen Tape Shutter Section Transition ── */}
+      <SectionTransitionCurtain
+        isTransitioning={transitionState.isTransitioning}
+        targetSectionName={transitionState.name}
+        targetSectionSubtitle={transitionState.subtitle}
+        accentColor={transitionState.accent}
+      />
+
       {/* ── Fixed Master Header ── */}
       <header className="sticky top-0 z-40 w-full border-b border-[#332d26] bg-[#0f0d0b]/90 backdrop-blur-md">
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 h-18 flex items-center justify-between gap-4">
           
           {/* Brand Logo & Callsign */}
           <div
-            onClick={() => scrollToId("prologue")}
+            onClick={() => triggerSectionTransition("prologue")}
             className="flex items-center gap-3 cursor-pointer select-none group shrink-0"
           >
             <div className="w-8 h-8 rounded-full border border-[#4a4035] bg-[#1c1916] flex items-center justify-center text-white">
@@ -183,16 +258,16 @@ export default function App() {
             </div>
           </div>
 
-          {/* Quick Navigation Sections */}
+          {/* Quick Navigation Sections with Shutter Transition Triggers */}
           <nav className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1">
             <button
-              onClick={() => scrollToId("prologue")}
+              onClick={() => triggerSectionTransition("prologue")}
               className="px-3.5 py-1.5 rounded-full text-xs font-mono text-[#a89880] hover:text-[#f0ebe3] hover:bg-[#1c1916] transition-all cursor-pointer whitespace-nowrap"
             >
               PROLOGUE
             </button>
             <button
-              onClick={() => scrollToId("projects-area")}
+              onClick={() => triggerSectionTransition("projects-area")}
               className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer whitespace-nowrap ${
                 isProjectsSectionInView
                   ? "font-bold text-black shadow-md"
@@ -203,13 +278,13 @@ export default function App() {
               DISCOGRAPHY (PROJECTS)
             </button>
             <button
-              onClick={() => scrollToId("experience-area")}
+              onClick={() => triggerSectionTransition("experience-area")}
               className="px-3.5 py-1.5 rounded-full text-xs font-mono text-[#a89880] hover:text-[#f0ebe3] hover:bg-[#1c1916] transition-all cursor-pointer whitespace-nowrap"
             >
               SESSION LOGS
             </button>
             <button
-              onClick={() => scrollToId("frequencies-area")}
+              onClick={() => triggerSectionTransition("frequencies-area")}
               className="px-3.5 py-1.5 rounded-full text-xs font-mono text-[#a89880] hover:text-[#f0ebe3] hover:bg-[#1c1916] transition-all cursor-pointer whitespace-nowrap"
             >
               STUDIO SETUP
@@ -274,7 +349,7 @@ export default function App() {
             {/* Quick Action CTAs */}
             <div className="flex flex-wrap items-center gap-4 pt-4">
               <button
-                onClick={() => scrollToId("projects-area")}
+                onClick={() => triggerSectionTransition("projects-area")}
                 className="inline-flex items-center gap-2 px-6 py-3 rounded-full bg-[#e8a045] text-black font-semibold text-xs font-mono hover:bg-[#f0b055] transition-all cursor-pointer shadow-lg active:scale-95"
               >
                 <span>ENTER DISCOGRAPHY</span>
@@ -357,10 +432,13 @@ export default function App() {
             <Sparkle size={14} />
             <span>PLAYABLE DISCOGRAPHY AHEAD</span>
           </div>
-          <div className="flex items-center gap-2 animate-bounce">
-            <span>SCROLL TO ENTER THE STUDIO</span>
+          <button
+            onClick={() => triggerSectionTransition("projects-area")}
+            className="flex items-center gap-2 animate-bounce hover:text-[#f0ebe3] transition-colors cursor-pointer"
+          >
+            <span>CLICK OR SCROLL TO ENTER THE STUDIO</span>
             <ArrowDown size={14} />
-          </div>
+          </button>
         </div>
       </section>
 
@@ -696,7 +774,10 @@ export default function App() {
         currentIdx={activeTrackIdx}
         onPrev={handlePrevTrack}
         onNext={handleNextTrack}
-        onTrackSelect={(idx) => scrollToId(`track-${idx}`)}
+        onTrackSelect={(idx) => {
+          const target = PLAYABLE_TRACKS[idx];
+          triggerSectionTransition(`track-${idx}`, target.title, target.storyChapter, target.artAccent);
+        }}
       />
     </div>
   );
