@@ -1,5 +1,5 @@
 // Lo-Fi Spotify Portfolio - Track Data
-// Every "track" is a portfolio section. Switching tracks = full-screen view change.
+// Every "track" is a portfolio section.
 
 export type TrackId =
   | "home"
@@ -13,13 +13,13 @@ export type TrackId =
 export interface Track {
   id: TrackId;
   trackNo: string;
+  storyChapter: string;   // Label storyline tematik musik
   title: string;
   artist: string;         // role / context
   album: string;          // project category or "Artist Info"
   duration: string;
   bpm: string;
   genre: string;
-  // album art: CSS gradient representing the track mood
   artGradient: string;
   artAccent: string;
 }
@@ -28,6 +28,7 @@ export const TRACKS: Track[] = [
   {
     id: "home",
     trackNo: "00",
+    storyChapter: "PROLOGUE: THE ACOUSTIC CORE",
     title: "Ananda Bintang Saputra",
     artist: "Backend Engineer",
     album: "Artist Profile",
@@ -40,6 +41,7 @@ export const TRACKS: Track[] = [
   {
     id: "ayo-kasir",
     trackNo: "01",
+    storyChapter: "SIDE A: HIGH-SCALE SYMPHONY",
     title: "AYO Kasir by SRC",
     artist: "Enterprise POS Platform",
     album: "Weekend Inc. - PT HM Sampoerna",
@@ -52,6 +54,7 @@ export const TRACKS: Track[] = [
   {
     id: "ayo-qoncierge",
     trackNo: "02",
+    storyChapter: "SIDE A: CLEAN HARMONICS",
     title: "AYO Qoncierge by SRC",
     artist: "Staff & Coaching Platform",
     album: "Weekend Inc. - PT HM Sampoerna",
@@ -64,18 +67,20 @@ export const TRACKS: Track[] = [
   {
     id: "moneymate",
     trackNo: "03",
-    title: "MoneyMate API",
-    artist: "Financial Backend Engine",
+    storyChapter: "SIDE B: SYNTHESIZED ALGORITHMS",
+    title: "MoneyMate",
+    artist: "Financial Engine & Web App",
     album: "Personal Project",
     duration: "3:20",
     bpm: "116",
-    genre: "AI-Powered Finance API",
+    genre: "AI-Powered Finance App",
     artGradient: "from-[#2a1a28] via-[#1c1020] to-[#100a18]",
     artAccent: "#c77dff",
   },
   {
     id: "ecommerce",
     trackNo: "04",
+    storyChapter: "SIDE B: HIGH-THROUGHPUT GROOVE",
     title: "E-Commerce & Top-up Platform",
     artist: "Digital Commerce Engine",
     album: "Freelance Work",
@@ -88,6 +93,7 @@ export const TRACKS: Track[] = [
   {
     id: "frequencies",
     trackNo: "05",
+    storyChapter: "INTERLUDE: FREQUENCY BANDS",
     title: "Core Frequencies",
     artist: "Technical Skills & Stack",
     album: "Studio Setup",
@@ -100,6 +106,7 @@ export const TRACKS: Track[] = [
   {
     id: "sessions",
     trackNo: "06",
+    storyChapter: "OUTRO: MASTER RECORDINGS",
     title: "Session History",
     artist: "Work Experience & Education",
     album: "The Logbook",
@@ -140,16 +147,17 @@ export const PROJECTS = {
   },
   moneymate: {
     description:
-      "Robust personal finance API featuring JWT token revocation, Firebase Google OAuth, AI-powered receipt scanning via Gemini Vision, realtime carry-over budget calculation, automated daily web push notifications via VAPID, and strict security middleware.",
-    stack: ["Node.js", "Express.js", "Knex.js", "MySQL", "Google Gemini AI", "Firebase Admin", "Web Push VAPID", "Docker"],
+      "Full-stack personal finance application with React/Vite frontend and Express.js backend. Features JWT token revocation, Firebase Google OAuth, AI-powered receipt scanning via Gemini Vision, realtime carry-over budget calculation, and automated daily web push notifications.",
+    stack: ["React", "Node.js", "Express.js", "Knex.js", "MySQL", "Google Gemini AI", "Firebase Auth", "Web Push VAPID", "Docker"],
     deliverables: [
       "Implemented realtime carry-over, invest, and zero-budget period calculation engines",
       "Built Gemini Vision receipt OCR pipeline returning structured transaction JSON",
       "Configured burst rate limiting, HPP protection, and duplicate 60s request blocking",
-      "Architected daily 08:00 cron-based push notification scheduler per user timezone",
+      "Deployed full-stack app live on Netlify with backend on high-availability server",
     ],
+    liveUrl: "https://moneymate-abp.netlify.app/",
     githubUrl: "https://github.com/MoneyMate-ABP/moneymate-api",
-    scale: "Live Dockerized Multi-Tenant",
+    scale: "Live Production App",
   },
   ecommerce: {
     description:

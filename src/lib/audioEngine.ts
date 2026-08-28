@@ -111,36 +111,45 @@ class AudioEngine {
   }
 
   sfx(type: "click" | "prev" | "next") {
-    if (!this.ctx) this.init();
-    if (this.ctx?.state === "suspended") this.ctx.resume();
-    if (!this.ctx || !this.masterGain) return;
+    try {
+      if (!this.ctx) this.init();
+      if (this.ctx?.state === "suspended") this.ctx.resume();
+      if (!this.ctx || !this.masterGain) return;
 
-    const now = this.ctx.currentTime;
-    const o = this.ctx.createOscillator();
-    const g = this.ctx.createGain();
+      const now = this.ctx.currentTime;
+      const o = this.ctx.createOscillator();
+      const g = this.ctx.createGain();
 
-    if (type === "click") {
-      o.frequency.setValueAtTime(900, now);
-      o.frequency.exponentialRampToValueAtTime(200, now + 0.05);
-      g.gain.setValueAtTime(0.06, now);
-      g.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
-      o.stop(now + 0.07);
-    } else {
-      // prev / next: quick arpeggio hint
-      const steps = type === "next" ? [440, 554, 659] : [659, 554, 440];
-      steps.forEach((f, i) => {
-        const t = now + i * 0.04;
-        o.frequency.setValueAtTime(f, t);
-        g.gain.setValueAtTime(0.04, t);
-        g.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
-      });
-      o.stop(now + steps.length * 0.04 + 0.05);
+      o.type = "sine";
+      if (type === "click") {
+        o.frequency.setValueAtTime(900, now);
+        o.frequency.exponentialRampToValueAtTime(200, now + 0.05);
+        g.gain.setValueAtTime(0.06, now);
+        g.gain.exponentialRampToValueAtTime(0.001, now + 0.06);
+        o.connect(g);
+        g.connect(this.masterGain);
+        o.start(now);
+        o.stop(now + 0.07);
+      } else {
+        const steps = type === "next" ? [440, 554, 659] : [659, 554, 440];
+        steps.forEach((f, i) => {
+          if (!this.ctx || !this.masterGain) return;
+          const stepOsc = this.ctx.createOscillator();
+          const stepGain = this.ctx.createGain();
+          const t = now + i * 0.04;
+          stepOsc.type = "sine";
+          stepOsc.frequency.setValueAtTime(f, t);
+          stepGain.gain.setValueAtTime(0.04, t);
+          stepGain.gain.exponentialRampToValueAtTime(0.001, t + 0.035);
+          stepOsc.connect(stepGain);
+          stepGain.connect(this.masterGain);
+          stepOsc.start(t);
+          stepOsc.stop(t + 0.04);
+        });
+      }
+    } catch {
+      // Graceful fallback for audio limitations
     }
-
-    o.type = "sine";
-    o.connect(g);
-    g.connect(this.masterGain);
-    o.start(now);
   }
 
   getFreqData(): Uint8Array {

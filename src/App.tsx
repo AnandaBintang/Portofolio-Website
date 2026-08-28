@@ -15,6 +15,13 @@ import { audio } from "./lib/audioEngine";
 
 gsap.registerPlugin(ScrollTrigger);
 
+// Global window reference for scroll trigger accessibility
+declare global {
+  interface Window {
+    __portfolioScrollTo?: (idx: number) => void;
+  }
+}
+
 export default function App() {
   const [activeIdx, setActiveIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -25,6 +32,25 @@ export default function App() {
   // Sync audio playing state
   useEffect(() => {
     return audio.onStateChange(setIsPlaying);
+  }, []);
+
+  // Smooth scroll handler
+  const scrollToChapter = (idx: number) => {
+    audio.sfx("click");
+    const target = document.getElementById(`chapter-${idx}`);
+    if (target) {
+      if (lenisRef.current) {
+        lenisRef.current.scrollTo(target, { offset: -90, duration: 1.2 });
+      } else {
+        const top = target.getBoundingClientRect().top + window.scrollY - 90;
+        window.scrollTo({ top, behavior: "smooth" });
+      }
+    }
+  };
+
+  // Expose global scroll for easy debugging and synthetic triggers
+  useEffect(() => {
+    window.__portfolioScrollTo = scrollToChapter;
   }, []);
 
   // Initialize Lenis Smooth Scroll + GSAP ScrollTrigger
@@ -94,15 +120,6 @@ export default function App() {
     };
   }, []);
 
-  // Smooth scroll to chapter
-  const scrollToChapter = (idx: number) => {
-    audio.sfx("click");
-    const target = document.getElementById(`chapter-${idx}`);
-    if (target && lenisRef.current) {
-      lenisRef.current.scrollTo(target, { offset: -90, duration: 1.2 });
-    }
-  };
-
   const handlePrev = () => {
     audio.sfx("prev");
     const prevIdx = activeIdx > 0 ? activeIdx - 1 : TRACKS.length - 1;
@@ -126,14 +143,14 @@ export default function App() {
       {/* Film Grain Texture Overlay */}
       <div className="grain" />
 
-      {/* ── Persistent Top Navigation Bar ── */}
+      {/* ── Persistent Top Storyline Navigation Bar ── */}
       <header className="sticky top-0 z-40 w-full border-b border-[#332d26] bg-[#0f0d0b]/90 backdrop-blur-md">
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 h-18 flex items-center justify-between gap-4">
           
           {/* Brand Identity */}
           <div
             onClick={() => scrollToChapter(0)}
-            className="flex items-center gap-3 cursor-pointer select-none group"
+            className="flex items-center gap-3 cursor-pointer select-none group shrink-0"
           >
             <div className="w-8 h-8 rounded-full border border-[#4a4035] bg-[#1c1916] flex items-center justify-center text-white">
               <svg width="18" height="12" viewBox="0 0 100 62" fill="none">
@@ -160,32 +177,33 @@ export default function App() {
             </div>
           </div>
 
-          {/* Chapter Quick Selector Buttons */}
-          <nav className="flex items-center gap-1.5 overflow-x-auto scrollbar-none py-1">
+          {/* Music Storyline Timeline Tracker */}
+          <nav className="flex items-center gap-2 overflow-x-auto scrollbar-none py-1">
             {TRACKS.map((t, i) => (
               <button
                 key={t.id}
                 onClick={() => scrollToChapter(i)}
-                className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer select-none ${
+                className={`px-3 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer select-none whitespace-nowrap flex items-center gap-1.5 ${
                   i === activeIdx
                     ? "font-bold text-black shadow-md scale-105"
                     : "text-[#5c5248] hover:text-[#a89880] hover:bg-[#1c1916]"
                 }`}
                 style={i === activeIdx ? { background: currentTrack.artAccent } : {}}
               >
-                {t.trackNo === "00" ? "PROLOGUE" : `CH ${t.trackNo}`}
+                <span className="opacity-70 text-[10px]">{t.trackNo}</span>
+                <span>{t.storyChapter.split(":")[0]}</span>
               </button>
             ))}
           </nav>
 
           {/* Right Status */}
-          <div className="hidden lg:flex items-center gap-3 text-xs font-mono text-[#5c5248]">
+          <div className="hidden xl:flex items-center gap-3 text-xs font-mono text-[#5c5248] shrink-0">
             <span className="flex items-center gap-1.5">
               <span
                 className="w-2 h-2 rounded-full transition-colors"
                 style={{ background: isPlaying ? "#1db954" : "#5c5248" }}
               />
-              {isPlaying ? "LIVE TAPE" : "MUTED"}
+              {isPlaying ? "LIVE MASTER" : "MUTED"}
             </span>
           </div>
 
@@ -209,7 +227,7 @@ export default function App() {
           <div className="lg:col-span-7 space-y-36 pb-20">
 
             {/* ══════════════════════════════════════════════════════════════
-                CHAPTER 00: PROLOGUE / THE ARTIST PROFILE
+                CHAPTER 00: PROLOGUE: THE ACOUSTIC CORE
             ══════════════════════════════════════════════════════════════ */}
             <section
               id="chapter-0"
@@ -218,7 +236,7 @@ export default function App() {
             >
               <div className="space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#e8a045]">
-                  <span>CHAPTER 00 / PROLOGUE</span>
+                  <span>{TRACKS[0].storyChapter}</span>
                 </div>
                 <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-[#f0ebe3] leading-[1.08]">
                   THE INVISIBLE <br />
@@ -293,7 +311,7 @@ export default function App() {
             >
               <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#4a9eff]">
-                  <span>CHAPTER 01 / ENTERPRISE MASTER</span>
+                  <span>{TRACKS[1].storyChapter}</span>
                 </div>
                 <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#f0ebe3]">
                   AYO KASIR BY SRC.
@@ -366,7 +384,7 @@ export default function App() {
             >
               <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#5dbf6e]">
-                  <span>CHAPTER 02 / DOMAIN SERVICES</span>
+                  <span>{TRACKS[2].storyChapter}</span>
                 </div>
                 <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#f0ebe3]">
                   AYO QONCIERGE.
@@ -419,7 +437,7 @@ export default function App() {
             </section>
 
             {/* ══════════════════════════════════════════════════════════════
-                CHAPTER 03: MONEYMATE API
+                CHAPTER 03: MONEYMATE
             ══════════════════════════════════════════════════════════════ */}
             <section
               id="chapter-3"
@@ -428,20 +446,20 @@ export default function App() {
             >
               <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#c77dff]">
-                  <span>CHAPTER 03 / FINANCIAL ENGINE</span>
+                  <span>{TRACKS[3].storyChapter}</span>
                 </div>
                 <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#f0ebe3]">
-                  MONEYMATE API.
+                  MONEYMATE.
                 </h2>
                 <p className="text-sm font-mono text-[#a89880]">
-                  AI Vision Scan & Realtime Carry-Over Budget Engine
+                  AI Vision Scan & Realtime Carry-Over Budget Platform
                 </p>
               </div>
 
               <div className="story-reveal bg-[#141210] border border-[#332d26] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
                 <div className="space-y-3">
                   <h3 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest">
-                    ALGORITHMIC ENGINE
+                    ALGORITHMIC FINANCIAL PLATFORM
                   </h3>
                   <p className="text-sm sm:text-base text-[#a89880] leading-relaxed">
                     {PROJECTS["moneymate"].description}
@@ -478,15 +496,26 @@ export default function App() {
                       </span>
                     ))}
                   </div>
-                  <a
-                    href={PROJECTS["moneymate"].githubUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#c77dff] text-[#c77dff] hover:bg-[#c77dff] hover:text-black text-xs font-mono font-bold transition-all"
-                  >
-                    <span>SOURCE REPO</span>
-                    <ArrowUpRight size={13} weight="bold" />
-                  </a>
+                  <div className="flex items-center gap-3">
+                    <a
+                      href={PROJECTS["moneymate"].liveUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#c77dff] text-black text-xs font-mono font-bold hover:bg-[#d699ff] transition-all"
+                    >
+                      <span>LIVE WEB APP</span>
+                      <ArrowUpRight size={13} weight="bold" />
+                    </a>
+                    <a
+                      href={PROJECTS["moneymate"].githubUrl}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#c77dff] text-[#c77dff] hover:bg-[#c77dff] hover:text-black text-xs font-mono font-bold transition-all"
+                    >
+                      <span>SOURCE REPO</span>
+                      <ArrowUpRight size={13} weight="bold" />
+                    </a>
+                  </div>
                 </div>
               </div>
             </section>
@@ -501,7 +530,7 @@ export default function App() {
             >
               <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#fbbf24]">
-                  <span>CHAPTER 04 / DIGITAL COMMERCE</span>
+                  <span>{TRACKS[4].storyChapter}</span>
                 </div>
                 <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#f0ebe3]">
                   TRANSACTION LEDGER.
@@ -563,7 +592,7 @@ export default function App() {
             >
               <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#2dd4bf]">
-                  <span>CHAPTER 05 / EQUALIZER BANDS</span>
+                  <span>{TRACKS[5].storyChapter}</span>
                 </div>
                 <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#f0ebe3]">
                   STUDIO SETUP.
@@ -611,7 +640,7 @@ export default function App() {
             >
               <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#f472b6]">
-                  <span>CHAPTER 06 / LOGBOOK</span>
+                  <span>{TRACKS[6].storyChapter}</span>
                 </div>
                 <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#f0ebe3]">
                   SESSION LOGS.
