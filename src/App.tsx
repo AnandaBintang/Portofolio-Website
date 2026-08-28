@@ -119,7 +119,6 @@ export default function App() {
   );
 
   const handleContainerScroll = (e: React.UIEvent<HTMLDivElement>) => {
-    // If locked during transition, force container to top (0) to eliminate inertia pollution
     if (isTransitioningRef.current || Date.now() < transitionLockUntilRef.current) {
       if (e.currentTarget.scrollTop !== 0) {
         e.currentTarget.scrollTop = 0;
@@ -130,11 +129,10 @@ export default function App() {
     computeAndSetProgress(activeSectionIdx, el.scrollTop, el.scrollHeight, el.clientHeight);
   };
 
-  // Fullscreen Needle Drop Transition with calm pacing & mechanical reveal
+  // Fullscreen Needle Drop Transition with self-contained autonomous sequence
   const goToSection = useCallback(
     (targetIdx: number) => {
       const now = Date.now();
-      // Hard Lock: block any call if already transitioning or inside cooldown period
       if (
         isTransitioningRef.current ||
         now < transitionLockUntilRef.current ||
@@ -146,15 +144,15 @@ export default function App() {
         return;
       }
 
-      // Lock for 2300ms for a peaceful, unhurried analog experience
+      // Lock for 2200ms to guarantee zero scroll pollution during the entire autonomous sequence
       isTransitioningRef.current = true;
-      transitionLockUntilRef.current = now + 2300;
+      transitionLockUntilRef.current = now + 2200;
       setMenuOpen(false);
 
       const targetMeta = SECTIONS_CONFIG[targetIdx];
       audio.sfx("rewind");
 
-      // 1. INSTANT COVER: Mechanical shutter snaps shut at t=0
+      // 1. Trigger Autonomous Transition Sequence
       setTransitionState({
         isTransitioning: true,
         name: targetMeta.name,
@@ -162,7 +160,7 @@ export default function App() {
         accent: targetMeta.accent,
       });
 
-      // 2. STAGE SWITCH: Update content behind the opaque vinyl shutter at t=600ms
+      // 2. STAGE SWITCH: Update content behind the opaque vinyl curtain at t=700ms (during reading pause)
       setTimeout(() => {
         setActiveSectionIdx(targetIdx);
         activeSectionIdxRef.current = targetIdx;
@@ -170,26 +168,18 @@ export default function App() {
           scrollContainerRef.current.scrollTop = 0;
         }
         setScrollProgress(targetIdx * 25);
-      }, 600);
-
-      // 3. ZERO SCROLL GUARANTEE at t=1000ms
-      setTimeout(() => {
-        if (scrollContainerRef.current) {
-          scrollContainerRef.current.scrollTop = 0;
-        }
-      }, 1000);
-
-      // 4. CALM MECHANICAL REVEAL: Needle lifts and shutter panels split open at t=1400ms
-      setTimeout(() => {
-        setTransitionState((prev) => ({ ...prev, isTransitioning: false }));
-        isTransitioningRef.current = false;
-        if (scrollContainerRef.current) {
-          scrollContainerRef.current.scrollTop = 0;
-        }
-      }, 1400);
+      }, 700);
     },
     [menuOpen]
   );
+
+  const handleAnimationComplete = useCallback(() => {
+    setTransitionState((prev) => ({ ...prev, isTransitioning: false }));
+    isTransitioningRef.current = false;
+    if (scrollContainerRef.current) {
+      scrollContainerRef.current.scrollTop = 0;
+    }
+  }, []);
 
   // Keyboard shortcut listener (ESC to close menu)
   useEffect(() => {
@@ -212,7 +202,6 @@ export default function App() {
 
     const onWheel = (e: WheelEvent) => {
       const now = Date.now();
-      // If locked or menu is open, swallow wheel momentum entirely & zero scroll
       if (isTransitioningRef.current || now < transitionLockUntilRef.current || menuOpen) {
         e.preventDefault();
         container.scrollTop = 0;
@@ -342,12 +331,13 @@ export default function App() {
         }}
       />
 
-      {/* ── Fullscreen Tape Shutter Section Transition (Turntable Needle Drop) ── */}
+      {/* ── Fullscreen Autonomous Turntable Transition Sequence ── */}
       <SectionTransitionCurtain
         isTransitioning={transitionState.isTransitioning}
         targetSectionName={transitionState.name}
         targetSectionSubtitle={transitionState.subtitle}
         accentColor={transitionState.accent}
+        onAnimationComplete={handleAnimationComplete}
       />
 
       {/* ── Fixed Master Header ── */}

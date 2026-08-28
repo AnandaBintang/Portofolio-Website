@@ -6,6 +6,7 @@ interface SectionTransitionCurtainProps {
   targetSectionName: string;
   targetSectionSubtitle: string;
   accentColor: string;
+  onAnimationComplete?: () => void;
 }
 
 export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> = ({
@@ -13,93 +14,94 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
   targetSectionName,
   targetSectionSubtitle,
   accentColor,
+  onAnimationComplete,
 }) => {
   const containerRef = useRef<HTMLDivElement | null>(null);
   const cardRef = useRef<HTMLDivElement | null>(null);
   const vinylDiscRef = useRef<HTMLDivElement | null>(null);
   const tonearmRef = useRef<HTMLDivElement | null>(null);
-  const wasActiveRef = useRef(false);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     if (isTransitioning) {
-      wasActiveRef.current = true;
-      // 1. Instantly display & lock the solid backdrop
+      // 1. Instantly display backdrop
       containerRef.current.style.display = "flex";
       containerRef.current.style.pointerEvents = "auto";
 
       const ctx = gsap.context(() => {
         const tl = gsap.timeline();
 
-        // 2. Solid Curtain Fades In quickly
+        // ════════════════════════════════════════════════════════════════════
+        // ENTRANCE SEQUENCE (~0.7s)
+        // ════════════════════════════════════════════════════════════════════
         tl.fromTo(
           containerRef.current,
           { opacity: 0 },
           { opacity: 1, duration: 0.2, ease: "power2.out" }
         )
-          // 3. Entire Turntable + Typography enters together
           .fromTo(
             cardRef.current,
             { opacity: 0, scale: 0.88, y: 25 },
-            { opacity: 1, scale: 1, y: 0, duration: 0.4, ease: "power3.out" },
+            { opacity: 1, scale: 1, y: 0, duration: 0.45, ease: "power3.out" },
             0.05
           )
-          // 4. Continuous Vinyl Spin
           .fromTo(
             vinylDiscRef.current,
             { rotate: 0 },
-            { rotate: 1800, duration: 4, ease: "power1.inOut" },
+            { rotate: 1800, duration: 3.5, ease: "power1.inOut" },
             0
           )
-          // 5. Tonearm Drops onto the spinning vinyl grooves
+          // Needle Drops onto the record
           .fromTo(
             tonearmRef.current,
             { rotate: -38, transformOrigin: "top right" },
             { rotate: 2, duration: 0.45, ease: "back.out(1.3)" },
             0.1
-          );
-      }, containerRef);
+          )
 
-      return () => ctx.revert();
-    } else if (wasActiveRef.current) {
-      // ONLY RUN OUTGOING ANIMATION IF IT WAS ACTUALLY ACTIVE
-      const ctx = gsap.context(() => {
-        const tl = gsap.timeline({
-          onComplete: () => {
-            if (containerRef.current) {
-              containerRef.current.style.display = "none";
-              containerRef.current.style.pointerEvents = "none";
-            }
-            wasActiveRef.current = false;
-          },
-        });
+          // ════════════════════════════════════════════════════════════════════
+          // READING / CUEING PAUSE (0.6s)
+          // ════════════════════════════════════════════════════════════════════
+          .to({}, { duration: 0.6 })
 
-        // Step 1: CLEAR NEEDLE LIFT (Tonearm swings up dramatically from record)
-        tl.to(tonearmRef.current, {
-          rotate: -40,
-          duration: 0.5,
-          ease: "power3.inOut",
-        })
-          // Step 2: Turntable card slides slightly up and scales down gracefully
+          // ════════════════════════════════════════════════════════════════════
+          // EXPLICIT EXIT SEQUENCE (~0.8s) - Needle Lifts & Card Slides Out
+          // ════════════════════════════════════════════════════════════════════
+          // 1. NEEDLE LIFTS CLEARLY OFF THE RECORD
+          .to(tonearmRef.current, {
+            rotate: -42,
+            duration: 0.45,
+            ease: "power3.inOut",
+          })
+          // 2. Turntable + Cue text smoothly glide up and scale down
           .to(
             cardRef.current,
             {
               opacity: 0,
               scale: 0.9,
-              y: -20,
-              duration: 0.45,
+              y: -25,
+              duration: 0.4,
               ease: "power2.in",
             },
             "-=0.2"
           )
-          // Step 3: Dark backdrop smoothly fades away revealing the target section
+          // 3. Dark backdrop smoothly reveals the target stage
           .to(
             containerRef.current,
             {
               opacity: 0,
-              duration: 0.45,
+              duration: 0.4,
               ease: "power2.out",
+              onComplete: () => {
+                if (containerRef.current) {
+                  containerRef.current.style.display = "none";
+                  containerRef.current.style.pointerEvents = "none";
+                }
+                if (onAnimationComplete) {
+                  onAnimationComplete();
+                }
+              },
             },
             "-=0.15"
           );
@@ -107,7 +109,7 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
 
       return () => ctx.revert();
     }
-  }, [isTransitioning]);
+  }, [isTransitioning, onAnimationComplete]);
 
   return (
     <div
