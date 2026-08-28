@@ -74,6 +74,8 @@ export default function App() {
 
   const lenisRef = useRef<Lenis | null>(null);
   const transitionTimeoutRef = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const isTransitioningRef = useRef<boolean>(false);
+  const lastSectionRef = useRef<string>("prologue");
 
   const currentTrack: Track = PLAYABLE_TRACKS[activeTrackIdx] || PLAYABLE_TRACKS[0];
 
@@ -91,6 +93,7 @@ export default function App() {
     };
 
     audio.sfx("rewind");
+    isTransitioningRef.current = true;
 
     setTransitionState({
       isTransitioning: true,
@@ -103,7 +106,7 @@ export default function App() {
       clearTimeout(transitionTimeoutRef.current);
     }
 
-    // Smooth scroll during shutter closure
+    // Scroll during shutter closure
     setTimeout(() => {
       const target = document.getElementById(targetId);
       if (target) {
@@ -118,7 +121,39 @@ export default function App() {
     // Open shutter back
     transitionTimeoutRef.current = setTimeout(() => {
       setTransitionState((prev) => ({ ...prev, isTransitioning: false }));
+      isTransitioningRef.current = false;
     }, 650);
+  };
+
+  // Micro flash shutter for in-scroll threshold transitions
+  const triggerScrollWipe = (sectionId: string) => {
+    if (isTransitioningRef.current || lastSectionRef.current === sectionId) return;
+    lastSectionRef.current = sectionId;
+    isTransitioningRef.current = true;
+
+    const meta = SECTION_METADATA[sectionId] || {
+      name: "STUDIO SECTION",
+      subtitle: "// ENTERING NEW ACOUSTIC SPACE",
+      accent: currentTrack.artAccent,
+    };
+
+    audio.sfx("rewind");
+
+    setTransitionState({
+      isTransitioning: true,
+      name: meta.name,
+      subtitle: meta.subtitle,
+      accent: meta.accent,
+    });
+
+    if (transitionTimeoutRef.current) {
+      clearTimeout(transitionTimeoutRef.current);
+    }
+
+    transitionTimeoutRef.current = setTimeout(() => {
+      setTransitionState((prev) => ({ ...prev, isTransitioning: false }));
+      isTransitioningRef.current = false;
+    }, 550);
   };
 
   const handlePrevTrack = () => {
@@ -156,6 +191,25 @@ export default function App() {
 
     gsap.ticker.add(updateTicker);
     gsap.ticker.lagSmoothing(0);
+
+    // Global Section ScrollTriggers that trigger the fullscreen shutter wipe on natural scroll
+    const mainSectionIds = ["prologue", "projects-area", "experience-area", "frequencies-area"];
+    const sectionTriggers: ScrollTrigger[] = [];
+
+    mainSectionIds.forEach((id) => {
+      const el = document.getElementById(id);
+      if (!el) return;
+
+      const st = ScrollTrigger.create({
+        trigger: el,
+        start: "top 60%",
+        end: "bottom 40%",
+        onEnter: () => triggerScrollWipe(id),
+        onEnterBack: () => triggerScrollWipe(id),
+      });
+
+      sectionTriggers.push(st);
+    });
 
     // Observer for projects area (where vinyl deck is active)
     const projectsSection = document.getElementById("projects-area");
@@ -208,6 +262,7 @@ export default function App() {
     });
 
     return () => {
+      sectionTriggers.forEach((t) => t.kill());
       trackTriggers.forEach((t) => t.kill());
       lenis.destroy();
       gsap.ticker.remove(updateTicker);
