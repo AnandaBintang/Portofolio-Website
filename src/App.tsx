@@ -79,6 +79,7 @@ export default function App() {
   const [activeTrackIdx, setActiveTrackIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [scrollProgress, setScrollProgress] = useState(0);
   const [transitionState, setTransitionState] = useState<TransitionState>({
     isTransitioning: false,
     name: "",
@@ -97,6 +98,19 @@ export default function App() {
   useEffect(() => {
     return audio.onStateChange(setIsPlaying);
   }, []);
+
+  // Update total scroll percentage across the 4 chapters
+  const updateScrollProgress = useCallback(() => {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    const maxScrollInStage = container.scrollHeight - container.clientHeight;
+    const stageScrollRatio = maxScrollInStage > 0 ? container.scrollTop / maxScrollInStage : 0;
+
+    // Total progress = (activeSectionIdx * 25%) + (stageScrollRatio * 25%)
+    const totalProgress = (activeSectionIdx * 25) + (stageScrollRatio * 25);
+    setScrollProgress(Math.min(100, Math.max(0, totalProgress)));
+  }, [activeSectionIdx]);
 
   // Fullscreen transition shutter between pinned sections
   const goToSection = useCallback(
@@ -130,6 +144,7 @@ export default function App() {
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollTop = 0;
         }
+        setScrollProgress(targetIdx * 25);
       }, 300);
 
       // Open shutter
@@ -142,7 +157,7 @@ export default function App() {
     [activeSectionIdx, menuOpen]
   );
 
-  // Keyboard shortcut listener (ESC to close menu, Space to play/pause)
+  // Keyboard shortcut listener (ESC to close menu)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && menuOpen) {
@@ -153,7 +168,7 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [menuOpen]);
 
-  // Wheel listener: checks if container reached bottom/top to trigger section wipe
+  // Wheel & Touch listener for bottom-boundary section transitions
   useEffect(() => {
     const handleWheel = (e: WheelEvent) => {
       if (isTransitioningRef.current || menuOpen) {
@@ -225,16 +240,15 @@ export default function App() {
     };
   }, [activeSectionIdx, goToSection, menuOpen]);
 
-  const handlePrevTrack = () => {
-    audio.sfx("prev");
-    const next = activeTrackIdx > 0 ? activeTrackIdx - 1 : PLAYABLE_TRACKS.length - 1;
-    setActiveTrackIdx(next);
+  // Section next / prev controls
+  const handlePrevSection = () => {
+    const nextIdx = activeSectionIdx > 0 ? activeSectionIdx - 1 : SECTIONS_CONFIG.length - 1;
+    goToSection(nextIdx);
   };
 
-  const handleNextTrack = () => {
-    audio.sfx("next");
-    const next = activeTrackIdx < PLAYABLE_TRACKS.length - 1 ? activeTrackIdx + 1 : 0;
-    setActiveTrackIdx(next);
+  const handleNextSection = () => {
+    const nextIdx = activeSectionIdx < SECTIONS_CONFIG.length - 1 ? activeSectionIdx + 1 : 0;
+    goToSection(nextIdx);
   };
 
   const currentSectionConfig = SECTIONS_CONFIG[activeSectionIdx];
@@ -333,6 +347,7 @@ export default function App() {
       {/* ── Active Pinned Section Stage ── */}
       <main
         ref={scrollContainerRef}
+        onScroll={updateScrollProgress}
         className="flex-1 overflow-y-auto scrollable relative pb-32"
       >
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-8 md:py-10 min-h-full">
@@ -790,18 +805,19 @@ export default function App() {
         </div>
       </main>
 
-      {/* ── Persistent Bottom Music Player Bar ── */}
+      {/* ── Persistent Bottom Music Player Bar with Realtime Scroll Percentage ── */}
       <PlayerBar
         currentTrack={currentTrack}
-        currentIdx={activeTrackIdx}
-        onPrev={handlePrevTrack}
-        onNext={handleNextTrack}
+        scrollProgress={scrollProgress}
+        onPrevSection={handlePrevSection}
+        onNextSection={handleNextSection}
         onTrackSelect={(idx) => {
           setActiveTrackIdx(idx);
           if (activeSectionIdx !== 1) {
             goToSection(1);
           }
         }}
+        currentTrackIdx={activeTrackIdx}
       />
     </div>
   );

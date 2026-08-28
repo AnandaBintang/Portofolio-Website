@@ -1,4 +1,4 @@
-import React, { useEffect, useRef, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { PLAYABLE_TRACKS, type Track } from "../data/tracks";
 import { audio } from "../lib/audioEngine";
 import { Waveform } from "./Waveform";
@@ -6,10 +6,11 @@ import { Cassette } from "./Cassette";
 
 interface PlayerBarProps {
   currentTrack: Track;
-  onPrev: () => void;
-  onNext: () => void;
+  scrollProgress: number; // 0 to 100 percentage based on user scroll of the entire experience
+  onPrevSection: () => void;
+  onNextSection: () => void;
   onTrackSelect: (idx: number) => void;
-  currentIdx: number;
+  currentTrackIdx: number;
 }
 
 const IconPrev = () => (
@@ -40,50 +41,23 @@ const IconList = () => (
 
 export const PlayerBar: React.FC<PlayerBarProps> = ({
   currentTrack,
-  onPrev,
-  onNext,
+  scrollProgress,
+  onPrevSection,
+  onNextSection,
   onTrackSelect,
-  currentIdx,
+  currentTrackIdx,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
-  const [progress, setProgress] = useState(0);
   const [showPlaylist, setShowPlaylist] = useState(false);
-  const progRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Sync playing state from audio engine
   useEffect(() => {
     return audio.onStateChange(setIsPlaying);
   }, []);
 
-  // Progress crawl
-  useEffect(() => {
-    if (isPlaying) {
-      progRef.current = setInterval(() => {
-        setProgress((p) => (p >= 100 ? 0 : p + 0.15));
-      }, 80);
-    } else {
-      if (progRef.current) clearInterval(progRef.current);
-    }
-    return () => {
-      if (progRef.current) clearInterval(progRef.current);
-    };
-  }, [isPlaying]);
-
-  useEffect(() => {
-    setProgress(0);
-  }, [currentTrack.id]);
-
   const handlePlayPause = () => {
     audio.sfx("click");
     audio.toggle();
-  };
-
-  const handlePrev = () => {
-    onPrev();
-  };
-
-  const handleNext = () => {
-    onNext();
   };
 
   return (
@@ -115,7 +89,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                   setShowPlaylist(false);
                 }}
                 className={`w-full flex items-center gap-3.5 px-4 py-3 rounded-xl text-left transition-all cursor-pointer ${
-                  idx === currentIdx
+                  idx === currentTrackIdx
                     ? "bg-[#242018] text-[#e8a045] border border-[#4a4035]"
                     : "text-[#a89880] hover:bg-[#1c1916] hover:text-[#f0ebe3]"
                 }`}
@@ -125,7 +99,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                   <p className="text-sm font-semibold truncate text-[#f0ebe3]">{track.title}</p>
                   <p className="text-xs text-[#5c5248] truncate">{track.artist}</p>
                 </div>
-                {idx === currentIdx && isPlaying && (
+                {idx === currentTrackIdx && isPlaying && (
                   <span className="shrink-0 w-2 h-2 rounded-full bg-[#1db954] pulse" />
                 )}
               </button>
@@ -134,7 +108,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         </div>
       )}
 
-      {/* Sticky Player Bar */}
+      {/* Sticky Bottom Player Bar */}
       <div
         className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#332d26]"
         style={{
@@ -143,12 +117,12 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
           backdropFilter: "blur(24px)",
         }}
       >
-        {/* Realtime Progress Crawl */}
-        <div className="w-full h-0.5 bg-[#2a2520]">
+        {/* Realtime User Scroll Progress Trackline */}
+        <div className="w-full h-1 bg-[#242018] relative overflow-hidden">
           <div
-            className="h-full transition-none"
+            className="h-full transition-all duration-150 ease-out"
             style={{
-              width: `${progress}%`,
+              width: `${Math.min(100, Math.max(0, scrollProgress))}%`,
               background: `linear-gradient(90deg, ${currentTrack.artAccent}, #1db954)`,
             }}
           />
@@ -170,11 +144,11 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
             </div>
           </div>
 
-          {/* Center: Playhead Controls & Status */}
+          {/* Center: Playhead Controls (Previous Section / Play / Next Section) */}
           <div className="flex flex-col items-center gap-1.5 flex-1 max-w-md">
             <div className="hidden sm:flex items-center gap-2 text-[10px] font-mono text-[#5c5248]">
               <span className="bg-[#1c1916] px-2 py-0.5 rounded border border-[#332d26] text-[#e8a045]">
-                {currentTrack.trackNo}
+                {Math.round(scrollProgress)}% PROG
               </span>
               <span>{currentTrack.genre}</span>
               <span>·</span>
@@ -183,9 +157,9 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
 
             <div className="flex items-center gap-5">
               <button
-                onClick={handlePrev}
-                className="text-[#a89880] hover:text-[#f0ebe3] active:scale-90 transition-all cursor-pointer p-1"
-                title="Previous track"
+                onClick={onPrevSection}
+                className="text-[#a89880] hover:text-[#f0ebe3] active:scale-90 transition-all cursor-pointer p-1.5 rounded-full hover:bg-[#1c1916]"
+                title="Previous Section (Shutter Wipe)"
               >
                 <IconPrev />
               </button>
@@ -209,9 +183,9 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
               </button>
 
               <button
-                onClick={handleNext}
-                className="text-[#a89880] hover:text-[#f0ebe3] active:scale-90 transition-all cursor-pointer p-1"
-                title="Next track"
+                onClick={onNextSection}
+                className="text-[#a89880] hover:text-[#f0ebe3] active:scale-90 transition-all cursor-pointer p-1.5 rounded-full hover:bg-[#1c1916]"
+                title="Next Section (Shutter Wipe)"
               >
                 <IconNext />
               </button>
