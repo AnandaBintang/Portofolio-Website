@@ -91,9 +91,6 @@ export default function App() {
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
   const wheelAccumulatorRef = useRef(0);
   const touchStartYRef = useRef(0);
-  const targetScrollProgressRef = useRef(0);
-  const currentScrollProgressRef = useRef(0);
-  const rafProgressRef = useRef<number | null>(null);
   const lastSectionChangeTimeRef = useRef(0);
 
   const currentTrack: Track = PLAYABLE_TRACKS[activeTrackIdx] || PLAYABLE_TRACKS[0];
@@ -103,37 +100,20 @@ export default function App() {
     return audio.onStateChange(setIsPlaying);
   }, []);
 
-  // Smooth Interpolated Lerp Progress Loop (Ultra-smooth 60/120fps trackline)
-  useEffect(() => {
-    const updateProgressLerp = () => {
-      // Lerp: current = current + (target - current) * 0.12
-      currentScrollProgressRef.current +=
-        (targetScrollProgressRef.current - currentScrollProgressRef.current) * 0.14;
-
-      setScrollProgress(currentScrollProgressRef.current);
-      rafProgressRef.current = requestAnimationFrame(updateProgressLerp);
-    };
-
-    rafProgressRef.current = requestAnimationFrame(updateProgressLerp);
-
-    return () => {
-      if (rafProgressRef.current) cancelAnimationFrame(rafProgressRef.current);
-    };
+  // Recalculate and update continuous scroll percentage (0 to 100%)
+  const computeAndSetProgress = useCallback((sectionIdx: number, scrollTop: number, scrollHeight: number, clientHeight: number) => {
+    const maxScrollInStage = scrollHeight - clientHeight;
+    const stageRatio = maxScrollInStage > 0 ? Math.min(1, Math.max(0, scrollTop / maxScrollInStage)) : 0;
+    
+    // Each section represents a exact 25% span of the entire journey
+    const totalProg = (sectionIdx * 25) + (stageRatio * 25);
+    setScrollProgress(Math.min(100, Math.max(0, totalProg)));
   }, []);
 
-  // Update target scroll percentage across the 4 chapters
-  const updateScrollProgress = useCallback(() => {
-    const container = scrollContainerRef.current;
-    if (!container) return;
-
-    const maxScrollInStage = container.scrollHeight - container.clientHeight;
-    const stageScrollRatio =
-      maxScrollInStage > 0 ? container.scrollTop / maxScrollInStage : 0;
-
-    // Total target progress = (activeSectionIdx * 25%) + (stageScrollRatio * 25%)
-    const rawProgress = activeSectionIdx * 25 + stageScrollRatio * 25;
-    targetScrollProgressRef.current = Math.min(100, Math.max(0, rawProgress));
-  }, [activeSectionIdx]);
+  const handleContainerScroll = (e: React.UIEvent<HTMLDivElement>) => {
+    const el = e.currentTarget;
+    computeAndSetProgress(activeSectionIdx, el.scrollTop, el.scrollHeight, el.clientHeight);
+  };
 
   // Fullscreen transition shutter between pinned sections (strictly 1 section jump)
   const goToSection = useCallback(
@@ -172,7 +152,7 @@ export default function App() {
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollTop = 0;
         }
-        targetScrollProgressRef.current = targetIdx * 25;
+        setScrollProgress(targetIdx * 25);
       }, 300);
 
       // Open shutter
@@ -380,7 +360,7 @@ export default function App() {
       {/* ── Active Pinned Section Stage ── */}
       <main
         ref={scrollContainerRef}
-        onScroll={updateScrollProgress}
+        onScroll={handleContainerScroll}
         className="flex-1 overflow-y-auto scrollable relative pb-32"
       >
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-8 md:py-10 min-h-full">
@@ -838,7 +818,7 @@ export default function App() {
         </div>
       </main>
 
-      {/* ── Persistent Bottom Music Player Bar with Realtime Interpolated Scroll Percentage ── */}
+      {/* ── Persistent Bottom Music Player Bar with Direct Realtime Scroll Percentage ── */}
       <PlayerBar
         currentTrack={currentTrack}
         scrollProgress={scrollProgress}

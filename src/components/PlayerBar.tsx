@@ -6,7 +6,7 @@ import { Cassette } from "./Cassette";
 
 interface PlayerBarProps {
   currentTrack: Track;
-  scrollProgress: number; // 0 to 100 percentage based on user scroll of the entire experience
+  scrollProgress: number; // Continuous 0 to 100%
   onPrevSection: () => void;
   onNextSection: () => void;
   onTrackSelect: (idx: number) => void;
@@ -59,6 +59,8 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
     audio.sfx("click");
     audio.toggle();
   };
+
+  const clampedProgress = Math.min(100, Math.max(0, scrollProgress));
 
   return (
     <>
@@ -117,13 +119,15 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
           backdropFilter: "blur(24px)",
         }}
       >
-        {/* Realtime User Scroll Progress Trackline */}
+        {/* Realtime Smooth Continuous Scroll Progress Trackline */}
         <div className="w-full h-1 bg-[#242018] relative overflow-hidden">
           <div
-            className="h-full transition-all duration-150 ease-out"
+            className="h-full origin-left will-change-transform"
             style={{
-              width: `${Math.min(100, Math.max(0, scrollProgress))}%`,
+              transform: `scaleX(${clampedProgress / 100})`,
+              transformOrigin: "left",
               background: `linear-gradient(90deg, ${currentTrack.artAccent}, #1db954)`,
+              transition: "transform 0.08s linear",
             }}
           />
         </div>
@@ -148,7 +152,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
           <div className="flex flex-col items-center gap-1.5 flex-1 max-w-md">
             <div className="hidden sm:flex items-center gap-2 text-[10px] font-mono text-[#5c5248]">
               <span className="bg-[#1c1916] px-2 py-0.5 rounded border border-[#332d26] text-[#e8a045]">
-                {Math.round(scrollProgress)}% PROG
+                {Math.round(clampedProgress)}% JOURNEY
               </span>
               <span>{currentTrack.genre}</span>
               <span>·</span>
