@@ -1,40 +1,111 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@300;400;500;600;700&family=Space+Mono:ital,wght@0,400;0,700;1,400&display=swap');
 
-@layer base {
-  :root {
-    --bg-primary: #0a0a0c;
-    --bg-surface: #121216;
-    --bg-surface-elevated: #1a1a22;
-    --border-hairline: #262630;
-    --border-highlight: #3a3a48;
-    --text-primary: #f4f4f6;
-    --text-secondary: #9090a0;
-    --text-muted: #5c5c6e;
-    --accent-signal: #00f076;
-    --accent-signal-dim: rgba(0, 240, 118, 0.15);
-  }
+:root {
+  /* Lo-Fi Spotify Palette - warm dark */
+  --bg-void:      #0f0d0b;
+  --bg-base:      #141210;
+  --bg-surface:   #1c1916;
+  --bg-elevated:  #242018;
+  --bg-card:      #2a2520;
 
-  body {
-    background-color: var(--bg-primary);
-    color: var(--text-primary);
-    font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
-    overflow-x: hidden;
-    selection-background-color: var(--accent-signal);
-    selection-color: #000000;
-  }
+  --border:       #332d26;
+  --border-warm:  #4a4035;
+
+  --text-primary:    #f0ebe3;
+  --text-secondary:  #a89880;
+  --text-muted:      #5c5248;
+
+  --accent:       #e8a045;   /* warm amber - cassette tape orange */
+  --accent-dim:   rgba(232, 160, 69, 0.15);
+  --accent-glow:  rgba(232, 160, 69, 0.08);
+
+  --green:        #1db954;   /* Spotify green - for playing state */
+  --green-dim:    rgba(29, 185, 84, 0.15);
 }
 
-/* Custom scrollbar */
-::-webkit-scrollbar {
-  width: 6px;
+* { box-sizing: border-box; margin: 0; padding: 0; }
+
+html { height: 100%; }
+
+body {
+  height: 100%;
+  background: var(--bg-void);
+  color: var(--text-primary);
+  font-family: 'Space Grotesk', system-ui, sans-serif;
+  overflow: hidden; /* full-screen app mode */
+  user-select: none;
 }
-::-webkit-scrollbar-track {
-  background: #0a0a0c;
+
+#root {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
 }
-::-webkit-scrollbar-thumb {
-  background: #262630;
-  border-radius: 3px;
+
+/* ---- Film Grain Overlay ---- */
+.grain {
+  position: fixed;
+  inset: 0;
+  z-index: 999;
+  pointer-events: none;
+  opacity: 0.035;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 512 512' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.75' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-repeat: repeat;
+  background-size: 256px 256px;
+  animation: grain-shift 0.5s steps(2) infinite;
 }
-::-webkit-scrollbar-thumb:hover {
-  background: #3a3a48;
+
+@keyframes grain-shift {
+  0%   { background-position: 0 0; }
+  25%  { background-position: -64px -32px; }
+  50%  { background-position: 32px 64px; }
+  75%  { background-position: -96px 16px; }
+  100% { background-position: 48px -48px; }
+}
+
+/* ---- Scrollbar (inside track views) ---- */
+.scrollable {
+  overflow-y: auto;
+  scrollbar-width: thin;
+  scrollbar-color: var(--border-warm) transparent;
+}
+.scrollable::-webkit-scrollbar { width: 4px; }
+.scrollable::-webkit-scrollbar-track { background: transparent; }
+.scrollable::-webkit-scrollbar-thumb { background: var(--border-warm); border-radius: 2px; }
+
+/* ---- Cassette Reel spin ---- */
+@keyframes reel-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.reel-spin { animation: reel-spin 2s linear infinite; }
+.reel-spin-slow { animation: reel-spin 4s linear infinite; }
+
+/* ---- Pulse dot ---- */
+@keyframes pulse-dot {
+  0%, 100% { opacity: 1; }
+  50%       { opacity: 0.3; }
+}
+.pulse { animation: pulse-dot 1.4s ease-in-out infinite; }
+
+/* ---- Track view transitions (GSAP handles classes) ---- */
+.track-view {
+  position: absolute;
+  inset: 0;
+  bottom: 88px; /* player bar height */
+  overflow: hidden;
+}
+
+/* ---- Vinyl spin ---- */
+@keyframes vinyl-spin {
+  from { transform: rotate(0deg); }
+  to   { transform: rotate(360deg); }
+}
+.vinyl-spin { animation: vinyl-spin 5s linear infinite; }
+
+/* ---- Text selection ---- */
+::selection {
+  background: var(--accent);
+  color: #000;
 }
