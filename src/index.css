@@ -24,23 +24,19 @@
   --green-dim:    rgba(29, 185, 84, 0.15);
 }
 
-* { box-sizing: border-box; margin: 0; padding: 0; }
-
-html { height: 100%; }
-
-body {
-  height: 100%;
+html {
   background: var(--bg-void);
   color: var(--text-primary);
-  font-family: 'Space Grotesk', system-ui, sans-serif;
-  overflow: hidden; /* full-screen app mode */
-  user-select: none;
+  font-family: 'Space Grotesk', system-ui, -apple-system, sans-serif;
+  scroll-behavior: auto; /* Managed by Lenis */
 }
 
-#root {
-  height: 100%;
-  display: flex;
-  flex-direction: column;
+body {
+  background: var(--bg-void);
+  color: var(--text-primary);
+  overflow-x: hidden;
+  overflow-y: auto;
+  user-select: none;
 }
 
 /* ---- Film Grain Overlay ---- */
@@ -64,16 +60,6 @@ body {
   100% { background-position: 48px -48px; }
 }
 
-/* ---- Scrollbar (inside track views) ---- */
-.scrollable {
-  overflow-y: auto;
-  scrollbar-width: thin;
-  scrollbar-color: var(--border-warm) transparent;
-}
-.scrollable::-webkit-scrollbar { width: 4px; }
-.scrollable::-webkit-scrollbar-track { background: transparent; }
-.scrollable::-webkit-scrollbar-thumb { background: var(--border-warm); border-radius: 2px; }
-
 /* ---- Cassette Reel spin ---- */
 @keyframes reel-spin {
   from { transform: rotate(0deg); }
@@ -89,14 +75,6 @@ body {
 }
 .pulse { animation: pulse-dot 1.4s ease-in-out infinite; }
 
-/* ---- Track view transitions (GSAP handles classes) ---- */
-.track-view {
-  position: absolute;
-  inset: 0;
-  bottom: 88px; /* player bar height */
-  overflow: hidden;
-}
-
 /* ---- Vinyl spin ---- */
 @keyframes vinyl-spin {
   from { transform: rotate(0deg); }
@@ -104,7 +82,21 @@ body {
 }
 .vinyl-spin { animation: vinyl-spin 5s linear infinite; }
 
-/* ---- Text selection ---- */
+/* ---- Custom Scrollbar ---- */
+::-webkit-scrollbar {
+  width: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0f0d0b;
+}
+::-webkit-scrollbar-thumb {
+  background: #332d26;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #4a4035;
+}
+
 ::selection {
   background: var(--accent);
   color: #000;

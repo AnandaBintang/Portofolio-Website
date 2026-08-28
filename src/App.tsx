@@ -2,6 +2,12 @@ import { useEffect, useRef, useState } from "react";
 import Lenis from "lenis";
 import { gsap } from "gsap";
 import { ScrollTrigger } from "gsap/ScrollTrigger";
+import {
+  CaretRight,
+  ArrowUpRight,
+  EnvelopeSimple,
+  GithubLogo,
+} from "@phosphor-icons/react";
 import { TRACKS, PROJECTS, SKILLS, SESSIONS, PROFILE, type Track } from "./data/tracks";
 import { StickyAudioDeck } from "./components/StickyAudioDeck";
 import { PlayerBar } from "./components/PlayerBar";
@@ -21,16 +27,16 @@ export default function App() {
     return audio.onStateChange(setIsPlaying);
   }, []);
 
-  // Initialize Lenis Smooth Scroll + GSAP ScrollTrigger synchronization
+  // Initialize Lenis Smooth Scroll + GSAP ScrollTrigger
   useEffect(() => {
     const lenis = new Lenis({
-      duration: 1.3,
+      duration: 1.2,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
-      wheelMultiplier: 1.1,
-      touchMultiplier: 1.8,
+      wheelMultiplier: 1.0,
+      touchMultiplier: 1.5,
     });
 
     lenisRef.current = lenis;
@@ -38,10 +44,11 @@ export default function App() {
     // Connect Lenis to GSAP ScrollTrigger
     lenis.on("scroll", ScrollTrigger.update);
 
-    gsap.ticker.add((time) => {
+    const updateTicker = (time: number) => {
       lenis.raf(time * 1000);
-    });
+    };
 
+    gsap.ticker.add(updateTicker);
     gsap.ticker.lagSmoothing(0);
 
     // Bind ScrollTrigger to all chapter sections for dynamic player & deck syncing
@@ -52,7 +59,7 @@ export default function App() {
       const idx = Number(section.dataset.chapterIndex);
       const st = ScrollTrigger.create({
         trigger: section,
-        start: "top center+=100",
+        start: "top center+=120",
         end: "bottom center",
         onEnter: () => setActiveIdx(idx),
         onEnterBack: () => setActiveIdx(idx),
@@ -65,15 +72,15 @@ export default function App() {
     cards.forEach((card) => {
       gsap.fromTo(
         card,
-        { opacity: 0, y: 35 },
+        { opacity: 0, y: 25 },
         {
           opacity: 1,
           y: 0,
-          duration: 0.8,
-          ease: "power3.out",
+          duration: 0.7,
+          ease: "power2.out",
           scrollTrigger: {
             trigger: card,
-            start: "top 85%",
+            start: "top 88%",
             toggleActions: "play none none reverse",
           },
         }
@@ -83,7 +90,7 @@ export default function App() {
     return () => {
       triggers.forEach((t) => t.kill());
       lenis.destroy();
-      gsap.ticker.remove(lenis.raf);
+      gsap.ticker.remove(updateTicker);
     };
   }, []);
 
@@ -92,7 +99,7 @@ export default function App() {
     audio.sfx("click");
     const target = document.getElementById(`chapter-${idx}`);
     if (target && lenisRef.current) {
-      lenisRef.current.scrollTo(target, { offset: -80, duration: 1.2 });
+      lenisRef.current.scrollTo(target, { offset: -90, duration: 1.2 });
     }
   };
 
@@ -110,17 +117,17 @@ export default function App() {
 
   return (
     <div
-      className="min-h-screen text-[#f0ebe3] selection:bg-[#e8a045] selection:text-black pb-28 relative"
+      className="min-h-screen text-[#f0ebe3] selection:bg-[#e8a045] selection:text-black pb-36 relative"
       style={{
-        background: `radial-gradient(ellipse 90% 55% at 50% 0%, ${currentTrack.artAccent}15 0%, #0f0d0b 65%)`,
-        transition: "background 0.9s cubic-bezier(0.16, 1, 0.3, 1)",
+        background: `radial-gradient(ellipse 90% 55% at 50% 0%, ${currentTrack.artAccent}15 0%, #0f0d0b 70%)`,
+        transition: "background 0.8s ease",
       }}
     >
       {/* Film Grain Texture Overlay */}
       <div className="grain" />
 
       {/* ── Persistent Top Navigation Bar ── */}
-      <header className="sticky top-0 z-40 w-full border-b border-[#332d26] bg-[#0f0d0b]/85 backdrop-blur-xl">
+      <header className="sticky top-0 z-40 w-full border-b border-[#332d26] bg-[#0f0d0b]/90 backdrop-blur-md">
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 h-18 flex items-center justify-between gap-4">
           
           {/* Brand Identity */}
@@ -159,7 +166,7 @@ export default function App() {
               <button
                 key={t.id}
                 onClick={() => scrollToChapter(i)}
-                className={`px-3 py-1 rounded-full text-xs font-mono transition-all cursor-pointer select-none ${
+                className={`px-3.5 py-1.5 rounded-full text-xs font-mono transition-all cursor-pointer select-none ${
                   i === activeIdx
                     ? "font-bold text-black shadow-md scale-105"
                     : "text-[#5c5248] hover:text-[#a89880] hover:bg-[#1c1916]"
@@ -186,7 +193,7 @@ export default function App() {
       </header>
 
       {/* ── Main Two-Column Scrollytelling Layout ── */}
-      <main className="max-w-[1400px] mx-auto px-4 md:px-8 pt-10">
+      <main className="max-w-[1400px] mx-auto px-4 md:px-8 pt-12">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-12 items-start">
 
           {/* ── Left Column: Sticky Interactive Audio Turntable ── */}
@@ -199,7 +206,7 @@ export default function App() {
           </aside>
 
           {/* ── Right Column: Continuous Storytelling Narrative Chapters ── */}
-          <div className="lg:col-span-7 space-y-36 pb-16">
+          <div className="lg:col-span-7 space-y-36 pb-20">
 
             {/* ══════════════════════════════════════════════════════════════
                 CHAPTER 00: PROLOGUE / THE ARTIST PROFILE
@@ -207,32 +214,32 @@ export default function App() {
             <section
               id="chapter-0"
               data-chapter-index="0"
-              className="min-h-[80vh] flex flex-col justify-center space-y-8 pt-8"
+              className="min-h-[75vh] flex flex-col justify-center space-y-8"
             >
               <div className="space-y-4">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#e8a045]">
                   <span>CHAPTER 00 / PROLOGUE</span>
                 </div>
-                <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-[#f0ebe3] leading-[1.05]">
+                <h1 className="text-4xl sm:text-6xl font-bold tracking-tight text-[#f0ebe3] leading-[1.08]">
                   THE INVISIBLE <br />
                   <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e8a045] via-[#f0ebe3] to-[#a89880]">
                     SIGNAL CHAIN.
                   </span>
                 </h1>
-                <p className="text-lg sm:text-xl text-[#a89880] leading-relaxed max-w-xl font-normal">
+                <p className="text-base sm:text-lg text-[#a89880] leading-relaxed max-w-xl font-normal">
                   Like warm analog tape mastering, robust backend engineering works in the background: zero latency, clean separation of domain frequencies, and absolute reliability when the volume peaks.
                 </p>
               </div>
 
-              <div className="story-reveal bg-[#141210] border border-[#332d26] rounded-2xl p-6 sm:p-8 space-y-6">
+              <div className="story-reveal bg-[#141210] border border-[#332d26] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
                 <div>
-                  <h3 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest mb-1">
+                  <h3 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest mb-1.5">
                     CURRENT RESIDENCY
                   </h3>
                   <p className="text-xl font-bold text-[#f0ebe3]">
                     Backend Engineer at Weekend Inc.
                   </p>
-                  <p className="text-sm font-mono text-[#e8a045] mt-0.5">
+                  <p className="text-sm font-mono text-[#e8a045] mt-1">
                     Engineering core platforms for PT HM Sampoerna
                   </p>
                 </div>
@@ -248,27 +255,29 @@ export default function App() {
                     { label: "RUNTIME", val: "Laravel / Node" },
                     { label: "LOCATION", val: "Sidoarjo / Remote" },
                   ].map((stat, i) => (
-                    <div key={i} className="bg-[#1c1916] border border-[#2a2520] p-3 rounded-xl">
-                      <span className="text-[10px] font-mono text-[#5c5248] block">{stat.label}</span>
+                    <div key={i} className="bg-[#1c1916] border border-[#2a2520] p-3.5 rounded-xl">
+                      <span className="text-[10px] font-mono text-[#5c5248] block mb-0.5">{stat.label}</span>
                       <span className="text-xs font-bold text-[#f0ebe3]">{stat.val}</span>
                     </div>
                   ))}
                 </div>
 
-                <div className="flex flex-wrap gap-3 pt-2 border-t border-[#332d26]">
+                <div className="flex flex-wrap items-center gap-3 pt-4 border-t border-[#332d26]">
                   <a
                     href={`mailto:${PROFILE.email}`}
-                    className="px-5 py-2.5 rounded-full bg-[#e8a045] text-black text-xs font-bold hover:bg-[#f0b055] transition-all cursor-pointer"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-[#e8a045] text-black text-xs font-bold hover:bg-[#f0b055] transition-all cursor-pointer shadow-md"
                   >
-                    TRANSMIT MESSAGE
+                    <EnvelopeSimple size={15} weight="bold" />
+                    <span>TRANSMIT MESSAGE</span>
                   </a>
                   <a
                     href={PROFILE.github}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="px-5 py-2.5 rounded-full border border-[#4a4035] text-[#a89880] hover:text-[#f0ebe3] text-xs font-mono transition-all"
+                    className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full border border-[#4a4035] text-[#a89880] hover:text-[#f0ebe3] text-xs font-mono transition-all"
                   >
-                    GITHUB REPOSITORIES
+                    <GithubLogo size={15} weight="fill" />
+                    <span>GITHUB REPOSITORIES</span>
                   </a>
                 </div>
               </div>
@@ -280,7 +289,7 @@ export default function App() {
             <section
               id="chapter-1"
               data-chapter-index="1"
-              className="min-h-[85vh] flex flex-col justify-center space-y-8"
+              className="min-h-[80vh] flex flex-col justify-center space-y-8"
             >
               <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#4a9eff]">
@@ -294,7 +303,7 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="story-reveal bg-[#141210] border border-[#332d26] rounded-2xl p-6 sm:p-8 space-y-6">
+              <div className="story-reveal bg-[#141210] border border-[#332d26] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
                 <div className="space-y-3">
                   <h3 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest">
                     THE ARCHITECTURAL CHALLENGE
@@ -308,7 +317,7 @@ export default function App() {
                   <h3 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest">
                     KEY ENGINEERING DELIVERABLES
                   </h3>
-                  <div className="grid grid-cols-1 gap-2.5">
+                  <div className="grid grid-cols-1 gap-3">
                     {PROJECTS["ayo-kasir"].deliverables.map((deliv, idx) => (
                       <div
                         key={idx}
@@ -317,7 +326,7 @@ export default function App() {
                         <span className="font-mono font-bold text-[#4a9eff] shrink-0 mt-0.5">
                           0{idx + 1}
                         </span>
-                        <span>{deliv}</span>
+                        <span className="leading-relaxed">{deliv}</span>
                       </div>
                     ))}
                   </div>
@@ -341,7 +350,7 @@ export default function App() {
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full bg-[#4a9eff] text-black text-xs font-bold hover:bg-[#68aeff] transition-colors"
                   >
                     <span>LIVE ECOSYSTEM</span>
-                    <span>↗</span>
+                    <ArrowUpRight size={13} weight="bold" />
                   </a>
                 </div>
               </div>
@@ -353,7 +362,7 @@ export default function App() {
             <section
               id="chapter-2"
               data-chapter-index="2"
-              className="min-h-[85vh] flex flex-col justify-center space-y-8"
+              className="min-h-[80vh] flex flex-col justify-center space-y-8"
             >
               <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#5dbf6e]">
@@ -367,7 +376,7 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="story-reveal bg-[#141210] border border-[#332d26] rounded-2xl p-6 sm:p-8 space-y-6">
+              <div className="story-reveal bg-[#141210] border border-[#332d26] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
                 <div className="space-y-3">
                   <h3 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest">
                     SYSTEM DOMAIN DESIGN
@@ -381,7 +390,7 @@ export default function App() {
                   <h3 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest">
                     CORE CONTRIBUTIONS
                   </h3>
-                  <div className="grid grid-cols-1 gap-2.5">
+                  <div className="grid grid-cols-1 gap-3">
                     {PROJECTS["ayo-qoncierge"].deliverables.map((deliv, idx) => (
                       <div
                         key={idx}
@@ -390,7 +399,7 @@ export default function App() {
                         <span className="font-mono font-bold text-[#5dbf6e] shrink-0 mt-0.5">
                           0{idx + 1}
                         </span>
-                        <span>{deliv}</span>
+                        <span className="leading-relaxed">{deliv}</span>
                       </div>
                     ))}
                   </div>
@@ -415,7 +424,7 @@ export default function App() {
             <section
               id="chapter-3"
               data-chapter-index="3"
-              className="min-h-[85vh] flex flex-col justify-center space-y-8"
+              className="min-h-[80vh] flex flex-col justify-center space-y-8"
             >
               <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#c77dff]">
@@ -429,7 +438,7 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="story-reveal bg-[#141210] border border-[#332d26] rounded-2xl p-6 sm:p-8 space-y-6">
+              <div className="story-reveal bg-[#141210] border border-[#332d26] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
                 <div className="space-y-3">
                   <h3 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest">
                     ALGORITHMIC ENGINE
@@ -443,7 +452,7 @@ export default function App() {
                   <h3 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest">
                     CRITICAL SUBSYSTEMS
                   </h3>
-                  <div className="grid grid-cols-1 gap-2.5">
+                  <div className="grid grid-cols-1 gap-3">
                     {PROJECTS["moneymate"].deliverables.map((deliv, idx) => (
                       <div
                         key={idx}
@@ -452,7 +461,7 @@ export default function App() {
                         <span className="font-mono font-bold text-[#c77dff] shrink-0 mt-0.5">
                           0{idx + 1}
                         </span>
-                        <span>{deliv}</span>
+                        <span className="leading-relaxed">{deliv}</span>
                       </div>
                     ))}
                   </div>
@@ -476,7 +485,7 @@ export default function App() {
                     className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border border-[#c77dff] text-[#c77dff] hover:bg-[#c77dff] hover:text-black text-xs font-mono font-bold transition-all"
                   >
                     <span>SOURCE REPO</span>
-                    <span>↗</span>
+                    <ArrowUpRight size={13} weight="bold" />
                   </a>
                 </div>
               </div>
@@ -488,7 +497,7 @@ export default function App() {
             <section
               id="chapter-4"
               data-chapter-index="4"
-              className="min-h-[85vh] flex flex-col justify-center space-y-8"
+              className="min-h-[80vh] flex flex-col justify-center space-y-8"
             >
               <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#fbbf24]">
@@ -502,7 +511,7 @@ export default function App() {
                 </p>
               </div>
 
-              <div className="story-reveal bg-[#141210] border border-[#332d26] rounded-2xl p-6 sm:p-8 space-y-6">
+              <div className="story-reveal bg-[#141210] border border-[#332d26] rounded-2xl p-6 sm:p-8 space-y-6 shadow-xl">
                 <div className="space-y-3">
                   <h3 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest">
                     TRANSACTION RELIABILITY
@@ -516,7 +525,7 @@ export default function App() {
                   <h3 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest">
                     FULFILLMENT PIPELINE
                   </h3>
-                  <div className="grid grid-cols-1 gap-2.5">
+                  <div className="grid grid-cols-1 gap-3">
                     {PROJECTS["ecommerce"].deliverables.map((deliv, idx) => (
                       <div
                         key={idx}
@@ -525,7 +534,7 @@ export default function App() {
                         <span className="font-mono font-bold text-[#fbbf24] shrink-0 mt-0.5">
                           0{idx + 1}
                         </span>
-                        <span>{deliv}</span>
+                        <span className="leading-relaxed">{deliv}</span>
                       </div>
                     ))}
                   </div>
@@ -550,7 +559,7 @@ export default function App() {
             <section
               id="chapter-5"
               data-chapter-index="5"
-              className="min-h-[85vh] flex flex-col justify-center space-y-8"
+              className="min-h-[80vh] flex flex-col justify-center space-y-8"
             >
               <div className="space-y-3">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#2dd4bf]">
@@ -568,7 +577,7 @@ export default function App() {
                 {SKILLS.map((cat, i) => (
                   <div
                     key={i}
-                    className="bg-[#141210] border border-[#332d26] rounded-2xl p-5 hover:border-[#4a4035] transition-colors space-y-4"
+                    className="bg-[#141210] border border-[#332d26] rounded-2xl p-5 hover:border-[#4a4035] transition-colors space-y-4 shadow-lg"
                   >
                     <div className="flex items-center justify-between border-b border-[#2a2520] pb-3">
                       <span className="text-xs font-mono font-bold text-[#2dd4bf]">
@@ -583,7 +592,7 @@ export default function App() {
                       {cat.items.map((skill, j) => (
                         <div key={j} className="flex items-center justify-between text-xs">
                           <span className="text-[#f0ebe3] font-medium">{skill}</span>
-                          <span className="font-mono text-[#5c5248]">OPTIMIZED</span>
+                          <span className="font-mono text-[#5c5248] text-[11px]">OPTIMIZED</span>
                         </div>
                       ))}
                     </div>
@@ -616,11 +625,11 @@ export default function App() {
                 {SESSIONS.map((session, i) => (
                   <div
                     key={i}
-                    className={`bg-[#141210] border rounded-2xl p-6 transition-all ${
-                      session.active ? "border-[#f472b6]/50 shadow-lg" : "border-[#332d26]"
+                    className={`bg-[#141210] border rounded-2xl p-6 sm:p-7 transition-all shadow-xl ${
+                      session.active ? "border-[#f472b6]/50" : "border-[#332d26]"
                     }`}
                   >
-                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#2a2520] pb-3 mb-4">
+                    <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#2a2520] pb-3.5 mb-4">
                       <div>
                         <span className="text-xs font-mono text-[#f472b6] font-bold block mb-1">
                           REC {session.no} / {session.period}
@@ -629,7 +638,7 @@ export default function App() {
                           {session.role} @ {session.company}
                         </h3>
                         {session.client && (
-                          <p className="text-xs font-mono text-[#a89880]">
+                          <p className="text-xs font-mono text-[#a89880] mt-0.5">
                             Client Account: {session.client}
                           </p>
                         )}
@@ -637,10 +646,10 @@ export default function App() {
                       <span className="text-xs font-mono text-[#5c5248]">{session.location}</span>
                     </div>
 
-                    <ul className="space-y-2 mb-4">
+                    <ul className="space-y-2.5 mb-5">
                       {session.highlights.map((h, j) => (
-                        <li key={j} className="text-xs sm:text-sm text-[#a89880] flex items-start gap-2.5">
-                          <span className="text-[#f472b6] font-mono mt-0.5">•</span>
+                        <li key={j} className="text-xs sm:text-sm text-[#a89880] flex items-start gap-2.5 leading-relaxed">
+                          <CaretRight size={14} className="text-[#f472b6] shrink-0 mt-0.5" />
                           <span>{h}</span>
                         </li>
                       ))}
@@ -650,7 +659,7 @@ export default function App() {
                       {session.tags.map((tag, j) => (
                         <span
                           key={j}
-                          className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1c1916] border border-[#332d26] text-[#a89880]"
+                          className="text-[10px] font-mono px-2.5 py-1 rounded bg-[#1c1916] border border-[#332d26] text-[#a89880]"
                         >
                           {tag}
                         </span>
@@ -661,20 +670,20 @@ export default function App() {
               </div>
 
               {/* Education Block */}
-              <div className="story-reveal bg-[#141210] border border-[#332d26] rounded-2xl p-6 space-y-4">
+              <div className="story-reveal bg-[#141210] border border-[#332d26] rounded-2xl p-6 sm:p-7 space-y-4 shadow-xl">
                 <h3 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest">
                   ACADEMIC FOUNDATION
                 </h3>
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
+                  <div className="bg-[#1c1916] p-4 rounded-xl border border-[#2a2520]">
                     <p className="text-base font-bold text-[#f0ebe3]">{PROFILE.education.school}</p>
-                    <p className="text-xs text-[#a89880]">{PROFILE.education.degree}</p>
-                    <p className="text-xs font-mono text-[#5c5248] mt-1">{PROFILE.education.period}</p>
+                    <p className="text-xs text-[#a89880] mt-0.5">{PROFILE.education.degree}</p>
+                    <p className="text-xs font-mono text-[#5c5248] mt-2">{PROFILE.education.period}</p>
                   </div>
-                  <div>
+                  <div className="bg-[#1c1916] p-4 rounded-xl border border-[#2a2520]">
                     <p className="text-base font-bold text-[#f0ebe3]">SMKS Antartika 2 Sidoarjo</p>
-                    <p className="text-xs text-[#a89880]">Software Engineering</p>
-                    <p className="text-xs font-mono text-[#5c5248] mt-1">Aug 2020 - Jun 2023</p>
+                    <p className="text-xs text-[#a89880] mt-0.5">Software Engineering</p>
+                    <p className="text-xs font-mono text-[#5c5248] mt-2">Aug 2020 - Jun 2023</p>
                   </div>
                 </div>
               </div>
