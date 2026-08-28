@@ -89,9 +89,14 @@ export default function App() {
 
   const isTransitioningRef = useRef(false);
   const scrollContainerRef = useRef<HTMLDivElement | null>(null);
-  const wheelAccumulatorRef = useRef(0);
   const touchStartYRef = useRef(0);
-  const lastSectionChangeTimeRef = useRef(0);
+  const transitionLockUntilRef = useRef<number>(0);
+  const activeSectionIdxRef = useRef<number>(0);
+
+  // Keep ref in sync with state
+  useEffect(() => {
+    activeSectionIdxRef.current = activeSectionIdx;
+  }, [activeSectionIdx]);
 
   const currentTrack: Track = PLAYABLE_TRACKS[activeTrackIdx] || PLAYABLE_TRACKS[0];
 
@@ -100,15 +105,18 @@ export default function App() {
     return audio.onStateChange(setIsPlaying);
   }, []);
 
-  // Recalculate and update continuous scroll percentage (0 to 100%)
-  const computeAndSetProgress = useCallback((sectionIdx: number, scrollTop: number, scrollHeight: number, clientHeight: number) => {
-    const maxScrollInStage = scrollHeight - clientHeight;
-    const stageRatio = maxScrollInStage > 0 ? Math.min(1, Math.max(0, scrollTop / maxScrollInStage)) : 0;
-    
-    // Each section represents a exact 25% span of the entire journey
-    const totalProg = (sectionIdx * 25) + (stageRatio * 25);
-    setScrollProgress(Math.min(100, Math.max(0, totalProg)));
-  }, []);
+  // Recalculate continuous scroll percentage (0 to 100%)
+  const computeAndSetProgress = useCallback(
+    (sectionIdx: number, scrollTop: number, scrollHeight: number, clientHeight: number) => {
+      const maxScrollInStage = scrollHeight - clientHeight;
+      const stageRatio =
+        maxScrollInStage > 0 ? Math.min(1, Math.max(0, scrollTop / maxScrollInStage)) : 0;
+
+      const totalProg = sectionIdx * 25 + stageRatio * 25;
+      setScrollProgress(Math.min(100, Math.max(0, totalProg)));
+    },
+    []
+  );
 
   const handleContainerScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const el = e.currentTarget;
@@ -119,24 +127,24 @@ export default function App() {
   const goToSection = useCallback(
     (targetIdx: number) => {
       const now = Date.now();
-      // Strict cooldown lock of 850ms to prevent multi-section skips
+      // Hard Lock: block any call if already transitioning or inside cooldown period
       if (
+        isTransitioningRef.current ||
+        now < transitionLockUntilRef.current ||
         targetIdx < 0 ||
         targetIdx >= SECTIONS_CONFIG.length ||
-        (targetIdx === activeSectionIdx && !menuOpen) ||
-        isTransitioningRef.current ||
-        now - lastSectionChangeTimeRef.current < 850
+        (targetIdx === activeSectionIdxRef.current && !menuOpen)
       ) {
-        setMenuOpen(false);
+        if (menuOpen) setMenuOpen(false);
         return;
       }
 
+      // Lock for 1200ms (entire animation duration + debounce buffer)
       isTransitioningRef.current = true;
-      lastSectionChangeTimeRef.current = now;
-      wheelAccumulatorRef.current = 0;
+      transitionLockUntilRef.current = now + 1200;
       setMenuOpen(false);
-      const targetMeta = SECTIONS_CONFIG[targetIdx];
 
+      const targetMeta = SECTIONS_CONFIG[targetIdx];
       audio.sfx("rewind");
 
       setTransitionState({
@@ -146,23 +154,23 @@ export default function App() {
         accent: targetMeta.accent,
       });
 
-      // Switch view midway through shutter close
+      // Switch stage content at midpoint of shutter closure
       setTimeout(() => {
         setActiveSectionIdx(targetIdx);
+        activeSectionIdxRef.current = targetIdx;
         if (scrollContainerRef.current) {
           scrollContainerRef.current.scrollTop = 0;
         }
         setScrollProgress(targetIdx * 25);
-      }, 300);
+      }, 350);
 
-      // Open shutter
+      // Open shutter back
       setTimeout(() => {
         setTransitionState((prev) => ({ ...prev, isTransitioning: false }));
         isTransitioningRef.current = false;
-        wheelAccumulatorRef.current = 0;
-      }, 700);
+      }, 750);
     },
-    [activeSectionIdx, menuOpen]
+    [menuOpen]
   );
 
   // Keyboard shortcut listener (ESC to close menu)
@@ -176,52 +184,68 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [menuOpen]);
 
-  // Wheel & Touch listener for bottom-boundary section transitions (Strictly 1 section at a time)
+  // Robust Native Wheel Listener attached directly to scroll container
   useEffect(() => {
-    const handleWheel = (e: WheelEvent) => {
-      if (isTransitioningRef.current || menuOpen) {
+    const container = scrollContainerRef.current;
+    if (!container) return;
+
+    let wheelDebounceTimeout: ReturnType<typeof setTimeout> | null = null;
+    let accumulatedDeltaY = 0;
+
+    const onWheel = (e: WheelEvent) => {
+      const now = Date.now();
+      // If locked or menu is open, swallow wheel momentum entirely
+      if (isTransitioningRef.current || now < transitionLockUntilRef.current || menuOpen) {
+        e.preventDefault();
         return;
       }
-
-      const container = scrollContainerRef.current;
-      if (!container) return;
 
       const atBottom =
         container.scrollHeight - container.scrollTop <= container.clientHeight + 4;
       const atTop = container.scrollTop <= 4;
 
       if (e.deltaY > 0 && atBottom) {
-        wheelAccumulatorRef.current += e.deltaY;
-        // Higher threshold + strict cooldown ensures single-step transition
-        if (wheelAccumulatorRef.current > 180) {
-          wheelAccumulatorRef.current = 0;
-          if (activeSectionIdx < SECTIONS_CONFIG.length - 1) {
-            goToSection(activeSectionIdx + 1);
+        e.preventDefault();
+        accumulatedDeltaY += e.deltaY;
+
+        if (accumulatedDeltaY > 120) {
+          accumulatedDeltaY = 0;
+          const cur = activeSectionIdxRef.current;
+          if (cur < SECTIONS_CONFIG.length - 1) {
+            goToSection(cur + 1); // Strictly next section only (+1)
           }
         }
       } else if (e.deltaY < 0 && atTop) {
-        wheelAccumulatorRef.current += e.deltaY;
-        if (wheelAccumulatorRef.current < -180) {
-          wheelAccumulatorRef.current = 0;
-          if (activeSectionIdx > 0) {
-            goToSection(activeSectionIdx - 1);
+        e.preventDefault();
+        accumulatedDeltaY += e.deltaY;
+
+        if (accumulatedDeltaY < -120) {
+          accumulatedDeltaY = 0;
+          const cur = activeSectionIdxRef.current;
+          if (cur > 0) {
+            goToSection(cur - 1); // Strictly previous section only (-1)
           }
         }
       } else {
-        wheelAccumulatorRef.current = 0;
+        accumulatedDeltaY = 0;
       }
+
+      if (wheelDebounceTimeout) clearTimeout(wheelDebounceTimeout);
+      wheelDebounceTimeout = setTimeout(() => {
+        accumulatedDeltaY = 0;
+      }, 200);
     };
 
-    const handleTouchStart = (e: TouchEvent) => {
+    const onTouchStart = (e: TouchEvent) => {
       touchStartYRef.current = e.touches[0].clientY;
     };
 
-    const handleTouchMove = (e: TouchEvent) => {
-      if (isTransitioningRef.current || menuOpen) {
+    const onTouchMove = (e: TouchEvent) => {
+      const now = Date.now();
+      if (isTransitioningRef.current || now < transitionLockUntilRef.current || menuOpen) {
+        e.preventDefault();
         return;
       }
-      const container = scrollContainerRef.current;
-      if (!container) return;
 
       const currentY = e.touches[0].clientY;
       const diffY = touchStartYRef.current - currentY;
@@ -229,38 +253,45 @@ export default function App() {
         container.scrollHeight - container.scrollTop <= container.clientHeight + 6;
       const atTop = container.scrollTop <= 6;
 
-      if (diffY > 90 && atBottom) {
+      if (diffY > 80 && atBottom) {
+        e.preventDefault();
         touchStartYRef.current = currentY;
-        if (activeSectionIdx < SECTIONS_CONFIG.length - 1) {
-          goToSection(activeSectionIdx + 1);
+        const cur = activeSectionIdxRef.current;
+        if (cur < SECTIONS_CONFIG.length - 1) {
+          goToSection(cur + 1);
         }
-      } else if (diffY < -90 && atTop) {
+      } else if (diffY < -80 && atTop) {
+        e.preventDefault();
         touchStartYRef.current = currentY;
-        if (activeSectionIdx > 0) {
-          goToSection(activeSectionIdx - 1);
+        const cur = activeSectionIdxRef.current;
+        if (cur > 0) {
+          goToSection(cur - 1);
         }
       }
     };
 
-    window.addEventListener("wheel", handleWheel, { passive: false });
-    window.addEventListener("touchstart", handleTouchStart, { passive: true });
-    window.addEventListener("touchmove", handleTouchMove, { passive: false });
+    container.addEventListener("wheel", onWheel, { passive: false });
+    container.addEventListener("touchstart", onTouchStart, { passive: true });
+    container.addEventListener("touchmove", onTouchMove, { passive: false });
 
     return () => {
-      window.removeEventListener("wheel", handleWheel);
-      window.removeEventListener("touchstart", handleTouchStart);
-      window.removeEventListener("touchmove", handleTouchMove);
+      container.removeEventListener("wheel", onWheel);
+      container.removeEventListener("touchstart", onTouchStart);
+      container.removeEventListener("touchmove", onTouchMove);
+      if (wheelDebounceTimeout) clearTimeout(wheelDebounceTimeout);
     };
-  }, [activeSectionIdx, goToSection, menuOpen]);
+  }, [goToSection, menuOpen]);
 
   // Section next / prev controls
   const handlePrevSection = () => {
-    const nextIdx = activeSectionIdx > 0 ? activeSectionIdx - 1 : SECTIONS_CONFIG.length - 1;
+    const cur = activeSectionIdxRef.current;
+    const nextIdx = cur > 0 ? cur - 1 : SECTIONS_CONFIG.length - 1;
     goToSection(nextIdx);
   };
 
   const handleNextSection = () => {
-    const nextIdx = activeSectionIdx < SECTIONS_CONFIG.length - 1 ? activeSectionIdx + 1 : 0;
+    const cur = activeSectionIdxRef.current;
+    const nextIdx = cur < SECTIONS_CONFIG.length - 1 ? cur + 1 : 0;
     goToSection(nextIdx);
   };
 
