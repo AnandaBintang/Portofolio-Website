@@ -22,13 +22,15 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
   const textRef = useRef<HTMLDivElement | null>(null);
   const badgeRef = useRef<HTMLDivElement | null>(null);
   const spectrumRef = useRef<HTMLDivElement | null>(null);
+  const curtainTopRef = useRef<HTMLDivElement | null>(null);
+  const curtainBottomRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     if (!containerRef.current) return;
 
     const ctx = gsap.context(() => {
       if (isTransitioning) {
-        // 1. Instantly mount backdrop at full opacity (0ms) so background glow never leaks
+        // 1. INSTANT OPAQUE COVER: Mount container at full opacity at t=0
         gsap.set(containerRef.current, {
           display: "flex",
           opacity: 1,
@@ -37,45 +39,59 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
 
         const tl = gsap.timeline();
 
-        // 2. Cohesive Entrance: Platter, Tonearm, Text, and Spectrum enter together synchronously
+        // 2. Dual physical shutter curtain closes with a solid analog snap
         tl.fromTo(
-          contentWrapperRef.current,
-          { opacity: 0, scale: 0.94 },
-          { opacity: 1, scale: 1, duration: 0.35, ease: "power2.out" }
+          curtainTopRef.current,
+          { yPercent: -100 },
+          { yPercent: 0, duration: 0.4, ease: "power4.inOut" }
         )
           .fromTo(
+            curtainBottomRef.current,
+            { yPercent: 100 },
+            { yPercent: 0, duration: 0.4, ease: "power4.inOut" },
+            "<"
+          )
+          // 3. Complete Entrance: Platter, Vinyl, Tonearm, Text, and Spectrum enter harmoniously
+          .fromTo(
+            contentWrapperRef.current,
+            { opacity: 0, scale: 0.92 },
+            { opacity: 1, scale: 1, duration: 0.4, ease: "power2.out" },
+            "-=0.15"
+          )
+          .fromTo(
             platterRef.current,
-            { scale: 0.85, opacity: 0, rotate: -15 },
-            { scale: 1, opacity: 1, rotate: 0, duration: 0.45, ease: "back.out(1.3)" },
-            0
+            { scale: 0.8, opacity: 0, rotate: -20 },
+            { scale: 1, opacity: 1, rotate: 0, duration: 0.55, ease: "back.out(1.4)" },
+            "<"
           )
           .fromTo(
             vinylDiscRef.current,
             { rotate: 0 },
-            { rotate: 1080, duration: 2.2, ease: "power1.inOut" },
-            0
+            { rotate: 1440, duration: 3.5, ease: "power1.inOut" },
+            "<"
           )
+          // 4. Tonearm physically swings and drops onto the record grooves (Needle Drop)
           .fromTo(
             tonearmRef.current,
-            { rotate: -38, transformOrigin: "top right" },
-            { rotate: 2, duration: 0.4, ease: "power3.out" },
-            0.1
+            { rotate: -42, transformOrigin: "top right" },
+            { rotate: 2, duration: 0.5, ease: "power3.out" },
+            "-=0.3"
           )
-          // Headline, Badge, & Equalizer bars reveal immediately alongside the turntable
+          // 5. Typography, Badge, and Spectrum reveal immediately
           .fromTo(
             [badgeRef.current, textRef.current, spectrumRef.current],
             { opacity: 0, y: 15 },
             {
               opacity: 1,
               y: 0,
-              stagger: 0.04,
-              duration: 0.35,
+              stagger: 0.05,
+              duration: 0.4,
               ease: "power2.out",
             },
-            0.1
+            "-=0.35"
           );
       } else {
-        // Smooth Exit Reveal: Needle lifts, typography slides up, backdrop fades out seamlessly
+        // FULL DRAMATIC NEEDLE LIFT & MECHANICAL SHUTTER REVEAL (Complete outgoing animation sequence)
         const tl = gsap.timeline({
           onComplete: () => {
             if (containerRef.current) {
@@ -85,33 +101,63 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
           },
         });
 
-        // Step A: Tonearm lifts off the record
+        // Step A: Needle Lift Animation (Tonearm visibly swings back up from vinyl)
         tl.to(tonearmRef.current, {
-          rotate: -38,
-          duration: 0.35,
+          rotate: -42,
+          duration: 0.45,
           ease: "power3.inOut",
         })
-          // Step B: Content fades out together
+          // Step B: Text, Badge, Spectrum and Turntable Platter animate out smoothly
+          .to(
+            [textRef.current, badgeRef.current, spectrumRef.current],
+            {
+              opacity: 0,
+              y: -20,
+              stagger: 0.04,
+              duration: 0.35,
+              ease: "power2.in",
+            },
+            "-=0.25"
+          )
+          .to(
+            platterRef.current,
+            {
+              scale: 0.8,
+              opacity: 0,
+              rotate: 15,
+              duration: 0.4,
+              ease: "power2.in",
+            },
+            "-=0.3"
+          )
           .to(
             contentWrapperRef.current,
             {
               opacity: 0,
-              scale: 0.96,
-              y: -10,
+              scale: 0.95,
               duration: 0.3,
               ease: "power2.in",
             },
-            "-=0.15"
+            "-=0.2"
           )
-          // Step C: Backdrop fades out cleanly
+          // Step C: Mechanical shutter panels split open to reveal the target section
           .to(
-            containerRef.current,
+            curtainTopRef.current,
             {
-              opacity: 0,
-              duration: 0.35,
-              ease: "power2.out",
+              yPercent: -100,
+              duration: 0.55,
+              ease: "power4.inOut",
             },
             "-=0.1"
+          )
+          .to(
+            curtainBottomRef.current,
+            {
+              yPercent: 100,
+              duration: 0.55,
+              ease: "power4.inOut",
+            },
+            "<"
           );
       }
     }, containerRef);
@@ -122,32 +168,36 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
   return (
     <div
       ref={containerRef}
-      className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#070605] select-none overflow-hidden"
+      className="fixed inset-0 z-50 flex flex-col items-center justify-center select-none overflow-hidden"
       style={{
         display: isTransitioning ? "flex" : "none",
         opacity: isTransitioning ? 1 : 0,
       }}
     >
-      {/* Solid Backdrop Layer (Ensures 100% opacity, no leaking page background) */}
-      <div className="absolute inset-0 bg-[#070605] z-0" />
-
-      {/* Subtle Radial Glow bound strictly inside the curtain */}
+      {/* Mechanical Shutter Top & Bottom Panels */}
       <div
-        className="absolute inset-0 transition-opacity duration-300 opacity-20 pointer-events-none z-1"
-        style={{
-          background: `radial-gradient(circle at center, ${accentColor} 0%, transparent 65%)`,
-        }}
+        ref={curtainTopRef}
+        className="absolute top-0 left-0 right-0 h-1/2 bg-[#080706] border-b border-[#24201a] z-10"
+      />
+      <div
+        ref={curtainBottomRef}
+        className="absolute bottom-0 left-0 right-0 h-1/2 bg-[#080706] border-t border-[#24201a] z-10"
       />
 
-      {/* Retro Scanline texture */}
-      <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,0,0,0.6)_51%)] bg-[length:100%_4px] pointer-events-none opacity-40 z-2" />
-
-      {/* Synchronized Content Wrapper */}
+      {/* Centerpiece Container inside Shutter */}
       <div
         ref={contentWrapperRef}
-        className="relative z-10 flex flex-col items-center justify-center p-6 max-w-xl mx-auto text-center space-y-6"
+        className="relative z-20 flex flex-col items-center justify-center p-6 max-w-xl mx-auto text-center space-y-6"
       >
-        {/* Turntable Platter Deck */}
+        {/* Background Radial Glow */}
+        <div
+          className="absolute -inset-20 transition-colors duration-500 opacity-25 pointer-events-none"
+          style={{
+            background: `radial-gradient(circle at center, ${accentColor} 0%, transparent 65%)`,
+          }}
+        />
+
+        {/* Turntable Platter Deck Graphic */}
         <div
           ref={platterRef}
           className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full border-4 border-[#24201a] bg-[#12100e] p-2.5 shadow-[0_0_70px_rgba(0,0,0,0.9)] flex items-center justify-center"
@@ -175,7 +225,7 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
                 45 RPM
               </span>
               {/* Spindle hole */}
-              <div className="w-2 h-2 rounded-full bg-[#090807] border border-[#332d26] mt-0.5" />
+              <div className="w-2.5 h-2.5 rounded-full bg-[#090807] border border-[#332d26] mt-0.5" />
             </div>
           </div>
 
