@@ -13,7 +13,7 @@ export const CustomMusicCursor: React.FC<CustomMusicCursorProps> = ({
   const dotRef = useRef<HTMLDivElement | null>(null);
   const ringRef = useRef<HTMLDivElement | null>(null);
   const vinylRef = useRef<HTMLDivElement | null>(null);
-  const [hoverState, setHoverState] = useState<"default" | "pointer" | "text">("default");
+  const [isPointerHover, setIsPointerHover] = useState(false);
   const [hoverText, setHoverText] = useState<string>("");
   const mousePos = useRef({ x: -100, y: -100 });
   const ringPos = useRef({ x: -100, y: -100 });
@@ -37,27 +37,23 @@ export const CustomMusicCursor: React.FC<CustomMusicCursorProps> = ({
         gsap.to(dotRef.current, {
           x: e.clientX,
           y: e.clientY,
-          duration: 0.05,
+          duration: 0.04,
           ease: "none",
         });
       }
 
-      // Check hover targets for interactive states
+      // Check hover targets for interactive pointer elements
       const target = e.target as HTMLElement | null;
       if (!target) return;
 
       const clickable = target.closest("button, a, [role='button'], input, [data-cursor]");
-      const isHeading = target.closest("h1, h2, h3");
 
       if (clickable) {
-        setHoverState("pointer");
+        setIsPointerHover(true);
         const customText = clickable.getAttribute("data-cursor-text") || "PLAY";
         setHoverText(customText);
-      } else if (isHeading) {
-        setHoverState("text");
-        setHoverText("");
       } else {
-        setHoverState("default");
+        setIsPointerHover(false);
         setHoverText("");
       }
     };
@@ -99,28 +95,22 @@ export const CustomMusicCursor: React.FC<CustomMusicCursorProps> = ({
 
   return (
     <>
-      {/* Center Stylus Dot / Needle Tip */}
+      {/* Center Stylus Dot / Needle Tip (ALWAYS A PERFECT CIRCLE) */}
       <div
         ref={dotRef}
         className="fixed top-0 left-0 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[100] transition-opacity duration-200 opacity-0"
         style={{ willChange: "transform" }}
       >
         <div
-          className={`rounded-full transition-all duration-200 ${
-            hoverState === "pointer"
-              ? "w-2 h-2 bg-white"
-              : hoverState === "text"
-              ? "w-1 h-5 bg-white rounded-none"
-              : "w-2.5 h-2.5"
-          }`}
+          className="w-2 h-2 rounded-full transition-all duration-200"
           style={{
-            background: hoverState === "pointer" ? "#ffffff" : accentColor,
+            background: isPointerHover ? "#ffffff" : accentColor,
             boxShadow: `0 0 10px ${accentColor}`,
           }}
         />
       </div>
 
-      {/* Heavy Trailing Vinyl Ring & Strobe Audio Halo */}
+      {/* Heavy Trailing Vinyl Ring & Strobe Audio Halo (ALWAYS A PERFECT CIRCLE) */}
       <div
         ref={ringRef}
         className="fixed top-0 left-0 -translate-x-1/2 -translate-y-1/2 pointer-events-none z-[99] transition-opacity duration-300 opacity-0 flex items-center justify-center"
@@ -129,15 +119,13 @@ export const CustomMusicCursor: React.FC<CustomMusicCursorProps> = ({
         <div
           ref={vinylRef}
           className={`rounded-full border transition-all duration-300 flex items-center justify-center ${
-            hoverState === "pointer"
+            isPointerHover
               ? "w-16 h-16 bg-[#141210]/95 border-2 scale-110 shadow-2xl backdrop-blur-sm"
-              : hoverState === "text"
-              ? "w-10 h-10 border-dashed opacity-40 scale-75"
               : "w-8 h-8 border-opacity-40"
           }`}
           style={{
             borderColor: accentColor,
-            boxShadow: hoverState === "pointer" ? `0 0 25px ${accentColor}50` : "none",
+            boxShadow: isPointerHover ? `0 0 25px ${accentColor}50` : "none",
           }}
         >
           {/* Rotating Vinyl Grooves on Hover or Audio Playback */}
@@ -148,7 +136,7 @@ export const CustomMusicCursor: React.FC<CustomMusicCursorProps> = ({
           />
 
           {/* Equalizer Frequency Pulse Dots inside Cursor */}
-          {hoverState === "pointer" && (
+          {isPointerHover && (
             <span
               className="text-[9px] font-mono font-bold tracking-wider uppercase text-center select-none"
               style={{ color: accentColor }}
