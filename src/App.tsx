@@ -229,6 +229,36 @@ export default function App() {
     [menuOpen]
   );
 
+  // ── Auto-Scroll Drive: Automatically scrolls page forward as Ambient Music plays ──
+  useEffect(() => {
+    if (!isPlaying) return;
+
+    const interval = setInterval(() => {
+      if (isTransitioningRef.current || Date.now() < transitionLockUntilRef.current || menuOpen) {
+        return;
+      }
+
+      const container = scrollContainerRef.current;
+      const lenis = lenisRef.current;
+      if (!container || !lenis) return;
+
+      const maxScroll = lenis.limit;
+      const currentScroll = lenis.scroll;
+
+      if (maxScroll > 0 && currentScroll < maxScroll - 6) {
+        // Smoothly scroll down 4px every tick
+        lenis.scrollTo(currentScroll + 4, { immediate: false, duration: 0.6 });
+      } else if (currentScroll >= maxScroll - 6 && maxScroll > 0) {
+        // If arrived at bottom, transition to next section automatically
+        if (activeSectionIdxRef.current < SECTIONS_CONFIG.length - 1) {
+          goToSection(activeSectionIdxRef.current + 1);
+        }
+      }
+    }, 120);
+
+    return () => clearInterval(interval);
+  }, [isPlaying, goToSection, menuOpen]);
+
   const handleAnimationComplete = useCallback(() => {
     setTransitionState((prev) => ({ ...prev, isTransitioning: false }));
     isTransitioningRef.current = false;
