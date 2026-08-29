@@ -227,7 +227,7 @@ export const PROFILE = {
   name: "Ananda Bintang Saputra",
   callsign: "Ananda Bintang",
   title: "Backend Engineer",
-  avatarUrl: "https://ananda-bintang.netlify.app/ananda-bintang.png",
+  avatarUrl: "/ananda-bintang.png",
   headline: "Backend Engineer",
   subheadline:
     "Backend Engineer with experience building scalable and production-ready systems, currently contributing to enterprise B2B and B2C platforms at Weekend Inc. for PT HM Sampoerna, including AYO KASIR and AYO QONCIERGE.",
