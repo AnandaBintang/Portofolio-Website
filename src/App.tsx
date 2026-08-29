@@ -19,7 +19,7 @@ import { SectionTransitionCurtain } from "./components/SectionTransitionCurtain"
 import { FullscreenMenuOverlay } from "./components/FullscreenMenuOverlay";
 import { CustomMusicCursor } from "./components/CustomMusicCursor";
 import { CenterStageHero } from "./components/CenterStageHero";
-import { ParallaxDiscography } from "./components/ParallaxDiscography";
+import { StackingDiscography } from "./components/StackingDiscography";
 import { audio } from "./lib/audioEngine";
 
 interface TransitionState {
@@ -163,11 +163,11 @@ export default function App() {
         reachedTopAtTimeRef.current = null;
       }
 
-      // In Section 1 (Discography): Dynamically update active track in turntable deck based on visible card
+      // In Section 1 (Discography): Dynamically update active track based on visible stacked sleeve
       if (activeSectionIdxRef.current === 1) {
         const cards = container.querySelectorAll(".project-parallax-card");
         const containerRect = container.getBoundingClientRect();
-        const midY = containerRect.top + containerRect.height * 0.45;
+        const midY = containerRect.top + containerRect.height * 0.4;
 
         cards.forEach((card) => {
           const rect = card.getBoundingClientRect();
@@ -564,10 +564,10 @@ export default function App() {
           )}
 
           {/* ════════════════════════════════════════════════════════════════════
-              STAGE 1: THE DISCOGRAPHY / SCROLL-DRIVEN PARALLAX PROJECT STREAM
+              STAGE 1: THE DISCOGRAPHY / 3D STACKING RECORD SLEEVES PARALLAX
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 1 && (
-            <ParallaxDiscography
+            <StackingDiscography
               activeTrackIdx={activeTrackIdx}
               currentTrack={currentTrack}
               isPlaying={isPlaying}
