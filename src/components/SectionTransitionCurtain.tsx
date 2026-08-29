@@ -1,4 +1,5 @@
-import React from "react";
+import React, { useEffect, useRef } from "react";
+import { gsap } from "gsap";
 
 interface SectionTransitionCurtainProps {
   isTransitioning: boolean;
@@ -15,45 +16,51 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
   accentColor,
   onAnimationComplete,
 }) => {
-  const containerRef = React.useRef<HTMLDivElement | null>(null);
-  const cardRef = React.useRef<HTMLDivElement | null>(null);
-  const vinylDiscRef = React.useRef<HTMLDivElement | null>(null);
-  const tonearmRef = React.useRef<HTMLDivElement | null>(null);
+  const containerRef = useRef<HTMLDivElement | null>(null);
+  const cardRef = useRef<HTMLDivElement | null>(null);
+  const vinylDiscRef = useRef<HTMLDivElement | null>(null);
+  const tonearmRef = useRef<HTMLDivElement | null>(null);
 
-  React.useEffect(() => {
+  useEffect(() => {
     if (!containerRef.current) return;
 
     if (isTransitioning) {
       containerRef.current.style.display = "flex";
       containerRef.current.style.pointerEvents = "auto";
 
-      const ctx = (window as any).gsap ? (window as any).gsap.context(() => {
-        const tl = (window as any).gsap.timeline();
+      const ctx = gsap.context(() => {
+        const tl = gsap.timeline();
 
+        // 1. Solid Curtain Fades In quickly
         tl.fromTo(
           containerRef.current,
           { opacity: 0 },
           { opacity: 1, duration: 0.2, ease: "power2.out" }
         )
+          // 2. Turntable & details enter
           .fromTo(
             cardRef.current,
             { opacity: 0, scale: 0.88, y: 25 },
             { opacity: 1, scale: 1, y: 0, duration: 0.45, ease: "power3.out" },
             0.05
           )
+          // 3. Continuous Vinyl Spin
           .fromTo(
             vinylDiscRef.current,
             { rotate: 0 },
             { rotate: 1800, duration: 3.5, ease: "power1.inOut" },
             0
           )
+          // 4. Tonearm Drops onto record
           .fromTo(
             tonearmRef.current,
             { rotate: -38, transformOrigin: "top right" },
             { rotate: 2, duration: 0.45, ease: "back.out(1.3)" },
             0.1
           )
+          // 5. Reading pause
           .to({}, { duration: 0.5 })
+          // 6. Needle Lift & Card Exit
           .to(tonearmRef.current, {
             rotate: -42,
             duration: 0.45,
@@ -88,9 +95,9 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
             },
             "-=0.15"
           );
-      }, containerRef) : null;
+      }, containerRef);
 
-      return () => ctx?.revert();
+      return () => ctx.revert();
     }
   }, [isTransitioning, onAnimationComplete]);
 
