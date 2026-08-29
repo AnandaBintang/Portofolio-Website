@@ -3,9 +3,6 @@ import Lenis from "lenis";
 import {
   CaretRight,
   ArrowUpRight,
-  EnvelopeSimple,
-  ArrowDown,
-  Sparkle,
   Cpu,
   GraduationCap,
   Briefcase,
@@ -25,6 +22,7 @@ import { PlayerBar } from "./components/PlayerBar";
 import { SectionTransitionCurtain } from "./components/SectionTransitionCurtain";
 import { FullscreenMenuOverlay } from "./components/FullscreenMenuOverlay";
 import { CustomMusicCursor } from "./components/CustomMusicCursor";
+import { CenterStageHero } from "./components/CenterStageHero";
 import { audio } from "./lib/audioEngine";
 
 interface TransitionState {
@@ -272,28 +270,24 @@ export default function App() {
 
       // Scrolling Downwards
       if (e.deltaY > 0) {
-        // If we are NOT at the bottom, user is scrolling inside the section. Do NOT allow transition!
         if (!isStrictlyAtBottom) {
           reachedBottomAtTimeRef.current = null;
           accumulatedDeltaY = 0;
           return;
         }
 
-        // If we just arrived at the bottom right now, record timestamp and clamp here (do not transition on same scroll)
         if (reachedBottomAtTimeRef.current === null) {
           reachedBottomAtTimeRef.current = now;
           accumulatedDeltaY = 0;
           return;
         }
 
-        // User must have been settled at the bottom for at least 400ms before a new scroll down gesture can trigger transition
         const timeSettledAtBottom = now - reachedBottomAtTimeRef.current;
         if (timeSettledAtBottom < 400) {
           accumulatedDeltaY = 0;
           return;
         }
 
-        // User is at bottom and deliberately initiated a new scroll down gesture
         accumulatedDeltaY += e.deltaY;
         if (accumulatedDeltaY > 120) {
           accumulatedDeltaY = 0;
@@ -306,28 +300,24 @@ export default function App() {
       }
       // Scrolling Upwards
       else if (e.deltaY < 0) {
-        // If we are NOT at the top, user is scrolling inside the section. Do NOT allow transition!
         if (!isStrictlyAtTop) {
           reachedTopAtTimeRef.current = null;
           accumulatedDeltaY = 0;
           return;
         }
 
-        // If we just arrived at the top right now, record timestamp and clamp here
         if (reachedTopAtTimeRef.current === null) {
           reachedTopAtTimeRef.current = now;
           accumulatedDeltaY = 0;
           return;
         }
 
-        // User must have been settled at the top for at least 400ms before a new scroll up gesture can trigger transition
         const timeSettledAtTop = now - reachedTopAtTimeRef.current;
         if (timeSettledAtTop < 400) {
           accumulatedDeltaY = 0;
           return;
         }
 
-        // User is at top and deliberately initiated a new scroll up gesture
         accumulatedDeltaY += e.deltaY;
         if (accumulatedDeltaY < -120) {
           accumulatedDeltaY = 0;
@@ -546,134 +536,17 @@ export default function App() {
         ref={scrollContainerRef}
         className="flex-1 overflow-y-auto scrollable relative pb-32"
       >
-        <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-8 md:py-10 min-h-full">
+        <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-4 md:py-6 min-h-full">
 
           {/* ════════════════════════════════════════════════════════════════════
-              STAGE 0: PROLOGUE (MINIMALIST VINYL ALBUM SLEEVE HERO)
+              STAGE 0: PROLOGUE (MODERN FULL-BLEED CENTER STAGE VINYL HUB)
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 0 && (
-            <div className="space-y-12 md:space-y-16 animate-[fadeIn_0.5s_ease-out]">
-              
-              {/* Minimal Liner Note Topbar */}
-              <div className="flex items-center justify-between text-xs font-mono text-[#5c5248] pb-4 border-b border-[#2a2520]">
-                <div className="flex items-center gap-2.5">
-                  <span className="w-2 h-2 rounded-full bg-[#1db954] animate-ping shrink-0" />
-                  <span className="text-[#1db954] font-medium tracking-wider">SIDE A · TRACK 00</span>
-                  <span className="text-[#332d26]">/</span>
-                  <span className="text-[#a89880]">RESIDENCY: WEEKEND INC. (SAMPOERNA)</span>
-                </div>
-                <div className="hidden sm:block text-[11px] text-[#5c5248] tracking-widest uppercase">
-                  MASTER STEREO 96kHz / 24-BIT
-                </div>
-              </div>
-
-              {/* Minimalist Vinyl Sleeve Hero Grid */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 lg:gap-16 items-center py-4 md:py-8">
-                
-                {/* Left: Punchy Clean Typography & Bio */}
-                <div className="lg:col-span-7 space-y-6">
-                  <div className="space-y-2">
-                    <span className="text-xs sm:text-sm font-mono text-[#e8a045] font-bold tracking-widest uppercase block">
-                      // THE INVISIBLE ENGINE
-                    </span>
-                    <h1 className="text-4xl sm:text-6xl md:text-7xl font-bold tracking-tight text-[#f0ebe3] leading-[1.04]">
-                      BACKEND <br />
-                      <span className="text-transparent bg-clip-text bg-gradient-to-r from-[#e8a045] via-[#f0ebe3] to-[#a89880]">
-                        ARCHITECT.
-                      </span>
-                    </h1>
-                  </div>
-
-                  <p className="text-base sm:text-lg text-[#a89880] leading-relaxed max-w-xl font-normal">
-                    Architecting high-throughput microservices, sub-100ms database query indexing, and mission-critical cloud APIs for enterprise retail platforms.
-                  </p>
-
-                  {/* Clean 2-Action Essential Buttons */}
-                  <div className="flex flex-wrap items-center gap-4 pt-2">
-                    <button
-                      onClick={() => goToSection(1)}
-                      className="inline-flex items-center gap-2.5 px-6 py-3.5 rounded-full bg-[#e8a045] text-black font-semibold text-xs font-mono hover:bg-[#f0b055] transition-all cursor-pointer shadow-lg active:scale-95"
-                    >
-                      <span>EXPLORE TRACKS</span>
-                      <ArrowDown size={14} weight="bold" />
-                    </button>
-
-                    <a
-                      href={`mailto:${PROFILE.email}`}
-                      className="inline-flex items-center gap-2 px-6 py-3.5 rounded-full bg-[#1c1916] border border-[#4a4035] text-[#f0ebe3] font-mono text-xs hover:border-[#e8a045] transition-all cursor-pointer"
-                    >
-                      <EnvelopeSimple size={15} />
-                      <span>GET IN TOUCH</span>
-                    </a>
-                  </div>
-                </div>
-
-                {/* Right: Vinyl Album Sleeve (Clean Photo + Vinyl Edge) */}
-                <div className="lg:col-span-5 flex justify-center">
-                  <div className="relative w-full max-w-[340px] sm:max-w-[370px] group select-none">
-                    
-                    {/* Peeking Spinning Vinyl Record Behind Sleeve */}
-                    <div
-                      className={`absolute top-2 -right-8 sm:-right-12 w-64 h-64 sm:w-72 sm:h-72 rounded-full bg-[#12100e] border-4 border-[#24201a] shadow-2xl flex items-center justify-center transition-all duration-700 group-hover:-right-14 sm:group-hover:-right-18 ${
-                        isPlaying ? "animate-spin" : ""
-                      }`}
-                      style={{ animationDuration: "6s" }}
-                    >
-                      <div className="w-20 h-20 rounded-full border-2 border-[#e8a045] bg-[radial-gradient(circle,#e8a045_0%,#1c1916_100%)] flex items-center justify-center p-1">
-                        <span className="text-[7px] font-mono font-bold text-black uppercase">45 RPM</span>
-                      </div>
-                    </div>
-
-                    {/* Minimalist Square Album Sleeve Frame */}
-                    <div className="relative z-10 aspect-square w-full rounded-2xl overflow-hidden border border-[#332d26] bg-[#141210] p-4 shadow-[0_20px_50px_rgba(0,0,0,0.8)] flex flex-col justify-between group-hover:border-[#4a4035] transition-colors">
-                      {/* Top Sleeve Label */}
-                      <div className="flex items-center justify-between text-[10px] font-mono text-[#5c5248]">
-                        <span className="tracking-widest text-[#e8a045]">VOL. 01 / PROLOGUE</span>
-                        <span>{PROFILE.coordinates}</span>
-                      </div>
-
-                      {/* Photo Artwork */}
-                      <div className="relative aspect-square w-full rounded-xl overflow-hidden border border-[#2a2520] my-2">
-                        <img
-                          src={PROFILE.avatarUrl}
-                          alt={PROFILE.name}
-                          className="w-full h-full object-cover grayscale contrast-115 group-hover:grayscale-0 transition-all duration-700"
-                        />
-                      </div>
-
-                      {/* Bottom Sleeve Title */}
-                      <div className="flex items-center justify-between pt-1 text-xs font-mono">
-                        <div>
-                          <span className="font-bold text-[#f0ebe3] block leading-tight">{PROFILE.name}</span>
-                          <span className="text-[10px] text-[#5c5248] uppercase tracking-wider block">{PROFILE.title}</span>
-                        </div>
-                        <span className="text-[10px] font-bold text-[#1db954] px-2 py-0.5 rounded bg-[#1c1916] border border-[#2a2520]">
-                          ● ONLINE
-                        </span>
-                      </div>
-                    </div>
-
-                  </div>
-                </div>
-
-              </div>
-
-              {/* Bottom Subtle Transition Helper */}
-              <div className="pt-6 border-t border-[#262630]/60 flex items-center justify-between text-xs font-mono text-[#5c5248]">
-                <div className="flex items-center gap-2 text-[#e8a045]">
-                  <Sparkle size={14} />
-                  <span>STUDIO DISCOGRAPHY AHEAD</span>
-                </div>
-                <button
-                  onClick={() => goToSection(1)}
-                  className="flex items-center gap-2 hover:text-[#f0ebe3] transition-colors cursor-pointer"
-                >
-                  <span>SCROLL DOWN AT BOTTOM TO CUE NEXT CHAPTER</span>
-                  <ArrowDown size={14} />
-                </button>
-              </div>
-
-            </div>
+            <CenterStageHero
+              isPlaying={isPlaying}
+              onExploreTracks={() => goToSection(1)}
+              accentColor={currentSectionConfig.accent}
+            />
           )}
 
           {/* ════════════════════════════════════════════════════════════════════
