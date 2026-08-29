@@ -5,8 +5,20 @@ import { Waveform } from "./Waveform";
 import { Cassette } from "./Cassette";
 import { SpeakerHigh, SpeakerSlash } from "@phosphor-icons/react";
 
+interface SectionMeta {
+  id: string;
+  navLabel: string;
+  mobileShort: string;
+  chapterNumber: string;
+  name: string;
+  subtitle: string;
+  accent: string;
+}
+
 interface PlayerBarProps {
   currentTrack: Track;
+  activeSection: SectionMeta;
+  activeSectionIdx: number;
   scrollProgress: number;
   onPrevSection: () => void;
   onNextSection: () => void;
@@ -36,6 +48,8 @@ const IconPause = () => (
 
 export const PlayerBar: React.FC<PlayerBarProps> = ({
   currentTrack,
+  activeSection,
+  activeSectionIdx,
   scrollProgress,
   onPrevSection,
   onNextSection,
@@ -78,6 +92,25 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   const totMin = Math.floor(totalSeconds / 60);
   const totSec = (totalSeconds % 60).toString().padStart(2, "0");
 
+  // Dynamic Metadata: Displays section info when in Section 0, 2, 3 and current project track when in Section 1 (Projects)
+  const displayTitle =
+    activeSectionIdx === 1
+      ? currentTrack.title
+      : activeSection.name;
+
+  const displaySubtitle =
+    activeSectionIdx === 1
+      ? currentTrack.subtitle
+      : activeSection.subtitle.replace("// ", "");
+
+  const displayMeta =
+    activeSectionIdx === 1
+      ? `${currentTrack.storyChapter} · ${currentTrack.period}`
+      : `SECTION ${activeSection.chapterNumber} / 03 · 2026`;
+
+  const activeAccent =
+    activeSectionIdx === 1 ? currentTrack.artAccent : activeSection.accent;
+
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#332d26]"
@@ -89,17 +122,17 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
     >
       <div className="max-w-[1400px] mx-auto h-full px-4 md:px-8 flex items-center justify-between gap-4">
         
-        {/* Left: Cassette Graphic & Current Track Metadata */}
+        {/* Left: Cassette Graphic & Dynamic Section / Track Metadata */}
         <div className="flex items-center gap-3.5 w-0 flex-1 min-w-0 lg:w-72 lg:flex-none">
           <div className="shrink-0 hidden sm:block">
-            <Cassette isPlaying={isPlaying} accentColor={currentTrack.artAccent} size={50} />
+            <Cassette isPlaying={isPlaying} accentColor={activeAccent} size={50} />
           </div>
           <div className="min-w-0">
             <p className="text-sm font-bold truncate text-[#f0ebe3] leading-tight">
-              {currentTrack.title}
+              {displayTitle}
             </p>
-            <p className="text-xs text-[#a89880] truncate mt-0.5">{currentTrack.subtitle}</p>
-            <p className="text-[10px] font-mono text-[#5c5248] truncate">{currentTrack.storyChapter} · {currentTrack.period}</p>
+            <p className="text-xs text-[#a89880] truncate mt-0.5">{displaySubtitle}</p>
+            <p className="text-[10px] font-mono text-[#5c5248] truncate">{displayMeta}</p>
           </div>
         </div>
 
@@ -122,10 +155,10 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
               style={{
                 background: isPlaying
                   ? "radial-gradient(circle, #1db954 0%, #17a847 100%)"
-                  : `radial-gradient(circle, ${currentTrack.artAccent} 0%, #b8752f 100%)`,
+                  : `radial-gradient(circle, ${activeAccent} 0%, #b8752f 100%)`,
                 boxShadow: isPlaying
                   ? "0 0 20px rgba(29,185,84,0.4)"
-                  : `0 0 20px ${currentTrack.artAccent}40`,
+                  : `0 0 20px ${activeAccent}40`,
               }}
               title={isPlaying ? "Pause audio & auto-scroll" : "Play ambient audio & auto-scroll"}
             >
@@ -163,8 +196,8 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                   style={{
                     width: `${clampedProgress}%`,
                     background: isPlaying
-                      ? `linear-gradient(90deg, ${currentTrack.artAccent}, #1db954)`
-                      : currentTrack.artAccent,
+                      ? `linear-gradient(90deg, ${activeAccent}, #1db954)`
+                      : activeAccent,
                   }}
                 />
               </div>
@@ -188,7 +221,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         {/* Right: Realtime Mini Waveform & Sound Mute Toggle */}
         <div className="flex items-center gap-3.5 w-0 flex-1 min-w-0 lg:w-72 lg:flex-none justify-end">
           <div className="hidden md:block w-36 h-8 opacity-80">
-            <Waveform isPlaying={isPlaying && !isMuted} barCount={22} height={32} accent={currentTrack.artAccent} />
+            <Waveform isPlaying={isPlaying && !isMuted} barCount={22} height={32} accent={activeAccent} />
           </div>
 
           {/* Mute / Unmute Sound Toggle Button */}

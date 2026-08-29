@@ -773,9 +773,11 @@ export default function App() {
         </div>
       </main>
 
-      {/* ── Persistent Bottom Music Player Bar with Direct Scrubber Trackline ── */}
+      {/* ── Persistent Bottom Music Player Bar with Dynamic Section Metadata ── */}
       <PlayerBar
         currentTrack={currentTrack}
+        activeSection={currentSectionConfig}
+        activeSectionIdx={activeSectionIdx}
         scrollProgress={scrollProgress}
         onPrevSection={handlePrevSection}
         onNextSection={handleNextSection}
