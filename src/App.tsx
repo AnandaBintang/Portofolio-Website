@@ -19,7 +19,7 @@ import { SectionTransitionCurtain } from "./components/SectionTransitionCurtain"
 import { FullscreenMenuOverlay } from "./components/FullscreenMenuOverlay";
 import { CustomMusicCursor } from "./components/CustomMusicCursor";
 import { CenterStageHero } from "./components/CenterStageHero";
-import { StackingDiscography } from "./components/StackingDiscography";
+import { HorizontalCrateDiscography } from "./components/HorizontalCrateDiscography";
 import { audio } from "./lib/audioEngine";
 
 interface TransitionState {
@@ -107,7 +107,7 @@ export default function App() {
     return audio.onStateChange(setIsPlaying);
   }, []);
 
-  // Initialize Lenis with Heavy Awwwards-tier smooth damping & track cards intersection observer
+  // Initialize Lenis with Heavy Awwwards-tier smooth damping
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -162,33 +162,13 @@ export default function App() {
       } else {
         reachedTopAtTimeRef.current = null;
       }
-
-      // In Section 1 (Discography): Dynamically update active track based on visible stacked sleeve
-      if (activeSectionIdxRef.current === 1) {
-        const cards = container.querySelectorAll(".project-parallax-card");
-        const containerRect = container.getBoundingClientRect();
-        const midY = containerRect.top + containerRect.height * 0.4;
-
-        cards.forEach((card) => {
-          const rect = card.getBoundingClientRect();
-          if (rect.top <= midY && rect.bottom >= midY) {
-            const idxStr = card.getAttribute("data-project-index");
-            if (idxStr !== null) {
-              const pIdx = parseInt(idxStr, 10);
-              if (!isNaN(pIdx) && pIdx !== activeTrackIdx) {
-                setActiveTrackIdx(pIdx);
-              }
-            }
-          }
-        });
-      }
     });
 
     return () => {
       lenis.destroy();
       cancelAnimationFrame(rafId);
     };
-  }, [activeSectionIdx, activeTrackIdx]);
+  }, [activeSectionIdx]);
 
   // Fullscreen Needle Drop Transition with self-contained autonomous sequence
   const goToSection = useCallback(
@@ -564,13 +544,14 @@ export default function App() {
           )}
 
           {/* ════════════════════════════════════════════════════════════════════
-              STAGE 1: THE DISCOGRAPHY / 3D STACKING RECORD SLEEVES PARALLAX
+              STAGE 1: THE DISCOGRAPHY / HORIZONTAL VINYL CRATE SCRUB
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 1 && (
-            <StackingDiscography
+            <HorizontalCrateDiscography
               activeTrackIdx={activeTrackIdx}
               currentTrack={currentTrack}
               isPlaying={isPlaying}
+              onTrackInView={(idx) => setActiveTrackIdx(idx)}
             />
           )}
 
