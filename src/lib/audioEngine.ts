@@ -11,6 +11,7 @@ class AudioEngine {
   private audioSource: MediaElementAudioSourceNode | null = null;
   private freqArray: Uint8Array | null = null;
   private playing = false;
+  private muted = false;
   private stateListeners: StateCallback[] = [];
 
   private init() {
@@ -65,6 +66,21 @@ class AudioEngine {
     return this.playing;
   }
 
+  toggleMute(): boolean {
+    if (!this.ctx) this.init();
+    this.muted = !this.muted;
+
+    if (this.masterGain && this.ctx) {
+      this.masterGain.gain.setTargetAtTime(this.muted ? 0 : 0.7, this.ctx.currentTime, 0.1);
+    }
+
+    return this.muted;
+  }
+
+  isMuted(): boolean {
+    return this.muted;
+  }
+
   getFreqData(): Uint8Array | null {
     if (!this.analyser || !this.freqArray || !this.playing) return null;
     this.analyser.getByteFrequencyData(this.freqArray as any);
@@ -75,7 +91,7 @@ class AudioEngine {
     try {
       if (!this.ctx) this.init();
       if (this.ctx?.state === "suspended") this.ctx.resume();
-      if (!this.ctx || !this.masterGain) return;
+      if (!this.ctx || !this.masterGain || this.muted) return;
 
       const now = this.ctx.currentTime;
 
