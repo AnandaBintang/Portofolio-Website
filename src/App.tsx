@@ -246,10 +246,8 @@ export default function App() {
       const currentScroll = lenis.scroll;
 
       if (maxScroll > 0 && currentScroll < maxScroll - 6) {
-        // Smoothly scroll down 4px every tick
         lenis.scrollTo(currentScroll + 4, { immediate: false, duration: 0.6 });
       } else if (currentScroll >= maxScroll - 6 && maxScroll > 0) {
-        // If arrived at bottom, transition to next section automatically
         if (activeSectionIdxRef.current < SECTIONS_CONFIG.length - 1) {
           goToSection(activeSectionIdxRef.current + 1);
         }
@@ -258,6 +256,30 @@ export default function App() {
 
     return () => clearInterval(interval);
   }, [isPlaying, goToSection, menuOpen]);
+
+  // ── Scrubber Seeking via Trackline Click (0 to 100%) ──
+  const handleSeekProgress = useCallback(
+    (seekPercent: number) => {
+      const targetSection = Math.min(3, Math.floor(seekPercent / 25));
+      const sectionOffsetRatio = (seekPercent % 25) / 25;
+
+      if (targetSection !== activeSectionIdxRef.current) {
+        goToSection(targetSection);
+        setTimeout(() => {
+          if (lenisRef.current) {
+            const limit = lenisRef.current.limit;
+            lenisRef.current.scrollTo(limit * sectionOffsetRatio, { immediate: true });
+          }
+        }, 800);
+      } else {
+        if (lenisRef.current) {
+          const limit = lenisRef.current.limit;
+          lenisRef.current.scrollTo(limit * sectionOffsetRatio, { immediate: false, duration: 0.8 });
+        }
+      }
+    },
+    [goToSection]
+  );
 
   const handleAnimationComplete = useCallback(() => {
     setTransitionState((prev) => ({ ...prev, isTransitioning: false }));
@@ -567,7 +589,7 @@ export default function App() {
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-4 md:py-6 min-h-full">
 
           {/* ════════════════════════════════════════════════════════════════════
-              STAGE 0: ABOUT / HERO (3D MASTER ALBUM HUB)
+              STAGE 0: PROLOGUE / HERO (3D MASTER ALBUM HUB)
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 0 && (
             <CenterStageHero
@@ -751,19 +773,13 @@ export default function App() {
         </div>
       </main>
 
-      {/* ── Persistent Bottom Music Player Bar with Direct Realtime Scroll Percentage ── */}
+      {/* ── Persistent Bottom Music Player Bar with Direct Scrubber Trackline ── */}
       <PlayerBar
         currentTrack={currentTrack}
         scrollProgress={scrollProgress}
         onPrevSection={handlePrevSection}
         onNextSection={handleNextSection}
-        onTrackSelect={(idx) => {
-          setActiveTrackIdx(idx);
-          if (activeSectionIdx !== 1) {
-            goToSection(1);
-          }
-        }}
-        currentTrackIdx={activeTrackIdx}
+        onSeekProgress={handleSeekProgress}
       />
     </div>
   );

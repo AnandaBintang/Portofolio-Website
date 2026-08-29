@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef } from "react";
 import { type Track } from "../data/tracks";
 import { audio } from "../lib/audioEngine";
 import { Waveform } from "./Waveform";
@@ -10,8 +10,7 @@ interface PlayerBarProps {
   scrollProgress: number;
   onPrevSection: () => void;
   onNextSection: () => void;
-  onTrackSelect: (idx: number) => void;
-  currentTrackIdx: number;
+  onSeekProgress?: (progressPercent: number) => void;
 }
 
 const IconPrev = () => (
@@ -40,9 +39,11 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
   scrollProgress,
   onPrevSection,
   onNextSection,
+  onSeekProgress,
 }) => {
   const [isPlaying, setIsPlaying] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
+  const tracklineRef = useRef<HTMLDivElement | null>(null);
 
   useEffect(() => {
     return audio.onStateChange(setIsPlaying);
@@ -59,36 +60,39 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
     setIsMuted(muted);
   };
 
+  const handleTracklineClick = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (!tracklineRef.current || !onSeekProgress) return;
+    const rect = tracklineRef.current.getBoundingClientRect();
+    const clickX = e.clientX - rect.left;
+    const percent = Math.min(100, Math.max(0, (clickX / rect.width) * 100));
+    onSeekProgress(percent);
+  };
+
   const clampedProgress = Math.min(100, Math.max(0, scrollProgress));
+
+  // Convert scroll percentage to aesthetic player timecode (e.g. 0:00 to 3:45)
+  const totalSeconds = 225; // 3:45 total duration
+  const currentSeconds = Math.round((clampedProgress / 100) * totalSeconds);
+  const curMin = Math.floor(currentSeconds / 60);
+  const curSec = (currentSeconds % 60).toString().padStart(2, "0");
+  const totMin = Math.floor(totalSeconds / 60);
+  const totSec = (totalSeconds % 60).toString().padStart(2, "0");
 
   return (
     <div
       className="fixed bottom-0 left-0 right-0 z-40 border-t border-[#332d26]"
       style={{
-        height: "88px",
+        height: "90px",
         background: "rgba(15,13,11,0.95)",
         backdropFilter: "blur(24px)",
       }}
     >
-      {/* Realtime Smooth Continuous Scroll Progress Trackline */}
-      <div className="w-full h-1 bg-[#242018] relative overflow-hidden">
-        <div
-          className="h-full origin-left will-change-transform"
-          style={{
-            transform: `scaleX(${clampedProgress / 100})`,
-            transformOrigin: "left",
-            background: `linear-gradient(90deg, ${currentTrack.artAccent}, #1db954)`,
-            transition: "transform 0.08s linear",
-          }}
-        />
-      </div>
-
       <div className="max-w-[1400px] mx-auto h-full px-4 md:px-8 flex items-center justify-between gap-4">
         
         {/* Left: Cassette Graphic & Current Track Metadata */}
         <div className="flex items-center gap-3.5 w-0 flex-1 min-w-0 lg:w-72 lg:flex-none">
           <div className="shrink-0 hidden sm:block">
-            <Cassette isPlaying={isPlaying} accentColor={currentTrack.artAccent} size={54} />
+            <Cassette isPlaying={isPlaying} accentColor={currentTrack.artAccent} size={50} />
           </div>
           <div className="min-w-0">
             <p className="text-sm font-bold truncate text-[#f0ebe3] leading-tight">
@@ -99,16 +103,11 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
           </div>
         </div>
 
-        {/* Center: Playhead Controls (Previous Section / Play / Next Section) */}
-        <div className="flex flex-col items-center gap-1.5 flex-1 max-w-md">
-          <div className="hidden sm:flex items-center gap-2 text-[10px] font-mono text-[#5c5248]">
-            <span className="bg-[#1c1916] px-2 py-0.5 rounded border border-[#332d26] text-[#e8a045]">
-              {Math.round(clampedProgress)}% SCROLL
-            </span>
-            <span>{currentTrack.role}</span>
-          </div>
-
-          <div className="flex items-center gap-5">
+        {/* Center: Interactive Scrubber Trackline & Playhead Controls */}
+        <div className="flex flex-col items-center gap-2 flex-1 max-w-lg">
+          
+          {/* Controls: Prev / Play / Next */}
+          <div className="flex items-center gap-6">
             <button
               onClick={onPrevSection}
               className="text-[#a89880] hover:text-[#f0ebe3] active:scale-90 transition-all cursor-pointer p-1.5 rounded-full hover:bg-[#1c1916]"
@@ -143,6 +142,47 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
               <IconNext />
             </button>
           </div>
+
+          {/* Authentic Music Player Scrub Trackline Bar */}
+          <div className="w-full flex items-center gap-3">
+            <span className="text-[10px] font-mono text-[#5c5248] w-8 text-right select-none">
+              {curMin}:{curSec}
+            </span>
+
+            {/* Clickable / Draggable Trackline */}
+            <div
+              ref={tracklineRef}
+              onClick={handleTracklineClick}
+              className="flex-1 h-3 flex items-center cursor-pointer group py-1"
+              title="Click to seek page position"
+            >
+              <div className="w-full h-1.5 bg-[#242018] group-hover:h-2 rounded-full relative overflow-hidden transition-all border border-[#332d26]/60">
+                {/* Active Playhead Fill */}
+                <div
+                  className="h-full rounded-full will-change-transform"
+                  style={{
+                    width: `${clampedProgress}%`,
+                    background: isPlaying
+                      ? `linear-gradient(90deg, ${currentTrack.artAccent}, #1db954)`
+                      : currentTrack.artAccent,
+                  }}
+                />
+              </div>
+
+              {/* Scrubber Knob Indicator */}
+              <div
+                className="w-3.5 h-3.5 rounded-full bg-white shadow-[0_0_10px_rgba(255,255,255,0.8)] opacity-0 group-hover:opacity-100 transition-opacity -ml-2 pointer-events-none z-10"
+                style={{
+                  transform: `translateX(${clampedProgress}%)`,
+                }}
+              />
+            </div>
+
+            <span className="text-[10px] font-mono text-[#5c5248] w-8 select-none">
+              {totMin}:{totSec}
+            </span>
+          </div>
+
         </div>
 
         {/* Right: Realtime Mini Waveform & Sound Mute Toggle */}
