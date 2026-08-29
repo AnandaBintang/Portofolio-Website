@@ -32,11 +32,11 @@ interface TransitionState {
 const SECTIONS_CONFIG = [
   {
     id: "prologue",
-    navLabel: "ABOUT",
+    navLabel: "PROLOGUE",
     mobileShort: "00",
     chapterNumber: "00",
-    name: "ANANDA BINTANG",
-    subtitle: "// BACKEND ENGINEER & ARCHITECT",
+    name: "PROLOGUE",
+    subtitle: "// PROFILE & BACKGROUND",
     accent: "#e8a045",
   },
   {
