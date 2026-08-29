@@ -32,38 +32,38 @@ interface TransitionState {
 const SECTIONS_CONFIG = [
   {
     id: "prologue",
-    navLabel: "PROLOGUE",
+    navLabel: "ABOUT",
     mobileShort: "00",
-    chapterNumber: "CH 00",
-    name: "THE ACOUSTIC PROLOGUE",
-    subtitle: "// PROFILE, SPECIALIZATION & RESIDENCY",
+    chapterNumber: "00",
+    name: "ANANDA BINTANG",
+    subtitle: "// BACKEND ENGINEER & ARCHITECT",
     accent: "#e8a045",
   },
   {
     id: "projects-area",
-    navLabel: "DISCOGRAPHY",
+    navLabel: "PROJECTS",
     mobileShort: "01",
-    chapterNumber: "CH 01",
-    name: "STUDIO DISCOGRAPHY",
-    subtitle: "// 4 MASTER PRODUCTION RELEASES",
+    chapterNumber: "01",
+    name: "SELECTED PROJECTS",
+    subtitle: "// ENTERPRISE PLATFORMS & APIS",
     accent: "#4a9eff",
   },
   {
     id: "experience-area",
-    navLabel: "SESSION LOGS",
+    navLabel: "EXPERIENCE",
     mobileShort: "02",
-    chapterNumber: "CH 02",
-    name: "STUDIO MASTER LOGS",
-    subtitle: "// CHRONOLOGICAL PRODUCTION SESSIONS",
+    chapterNumber: "02",
+    name: "WORK EXPERIENCE",
+    subtitle: "// CAREER HISTORY & EDUCATION",
     accent: "#f472b6",
   },
   {
     id: "frequencies-area",
-    navLabel: "STUDIO SETUP",
+    navLabel: "SKILLS",
     mobileShort: "03",
-    chapterNumber: "CH 03",
-    name: "FREQUENCY BANDS",
-    subtitle: "// 6 CALIBRATED EQUALIZER TIERS",
+    chapterNumber: "03",
+    name: "TECH STACK",
+    subtitle: "// CORE SKILLS & INFRASTRUCTURE",
     accent: "#2dd4bf",
   },
 ];
@@ -88,12 +88,9 @@ export default function App() {
   const transitionLockUntilRef = useRef<number>(0);
   const activeSectionIdxRef = useRef<number>(0);
 
-  // Precise Boundary Time Tracking:
-  // User MUST be settled at the boundary for at least 400ms before a new gesture can trigger a transition
   const reachedBottomAtTimeRef = useRef<number | null>(null);
   const reachedTopAtTimeRef = useRef<number | null>(Date.now());
 
-  // Keep ref in sync with state
   useEffect(() => {
     activeSectionIdxRef.current = activeSectionIdx;
     reachedBottomAtTimeRef.current = null;
@@ -102,7 +99,6 @@ export default function App() {
 
   const currentTrack: Track = PLAYABLE_TRACKS[activeTrackIdx] || PLAYABLE_TRACKS[0];
 
-  // Sync audio state
   useEffect(() => {
     return audio.onStateChange(setIsPlaying);
   }, []);
@@ -115,7 +111,7 @@ export default function App() {
     const lenis = new Lenis({
       wrapper: container,
       content: container.firstElementChild as HTMLElement,
-      duration: 1.4, // Heavy inertia duration
+      duration: 1.4,
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
       gestureOrientation: "vertical",
@@ -133,7 +129,6 @@ export default function App() {
 
     const rafId = requestAnimationFrame(raf);
 
-    // Sync scroll progress and monitor boundary settlement via Lenis onScroll
     lenis.on("scroll", (e: { scroll: number; limit: number }) => {
       if (isTransitioningRef.current || Date.now() < transitionLockUntilRef.current) {
         if (e.scroll !== 0) lenis.scrollTo(0, { immediate: true });
@@ -163,7 +158,7 @@ export default function App() {
         reachedTopAtTimeRef.current = null;
       }
 
-      // In Section 1 (Discography): Dynamically update active track in turntable deck based on visible card
+      // In Section 1 (Projects): Dynamically update active track in turntable deck based on visible card
       if (activeSectionIdxRef.current === 1) {
         const cards = container.querySelectorAll(".project-parallax-card");
         const containerRect = container.getBoundingClientRect();
@@ -190,7 +185,7 @@ export default function App() {
     };
   }, [activeSectionIdx, activeTrackIdx]);
 
-  // Fullscreen Needle Drop Transition with self-contained autonomous sequence
+  // Fullscreen Needle Drop Transition
   const goToSection = useCallback(
     (targetIdx: number) => {
       const now = Date.now();
@@ -205,7 +200,6 @@ export default function App() {
         return;
       }
 
-      // Lock for 2200ms
       isTransitioningRef.current = true;
       transitionLockUntilRef.current = now + 2200;
       setMenuOpen(false);
@@ -213,7 +207,6 @@ export default function App() {
       const targetMeta = SECTIONS_CONFIG[targetIdx];
       audio.sfx("rewind");
 
-      // 1. Trigger Autonomous Transition Sequence
       setTransitionState({
         isTransitioning: true,
         name: targetMeta.name,
@@ -221,7 +214,6 @@ export default function App() {
         accent: targetMeta.accent,
       });
 
-      // 2. STAGE SWITCH: Update content behind the opaque vinyl curtain at t=700ms
       setTimeout(() => {
         setActiveSectionIdx(targetIdx);
         activeSectionIdxRef.current = targetIdx;
@@ -248,7 +240,6 @@ export default function App() {
     }
   }, []);
 
-  // Keyboard shortcut listener (ESC to close menu)
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
       if (e.key === "Escape" && menuOpen) {
@@ -259,7 +250,7 @@ export default function App() {
     return () => window.removeEventListener("keydown", handleKeyDown);
   }, [menuOpen]);
 
-  // Robust Native Wheel Listener: ONLY transitions if user has ALREADY settled at the boundary for >= 400ms
+  // Two-Step Boundary Guard Wheel Listener
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -282,7 +273,6 @@ export default function App() {
       const isStrictlyAtBottom = maxScroll > 0 ? currentScroll >= maxScroll - 6 : true;
       const isStrictlyAtTop = currentScroll <= 6;
 
-      // Scrolling Downwards
       if (e.deltaY > 0) {
         if (!isStrictlyAtBottom) {
           reachedBottomAtTimeRef.current = null;
@@ -308,12 +298,10 @@ export default function App() {
           reachedBottomAtTimeRef.current = null;
           const cur = activeSectionIdxRef.current;
           if (cur < SECTIONS_CONFIG.length - 1) {
-            goToSection(cur + 1); // Next section
+            goToSection(cur + 1);
           }
         }
-      }
-      // Scrolling Upwards
-      else if (e.deltaY < 0) {
+      } else if (e.deltaY < 0) {
         if (!isStrictlyAtTop) {
           reachedTopAtTimeRef.current = null;
           accumulatedDeltaY = 0;
@@ -338,7 +326,7 @@ export default function App() {
           reachedTopAtTimeRef.current = null;
           const cur = activeSectionIdxRef.current;
           if (cur > 0) {
-            goToSection(cur - 1); // Previous section
+            goToSection(cur - 1);
           }
         }
       } else {
@@ -372,7 +360,6 @@ export default function App() {
       const currentY = e.touches[0].clientY;
       const diffY = touchStartYRef.current - currentY;
 
-      // Swiping Up (Scrolling Down)
       if (diffY > 0) {
         if (!isStrictlyAtBottom) {
           reachedBottomAtTimeRef.current = null;
@@ -394,9 +381,7 @@ export default function App() {
             goToSection(cur + 1);
           }
         }
-      }
-      // Swiping Down (Scrolling Up)
-      else if (diffY < 0) {
+      } else if (diffY < 0) {
         if (!isStrictlyAtTop) {
           reachedTopAtTimeRef.current = null;
           return;
@@ -432,7 +417,6 @@ export default function App() {
     };
   }, [goToSection, menuOpen]);
 
-  // Section next / prev controls
   const handlePrevSection = () => {
     const cur = activeSectionIdxRef.current;
     const nextIdx = cur > 0 ? cur - 1 : SECTIONS_CONFIG.length - 1;
@@ -529,7 +513,7 @@ export default function App() {
               {isPlaying ? "AUDIO LIVE" : "BGM READY"}
             </div>
 
-            {/* Kinetic Fullscreen Menu Trigger */}
+            {/* Menu Trigger */}
             <button
               onClick={() => {
                 audio.sfx("click");
@@ -538,7 +522,7 @@ export default function App() {
               className="flex items-center gap-2 px-3.5 sm:px-4 py-2 rounded-full bg-[#1c1916] border border-[#4a4035] hover:border-[#e8a045] text-[#f0ebe3] text-xs font-mono font-bold active:scale-95 transition-all cursor-pointer shadow-md group"
             >
               <List size={16} className="text-[#e8a045] group-hover:rotate-90 transition-transform" />
-              <span>CHAPTERS MENU</span>
+              <span>MENU</span>
             </button>
           </div>
 
@@ -553,7 +537,7 @@ export default function App() {
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-4 md:py-6 min-h-full">
 
           {/* ════════════════════════════════════════════════════════════════════
-              STAGE 0: PROLOGUE (MODERN FULL-BLEED CENTER STAGE ALBUM HUB)
+              STAGE 0: ABOUT / HERO (3D MASTER ALBUM HUB)
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 0 && (
             <CenterStageHero
@@ -564,7 +548,7 @@ export default function App() {
           )}
 
           {/* ════════════════════════════════════════════════════════════════════
-              STAGE 1: THE DISCOGRAPHY / SCROLL-DRIVEN PARALLAX STREAM (OPTI 1)
+              STAGE 1: PROJECTS / SCROLL-DRIVEN PARALLAX STREAM
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 1 && (
             <ParallaxDiscography
@@ -575,25 +559,25 @@ export default function App() {
           )}
 
           {/* ════════════════════════════════════════════════════════════════════
-              STAGE 2: STUDIO MASTER LOGS (EXPERIENCE & EDUCATION)
+              STAGE 2: EXPERIENCE & EDUCATION
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 2 && (
             <div className="space-y-10 md:space-y-12 animate-[fadeIn_0.5s_ease-out]">
               <div className="space-y-3 pb-6 border-b border-[#2a2520]">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#f472b6]">
                   <Briefcase size={14} />
-                  <span>THE MASTER LOGS · CHRONOLOGICAL SESSIONS</span>
+                  <span>WORK EXPERIENCE</span>
                 </div>
                 <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#f0ebe3]">
-                  STUDIO SESSIONS.
+                  WORK EXPERIENCE.
                 </h2>
-                <p className="text-sm sm:text-base text-[#a89880] max-w-xl font-mono leading-relaxed">
-                  Professional trajectory spanning enterprise retail architectures, high-scale digital commerce, and technical community mentorship.
+                <p className="text-xs sm:text-sm md:text-base text-[#a89880] max-w-xl font-mono leading-relaxed">
+                  Professional background building scalable backend services, retail POS systems, and mentoring developers.
                 </p>
               </div>
 
               <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-                {/* Main Experience Tapes */}
+                {/* Main Experience Cards */}
                 <div className="lg:col-span-8 space-y-6">
                   {SESSIONS.map((session, i) => (
                     <div
@@ -605,13 +589,13 @@ export default function App() {
                       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#2a2520] pb-4 mb-4">
                         <div>
                           <span className="text-xs font-mono text-[#f472b6] font-bold block mb-1">
-                            {session.tapeId} · {session.period}
+                            {session.period}
                           </span>
                           <h3 className="text-lg sm:text-2xl font-bold text-[#f0ebe3]">
                             {session.role} @ {session.company}
                           </h3>
                           <p className="text-xs font-mono text-[#a89880] mt-0.5">
-                            Client Account: {session.client}
+                            {session.client}
                           </p>
                         </div>
 
@@ -626,7 +610,7 @@ export default function App() {
                         <div className="flex items-center gap-2 mb-4">
                           <span className="w-2 h-2 rounded-full bg-[#1db954] animate-pulse" />
                           <span className="text-xs font-mono text-[#1db954] font-bold">
-                            CURRENT PRODUCTION RESIDENCY
+                            CURRENT POSITION
                           </span>
                         </div>
                       )}
@@ -654,12 +638,12 @@ export default function App() {
                   ))}
                 </div>
 
-                {/* Sidebar: Education & Protocol */}
+                {/* Sidebar: Education */}
                 <div className="lg:col-span-4 space-y-6">
                   <div className="bg-[#141210] border border-[#332d26] rounded-2xl p-6 space-y-6 shadow-xl">
                     <div className="flex items-center gap-2 text-xs font-mono text-[#5c5248] uppercase border-b border-[#2a2520] pb-3">
                       <GraduationCap size={16} className="text-[#e8a045]" />
-                      <span>ACOUSTIC FOUNDATION (EDUCATION)</span>
+                      <span>EDUCATION</span>
                     </div>
 
                     <div className="space-y-4">
@@ -680,10 +664,10 @@ export default function App() {
                   <div className="bg-[#1c1916] border border-[#332d26] rounded-2xl p-6 space-y-3 shadow-lg">
                     <div className="flex items-center gap-2 text-xs font-mono text-[#5c5248] uppercase">
                       <Cpu size={15} className="text-[#e8a045]" />
-                      <span>ENGINEERING PROTOCOL</span>
+                      <span>DEVELOPMENT PRINCIPLES</span>
                     </div>
                     <p className="text-xs text-[#a89880] leading-relaxed font-mono">
-                      Clean Architecture discipline, automated diff-based linting (Husky + Commitlint), zero N+1 latency tolerance, and structured cloud observability.
+                      Clean Architecture, automated diff-based linting (Husky + Commitlint), database query optimization, and structured API error handling.
                     </p>
                   </div>
                 </div>
@@ -692,20 +676,20 @@ export default function App() {
           )}
 
           {/* ════════════════════════════════════════════════════════════════════
-              STAGE 3: STUDIO SETUP (FREQUENCY BANDS / SKILLS)
+              STAGE 3: SKILLS & TECH STACK
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 3 && (
             <div className="space-y-10 md:space-y-12 animate-[fadeIn_0.5s_ease-out]">
               <div className="space-y-3 pb-6 border-b border-[#2a2520]">
                 <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#2dd4bf]">
                   <Cpu size={14} />
-                  <span>STUDIO SETUP · 6 EQUALIZER FREQUENCY BANDS</span>
+                  <span>SKILLS & TECHNOLOGIES</span>
                 </div>
                 <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#f0ebe3]">
-                  FREQUENCY BANDS.
+                  TECH STACK.
                 </h2>
-                <p className="text-sm sm:text-base text-[#a89880] max-w-xl font-mono leading-relaxed">
-                  Calibrated technical proficiencies across persistence layers, core logic, cloud infrastructure, and quality automation.
+                <p className="text-xs sm:text-sm md:text-base text-[#a89880] max-w-xl font-mono leading-relaxed">
+                  Technical proficiencies across backend development, database management, cloud services, and code quality tools.
                 </p>
               </div>
 
@@ -713,27 +697,18 @@ export default function App() {
                 {SKILLS.map((cat, i) => (
                   <div
                     key={i}
-                    className="bg-[#141210] border border-[#332d26] rounded-2xl p-6 hover:border-[#4a4035] transition-colors space-y-5 shadow-lg"
+                    className="bg-[#141210] border border-[#332d26] rounded-2xl p-6 hover:border-[#4a4035] transition-colors space-y-4 shadow-lg"
                   >
-                    <div className="flex items-center justify-between border-b border-[#2a2520] pb-3.5">
-                      <div>
-                        <span className="text-xs font-mono font-bold text-[#2dd4bf] block mb-0.5">
-                          {cat.band}
-                        </span>
-                        <h3 className="text-sm font-bold text-[#f0ebe3] uppercase">
-                          {cat.category}
-                        </h3>
-                      </div>
-                      <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1c1916] border border-[#332d26] text-[#5c5248]">
-                        {cat.freq}
-                      </span>
+                    <div className="border-b border-[#2a2520] pb-3">
+                      <h3 className="text-sm font-bold text-[#f0ebe3] uppercase">
+                        {cat.category}
+                      </h3>
                     </div>
 
-                    <div className="space-y-2.5">
+                    <div className="space-y-2">
                       {cat.items.map((skill, j) => (
                         <div key={j} className="flex items-center justify-between text-xs">
-                          <span className="text-[#f0ebe3] font-medium">{skill}</span>
-                          <span className="font-mono text-[#5c5248] text-[11px]">CALIBRATED</span>
+                          <span className="text-[#dcd5cc] font-medium">{skill}</span>
                         </div>
                       ))}
                     </div>

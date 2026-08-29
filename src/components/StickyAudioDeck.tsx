@@ -1,4 +1,4 @@
-import { useEffect, useRef } from "react";
+import { useRef } from "react";
 import type { Track } from "../data/tracks";
 import { Waveform } from "./Waveform";
 
@@ -8,151 +8,87 @@ interface StickyAudioDeckProps {
   activeSectionIdx: number;
 }
 
-export const StickyAudioDeck = ({ currentTrack, isPlaying, activeSectionIdx }: StickyAudioDeckProps) => {
-  const canvasRef = useRef<HTMLCanvasElement | null>(null);
-
-  // Background animated particle rings on canvas
-  useEffect(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-
-    let animId: number;
-    let angle = 0;
-
-    const render = () => {
-      angle += isPlaying ? 0.02 : 0.005;
-      const w = canvas.width;
-      const h = canvas.height;
-      const cx = w / 2;
-      const cy = h / 2;
-
-      ctx.clearRect(0, 0, w, h);
-
-      // Draw pulsating frequency rings
-      const ringCount = 6;
-      for (let i = 1; i <= ringCount; i++) {
-        ctx.beginPath();
-        const r = (i * 26) + Math.sin(angle + i) * 6;
-        ctx.arc(cx, cy, r, 0, Math.PI * 2);
-        ctx.strokeStyle = `${currentTrack.artAccent}${Math.round((0.15 - i * 0.02) * 255).toString(16).padStart(2, "0")}`;
-        ctx.lineWidth = 1.2;
-        ctx.setLineDash([4, 8]);
-        ctx.stroke();
-      }
-
-      animId = requestAnimationFrame(render);
-    };
-
-    render();
-    return () => cancelAnimationFrame(animId);
-  }, [currentTrack.artAccent, isPlaying]);
+export const StickyAudioDeck: React.FC<StickyAudioDeckProps> = ({
+  currentTrack,
+  isPlaying,
+}) => {
+  const vinylRef = useRef<HTMLDivElement | null>(null);
 
   return (
-    <div className="sticky top-28 w-full max-w-[420px] mx-auto bg-[#141210]/90 backdrop-blur-xl border border-[#332d26] rounded-2xl p-6 shadow-2xl space-y-6 transition-all duration-700">
+    <div className="w-full bg-[#141210] border border-[#332d26] rounded-3xl p-6 shadow-2xl space-y-6 select-none relative overflow-hidden group">
       
-      {/* Top Deck Status Header */}
-      <div className="flex items-center justify-between border-b border-[#332d26] pb-3 text-xs font-mono text-[#5c5248]">
-        <div className="flex items-center gap-2">
-          <span
-            className="w-2.5 h-2.5 rounded-full transition-all duration-500"
-            style={{
-              background: currentTrack.artAccent,
-              boxShadow: `0 0 12px ${currentTrack.artAccent}`,
-            }}
-          />
-          <span className="text-[#f0ebe3] font-bold tracking-wider">
-            CHAPTER 0{activeSectionIdx + 1}
-          </span>
-        </div>
-        <span className="px-2 py-0.5 rounded bg-[#1c1916] border border-[#332d26] text-[#a89880]">
-          {currentTrack.bpm !== "—" ? `${currentTrack.bpm} BPM` : "MASTER TAPE"}
-        </span>
-      </div>
+      {/* Subtle Ambient Radial Glow */}
+      <div
+        className="absolute -top-16 -right-16 w-56 h-56 rounded-full pointer-events-none opacity-20 blur-3xl transition-colors duration-700"
+        style={{ background: currentTrack.artAccent }}
+      />
 
-      {/* Main Visual: Vinyl Record / Cassette Stage */}
-      <div className="relative aspect-square w-full rounded-xl bg-[#0f0d0b] border border-[#2a2520] flex items-center justify-center overflow-hidden p-4 group">
+      {/* Turntable Platter Deck & Vinyl */}
+      <div className="relative w-full aspect-square max-w-[280px] mx-auto rounded-full border-4 border-[#24201a] bg-[#100e0c] p-2.5 shadow-[0_15px_40px_rgba(0,0,0,0.8)] flex items-center justify-center">
         
-        {/* Background Canvas Rings */}
-        <canvas
-          ref={canvasRef}
-          width={360}
-          height={360}
-          className="absolute inset-0 w-full h-full pointer-events-none opacity-60"
-        />
+        {/* Strobe Ring */}
+        <div className="absolute inset-2 rounded-full border border-dashed border-[#3a332a] animate-[spin_12s_linear_infinite]" />
 
-        {/* Vinyl Record Body */}
+        {/* Vinyl Record */}
         <div
-          className={`relative z-10 w-56 h-56 rounded-full border border-[#4a4035] bg-gradient-to-tr from-[#12100e] via-[#1c1916] to-[#0a0908] shadow-[0_0_50px_rgba(0,0,0,0.8)] flex items-center justify-center transition-transform duration-1000 ${
-            isPlaying ? "animate-spin" : ""
+          ref={vinylRef}
+          className={`w-full h-full rounded-full border-2 border-[#332d26] bg-[radial-gradient(ellipse_at_center,#1c1916_0%,#0c0a08_40%,#181512_70%,#080706_100%)] flex items-center justify-center shadow-inner relative transition-transform ${
+            isPlaying ? "animate-[spin_5s_linear_infinite]" : "group-hover:rotate-45 duration-700"
           }`}
-          style={{ animationDuration: "6s" }}
         >
-          {/* Vinyl Grooves */}
-          <div className="absolute inset-3 rounded-full border border-[#332d26]/40" />
-          <div className="absolute inset-7 rounded-full border border-[#332d26]/30" />
-          <div className="absolute inset-12 rounded-full border border-[#332d26]/20" />
-          <div className="absolute inset-16 rounded-full border border-[#332d26]/20" />
-
-          {/* Center Record Label */}
+          {/* Center Label */}
           <div
-            className="w-22 h-22 rounded-full flex flex-col items-center justify-center p-2 text-center border transition-colors duration-700"
+            className="w-16 h-16 sm:w-20 sm:h-20 rounded-full border-2 flex flex-col items-center justify-center p-1 text-center shadow-md transition-colors duration-500"
             style={{
-              background: `radial-gradient(circle, ${currentTrack.artAccent}25 0%, #1c1916 100%)`,
+              background: `radial-gradient(circle, ${currentTrack.artAccent} 0%, #1c1916 100%)`,
               borderColor: currentTrack.artAccent,
             }}
           >
-            <span className="text-[10px] font-mono font-bold text-[#f0ebe3] uppercase leading-none">
+            <span className="text-[7px] sm:text-[8px] font-mono font-bold text-black uppercase leading-tight">
               {currentTrack.trackNo}
             </span>
-            <span
-              className="text-[9px] font-mono truncate max-w-[70px] mt-1 font-semibold"
-              style={{ color: currentTrack.artAccent }}
-            >
-              {currentTrack.genre.split(" ")[0]}
+            <span className="text-[6px] sm:text-[7px] font-mono text-black/80 uppercase">
+              PROJECT
             </span>
-            {/* Center Spindle Hole */}
-            <div className="w-3 h-3 rounded-full bg-[#0a0908] border border-[#4a4035] mt-1" />
+            <div className="w-2 h-2 rounded-full bg-[#080706] border border-[#332d26] mt-0.5" />
           </div>
         </div>
 
-        {/* Needle / Tonearm Indicator */}
-        <div
-          className="absolute top-4 right-6 w-16 h-28 origin-top-right transition-transform duration-500 pointer-events-none"
-          style={{
-            transform: isPlaying ? "rotate(18deg)" : "rotate(-15deg)",
-          }}
-        >
-          <div className="w-1 h-20 bg-gradient-to-b from-[#8a7b6a] to-[#4a4035] rounded-full mx-auto shadow-md" />
-          <div className="w-3 h-5 bg-[#e8a045] rounded-sm -mt-1 mx-auto shadow-sm" />
-        </div>
-
-      </div>
-
-      {/* Real-time Oscilloscope Waveform */}
-      <div className="bg-[#0f0d0b] border border-[#2a2520] p-3 rounded-xl space-y-1.5">
-        <div className="flex items-center justify-between text-[10px] font-mono text-[#5c5248]">
-          <span>FREQUENCY OSCILLATOR</span>
-          <span style={{ color: currentTrack.artAccent }}>LIVE SPECTRUM</span>
-        </div>
-        <div className="h-9">
-          <Waveform isPlaying={isPlaying} barCount={28} height={36} accent={currentTrack.artAccent} />
+        {/* Tonearm */}
+        <div className="absolute top-2 right-4 w-6 h-36 pointer-events-none transition-transform duration-700 group-hover:rotate-6" style={{ transformOrigin: "top right" }}>
+          <div className="w-6 h-6 rounded-full bg-[#3a332a] border border-[#5c5248] shadow-lg ml-auto" />
+          <div className="w-1 h-28 bg-gradient-to-b from-[#8a7e70] via-[#5c5248] to-[#332d26] rounded-full ml-auto mr-2.5 shadow-md" />
+          <div
+            className="w-3.5 h-5 rounded-sm shadow-md ml-auto mr-1 flex items-center justify-center transition-colors"
+            style={{ background: currentTrack.artAccent }}
+          >
+            <div className="w-1 h-1.5 bg-white rounded-full" />
+          </div>
         </div>
       </div>
 
-      {/* Meta Readout Tape */}
-      <div className="bg-[#1c1916] border border-[#332d26] p-3.5 rounded-xl flex items-center justify-between text-xs font-mono">
-        <div className="min-w-0 pr-2">
-          <span className="text-[10px] text-[#5c5248] uppercase block">NOW TUNED</span>
-          <p className="text-[#f0ebe3] font-bold truncate">{currentTrack.title}</p>
-          <p className="text-[11px] text-[#a89880] truncate">{currentTrack.artist}</p>
-        </div>
-        <div className="text-right shrink-0">
-          <span className="text-[10px] text-[#5c5248] uppercase block">TIMECODE</span>
-          <span className="font-bold" style={{ color: currentTrack.artAccent }}>
-            {currentTrack.duration}
+      {/* Track Meta Card */}
+      <div className="space-y-3 pt-1 border-t border-[#24201a]">
+        <div className="flex items-center justify-between text-xs font-mono">
+          <span className="text-[#a89880] flex items-center gap-1.5">
+            <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: currentTrack.artAccent }} />
+            {currentTrack.storyChapter}
           </span>
+          <span className="text-[#5c5248]">{currentTrack.period}</span>
+        </div>
+
+        <div>
+          <h3 className="text-lg sm:text-xl font-bold text-[#f0ebe3] truncate">
+            {currentTrack.title}
+          </h3>
+          <p className="text-xs text-[#a89880] font-mono truncate mt-0.5">
+            {currentTrack.subtitle}
+          </p>
+        </div>
+
+        {/* Realtime Waveform Canvas */}
+        <div className="h-7 bg-[#0c0a08] rounded-xl border border-[#24201a] p-1 overflow-hidden">
+          <Waveform isPlaying={isPlaying} barCount={26} height={20} accent={currentTrack.artAccent} />
         </div>
       </div>
 

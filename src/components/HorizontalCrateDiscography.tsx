@@ -17,7 +17,6 @@ export const HorizontalCrateDiscography: React.FC<HorizontalCrateDiscographyProp
   const scrollTrackRef = useRef<HTMLDivElement | null>(null);
   const [scrollXProgress, setScrollXProgress] = useState(0);
 
-  // Sync scroll percentage and trigger active track change based on horizontal position
   const handleScroll = (e: React.UIEvent<HTMLDivElement>) => {
     const target = e.currentTarget;
     const maxScrollLeft = target.scrollWidth - target.clientWidth;
@@ -25,7 +24,6 @@ export const HorizontalCrateDiscography: React.FC<HorizontalCrateDiscographyProp
       const progress = target.scrollLeft / maxScrollLeft;
       setScrollXProgress(progress);
 
-      // Determine active index (0 to 3) based on horizontal scroll
       const cardWidth = target.scrollWidth / PLAYABLE_TRACKS.length;
       const currentIdx = Math.min(
         PLAYABLE_TRACKS.length - 1,
@@ -38,7 +36,6 @@ export const HorizontalCrateDiscography: React.FC<HorizontalCrateDiscographyProp
     }
   };
 
-  // Convert vertical mouse wheel into smooth horizontal crate scrub when hovering over the track
   const handleWheel = (e: React.WheelEvent<HTMLDivElement>) => {
     const target = scrollTrackRef.current;
     if (!target) return;
@@ -46,7 +43,6 @@ export const HorizontalCrateDiscography: React.FC<HorizontalCrateDiscographyProp
     const atHorizontalEnd = target.scrollLeft + target.clientWidth >= target.scrollWidth - 4;
     const atHorizontalStart = target.scrollLeft <= 4;
 
-    // If still scrubbing horizontally inside the crate, convert vertical deltaY to horizontal scrollLeft
     if ((e.deltaY > 0 && !atHorizontalEnd) || (e.deltaY < 0 && !atHorizontalStart)) {
       e.stopPropagation();
       target.scrollLeft += e.deltaY * 1.5;
@@ -55,25 +51,23 @@ export const HorizontalCrateDiscography: React.FC<HorizontalCrateDiscographyProp
 
   return (
     <div className="space-y-8 sm:space-y-10 animate-[fadeIn_0.5s_ease-out] relative">
-      {/* ── Section Header ── */}
       <div className="space-y-3 pb-5 border-b border-[#2a2520] relative z-10 flex flex-col md:flex-row md:items-end justify-between gap-4">
         <div>
           <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#4a9eff]">
             <span className="w-2 h-2 rounded-full bg-[#4a9eff] animate-pulse" />
-            <span>STUDIO DISCOGRAPHY · HORIZONTAL VINYL CRATE</span>
+            <span>PROJECTS · FEATURED WORK</span>
           </div>
           <h2 className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight text-[#f0ebe3] mt-2">
-            SELECTED RELEASES.
+            SELECTED PROJECTS.
           </h2>
           <p className="text-xs sm:text-sm text-[#a89880] max-w-xl font-mono leading-relaxed mt-1">
-            Scroll or swipe horizontally through the studio record crate to dig into architectural deliverables.
+            Scroll horizontally to view details of each system.
           </p>
         </div>
 
-        {/* Horizontal Scrub Indicator Bar */}
         <div className="flex items-center gap-3 shrink-0">
           <span className="text-[10px] font-mono text-[#5c5248]">
-            DIGGING: TRACK 0{activeTrackIdx + 1} / 04
+            PROJECT 0{activeTrackIdx + 1} / 04
           </span>
           <div className="w-28 sm:w-36 h-1.5 bg-[#1c1916] rounded-full overflow-hidden border border-[#2a2520]">
             <div
@@ -86,7 +80,6 @@ export const HorizontalCrateDiscography: React.FC<HorizontalCrateDiscographyProp
         </div>
       </div>
 
-      {/* ── Horizontal Scrollable Vinyl Crate Stream ── */}
       <div
         ref={scrollTrackRef}
         onScroll={handleScroll}
@@ -107,7 +100,6 @@ export const HorizontalCrateDiscography: React.FC<HorizontalCrateDiscographyProp
               data-project-index={idx}
               className="w-[85vw] sm:w-[460px] md:w-[540px] shrink-0 snap-center will-change-transform"
             >
-              {/* 3D Vinyl Crate Card */}
               <div
                 className={`relative rounded-3xl p-6 sm:p-8 border transition-all duration-500 overflow-hidden shadow-[0_20px_60px_rgba(0,0,0,0.9)] flex flex-col justify-between min-h-[500px] sm:min-h-[540px] group ${
                   isActive
@@ -115,7 +107,6 @@ export const HorizontalCrateDiscography: React.FC<HorizontalCrateDiscographyProp
                     : "bg-[#100e0c]/90 border-[#26211c] scale-98 hover:border-[#3a332a]"
                 }`}
               >
-                {/* Vinyl Record Peeking Out Behind Sleeve */}
                 <div
                   className={`absolute -right-10 -top-10 w-44 h-44 sm:w-56 sm:h-56 rounded-full bg-[#12100e] border-4 border-[#24201a] shadow-2xl flex items-center justify-center pointer-events-none transition-all duration-700 opacity-60 group-hover:opacity-100 group-hover:scale-105 ${
                     isPlaying && isActive ? "animate-spin" : ""
@@ -130,17 +121,15 @@ export const HorizontalCrateDiscography: React.FC<HorizontalCrateDiscographyProp
                       borderColor: t.artAccent,
                     }}
                   >
-                    <span className="text-[7px] font-mono font-bold text-black uppercase">45 RPM</span>
+                    <span className="text-[7px] font-mono font-bold text-black uppercase">{t.trackNo}</span>
                   </div>
                 </div>
 
-                {/* Subtle Ambient Radial Glow */}
                 <div
                   className="absolute -top-20 -left-20 w-64 h-64 rounded-full pointer-events-none opacity-20 blur-3xl"
                   style={{ background: t.artAccent }}
                 />
 
-                {/* Background Watermark Track Number */}
                 <div className="absolute bottom-2 right-4 pointer-events-none z-0 select-none overflow-hidden">
                   <span
                     className="text-[120px] sm:text-[160px] font-bold tracking-tighter font-mono leading-none block opacity-10 group-hover:opacity-20 transition-opacity duration-700"
@@ -150,20 +139,18 @@ export const HorizontalCrateDiscography: React.FC<HorizontalCrateDiscographyProp
                   </span>
                 </div>
 
-                {/* Top Card Content */}
                 <div className="relative z-10 space-y-5">
-                  {/* Header Line */}
                   <div className="space-y-1.5 border-b border-[#24201a] pb-3.5">
                     <div className="flex items-center justify-between">
                       <span
-                        className="text-xs font-mono font-bold tracking-widest uppercase flex items-center gap-2"
+                        className="text-xs font-mono font-bold tracking-wider uppercase flex items-center gap-2"
                         style={{ color: t.artAccent }}
                       >
                         <span className="w-1.5 h-1.5 rounded-full" style={{ background: t.artAccent }} />
-                        {t.storyChapter} · {t.bpm} BPM
+                        {t.storyChapter} · {t.period}
                       </span>
                       <span className="text-[10px] font-mono px-2 py-0.5 rounded bg-[#1c1916] border border-[#2a2520] text-[#7a6e62]">
-                        RELEASE {t.trackNo} / 04
+                        {t.role}
                       </span>
                     </div>
 
@@ -173,20 +160,18 @@ export const HorizontalCrateDiscography: React.FC<HorizontalCrateDiscographyProp
                     <p className="text-xs sm:text-sm font-mono text-[#a89880]">{project.tagline}</p>
                   </div>
 
-                  {/* Architectural Scope */}
                   <div className="space-y-1">
-                    <h4 className="text-[10px] font-mono text-[#5c5248] uppercase tracking-widest">
-                      // ARCHITECTURAL SCOPE
+                    <h4 className="text-[10px] font-mono text-[#5c5248] uppercase tracking-wider">
+                      OVERVIEW
                     </h4>
                     <p className="text-xs sm:text-sm text-[#a89880] leading-relaxed font-normal">
                       {project.description}
                     </p>
                   </div>
 
-                  {/* Deliverables & Impact */}
                   <div className="space-y-2 pt-1">
-                    <h4 className="text-[10px] font-mono text-[#5c5248] uppercase tracking-widest">
-                      // KEY DELIVERABLES & SYSTEM IMPACT
+                    <h4 className="text-[10px] font-mono text-[#5c5248] uppercase tracking-wider">
+                      KEY DELIVERABLES
                     </h4>
                     <div className="grid grid-cols-1 gap-2">
                       {project.deliverables.map((deliv, dIdx) => (
@@ -207,7 +192,6 @@ export const HorizontalCrateDiscography: React.FC<HorizontalCrateDiscographyProp
                   </div>
                 </div>
 
-                {/* Bottom Tech Stack & Action Links */}
                 <div className="relative z-10 pt-4 border-t border-[#24201a] flex flex-wrap items-center justify-between gap-3 mt-4">
                   <div className="flex flex-wrap gap-1.5">
                     {project.stack.map((tech, tIdx) => (

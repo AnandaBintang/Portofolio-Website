@@ -41,26 +41,22 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
   useEffect(() => {
     if (isOpen) {
       setShouldRender(true);
-      // Small timeout to allow DOM mounting before GSAP animation
       const timer = setTimeout(() => {
         if (!overlayRef.current) return;
         const ctx = gsap.context(() => {
           const tl = gsap.timeline();
 
-          // Stage 1: Full-screen curtain wipe from bottom to top
           tl.fromTo(
             backdropRef.current,
             { yPercent: 100, opacity: 1 },
             { yPercent: 0, duration: 0.5, ease: "power4.out" }
           )
-            // Stage 2: Fade in content wrapper
             .fromTo(
               contentRef.current,
               { opacity: 0, scale: 0.95 },
               { opacity: 1, scale: 1, duration: 0.35, ease: "power2.out" },
               "-=0.25"
             )
-            // Stage 3: Kinetic stagger for chapter headlines
             .fromTo(
               itemsRef.current.filter(Boolean),
               { opacity: 0, x: -50, filter: "blur(6px)" },
@@ -74,7 +70,6 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
               },
               "-=0.2"
             )
-            // Stage 4: Vinyl deck rotate & scale in
             .fromTo(
               deckRef.current,
               { opacity: 0, scale: 0.8, rotate: -15 },
@@ -123,13 +118,11 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
       ref={overlayRef}
       className="fixed inset-0 z-50 overflow-hidden select-none"
     >
-      {/* Full Seamless Backdrop Curtain (No split line in the center) */}
       <div
         ref={backdropRef}
         className="absolute inset-0 bg-[#0c0a08] z-10 shadow-2xl"
       />
 
-      {/* Main Content Container inside Shutter */}
       <div
         ref={contentRef}
         className="relative z-20 w-full h-full flex flex-col justify-between p-6 sm:p-12 overflow-y-auto"
@@ -138,10 +131,8 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
           transition: "background 0.5s ease",
         }}
       >
-        {/* Background Film Grain */}
         <div className="grain" />
 
-        {/* Top Header bar */}
         <div className="flex items-center justify-between border-b border-[#332d26] pb-6 relative z-10">
           <div className="flex items-center gap-3">
             <div className="w-9 h-9 rounded-full border border-[#4a4035] bg-[#1c1916] flex items-center justify-center text-white shadow-inner">
@@ -152,11 +143,11 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
               />
             </div>
             <div>
-              <span className="text-xs font-mono font-bold tracking-widest text-[#f0ebe3] block uppercase">
-                STUDIO MASTER NAVIGATION
+              <span className="text-xs font-mono font-bold tracking-wider text-[#f0ebe3] block uppercase">
+                NAVIGATION
               </span>
-              <span className="text-[10px] font-mono text-[#5c5248] tracking-widest block uppercase">
-                SELECT RECORDING CHAPTER
+              <span className="text-[10px] font-mono text-[#5c5248] tracking-wider block uppercase">
+                ANANDA BINTANG PORTFOLIO
               </span>
             </div>
           </div>
@@ -166,15 +157,12 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
             className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#4a4035] bg-[#1c1916] text-[#a89880] hover:text-[#f0ebe3] hover:border-[#e8a045] active:scale-95 transition-all cursor-pointer shadow-lg group"
             aria-label="Close Navigation"
           >
-            <span className="text-xs font-mono">CLOSE TAPE</span>
+            <span className="text-xs font-mono">CLOSE</span>
             <X size={16} weight="bold" className="group-hover:rotate-90 transition-transform" />
           </button>
         </div>
 
-        {/* Center Section Chapters + Live Turntable Deck */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center py-8 my-auto relative z-10">
-          
-          {/* Left: 4 Kinetic Chapter Headlines */}
           <div className="lg:col-span-8 space-y-4 sm:space-y-6">
             {sections.map((sec, idx) => {
               const isActive = idx === activeSectionIdx;
@@ -191,17 +179,15 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
                   onClick={() => onSelectSection(idx)}
                   className="group flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6 cursor-pointer py-2 border-b border-[#2a2520] transition-all"
                 >
-                  {/* Track Chapter Prefix */}
                   <span
                     className="text-xs sm:text-sm font-mono font-bold tracking-widest transition-colors duration-300"
                     style={{
                       color: isHovered || isActive ? sec.accent : "#5c5248",
                     }}
                   >
-                    {sec.chapterNumber}
+                    0{idx}
                   </span>
 
-                  {/* Big Display Headline */}
                   <div className="flex-1">
                     <h2
                       className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight transition-all duration-300 leading-none group-hover:translate-x-3"
@@ -216,11 +202,10 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
                     </p>
                   </div>
 
-                  {/* Active / Select Marker */}
                   <div className="shrink-0 flex items-center gap-2 pt-1 sm:pt-0">
                     {isActive && (
                       <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-[#1db954] text-black shadow-md">
-                        ACTIVE TAPE
+                        CURRENT
                       </span>
                     )}
                     <span
@@ -235,7 +220,6 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
             })}
           </div>
 
-          {/* Right: Live Interactive Audio Deck Monitor */}
           <div
             ref={deckRef}
             className="lg:col-span-4 hidden lg:flex flex-col items-center justify-center p-8 rounded-3xl bg-[#141210]/95 border border-[#332d26] shadow-2xl space-y-6"
@@ -246,12 +230,11 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
                   className="w-2 h-2 rounded-full"
                   style={{ background: currentHoverAccent }}
                 />
-                MONITOR DECK
+                AUDIO PLAYER
               </span>
-              <span className="text-[#a89880]">96kHz / 24-BIT</span>
+              <span className="text-[#a89880]">LO-FI BGM</span>
             </div>
 
-            {/* Rotating Vinyl Graphic */}
             <div
               className={`w-44 h-44 rounded-full border border-[#4a4035] bg-gradient-to-tr from-[#12100e] via-[#1c1916] to-[#0a0908] shadow-[0_0_40px_rgba(0,0,0,0.8)] flex items-center justify-center transition-transform duration-1000 ${
                 isPlaying ? "animate-spin" : ""
@@ -269,44 +252,40 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
               </div>
             </div>
 
-            {/* Mini Waveform & Audio Controller */}
             <div className="w-full space-y-3">
               <div className="h-8 bg-[#0a0807] border border-[#2a2520] rounded-xl p-1.5 overflow-hidden">
                 <Waveform isPlaying={isPlaying} barCount={24} height={24} accent={currentHoverAccent} />
               </div>
 
-            <button
-              onClick={onTogglePlay}
-              className="w-full py-3 rounded-xl border border-[#4a4035] bg-[#1c1916] hover:bg-[#242018] text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98"
-            >
-              {isPlaying ? (
-                <>
-                  <Pause size={14} weight="fill" className="text-[#1db954]" />
-                  <span>PAUSE AMBIENT AUDIO</span>
-                </>
-              ) : (
-                <>
-                  <Play size={14} weight="fill" style={{ color: currentHoverAccent }} />
-                  <span>ENGAGE AMBIENT AUDIO</span>
-                </>
-              )}
-            </button>
+              <button
+                onClick={onTogglePlay}
+                className="w-full py-3 rounded-xl border border-[#4a4035] bg-[#1c1916] hover:bg-[#242018] text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98"
+              >
+                {isPlaying ? (
+                  <>
+                    <Pause size={14} weight="fill" className="text-[#1db954]" />
+                    <span>PAUSE MUSIC</span>
+                  </>
+                ) : (
+                  <>
+                    <Play size={14} weight="fill" style={{ color: currentHoverAccent }} />
+                    <span>PLAY AMBIENT MUSIC</span>
+                  </>
+                )}
+              </button>
+            </div>
           </div>
         </div>
 
-      </div>
-
-      {/* Bottom Metadata Bar */}
-      <div className="border-t border-[#332d26] pt-6 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[#5c5248] relative z-10">
-        <div>
-          <span>KEYBOARD SHORTCUTS: </span>
-          <span className="text-[#a89880]">ESC to Close · SPACE to Play/Pause</span>
-        </div>
-        <div className="flex items-center gap-4">
-          <span>ANANDA BINTANG · 2026 ARCHIVE</span>
+        <div className="border-t border-[#332d26] pt-6 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[#5c5248] relative z-10">
+          <div>
+            <span className="text-[#a89880]">ESC to Close · SPACE to Play/Pause</span>
+          </div>
+          <div className="flex items-center gap-4">
+            <span>ANANDA BINTANG · 2026</span>
+          </div>
         </div>
       </div>
     </div>
-  </div>
-);
+  );
 };

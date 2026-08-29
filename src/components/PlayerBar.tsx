@@ -72,7 +72,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
         >
           <div className="px-5 py-4 border-b border-[#332d26] flex items-center justify-between">
             <span className="text-xs font-mono text-[#a89880] uppercase tracking-widest font-bold">
-              STUDIO PLAYLIST (4 TRACKS)
+              FEATURED PROJECTS (4)
             </span>
             <button
               onClick={() => setShowPlaylist(false)}
@@ -99,7 +99,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                 <span className="text-xs font-mono w-5 shrink-0 opacity-60">{track.trackNo}</span>
                 <div className="min-w-0 flex-1">
                   <p className="text-sm font-semibold truncate text-[#f0ebe3]">{track.title}</p>
-                  <p className="text-xs text-[#5c5248] truncate">{track.artist}</p>
+                  <p className="text-xs text-[#5c5248] truncate">{track.subtitle}</p>
                 </div>
                 {idx === currentTrackIdx && isPlaying && (
                   <span className="shrink-0 w-2 h-2 rounded-full bg-[#1db954] pulse" />
@@ -143,8 +143,8 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
               <p className="text-sm font-bold truncate text-[#f0ebe3] leading-tight">
                 {currentTrack.title}
               </p>
-              <p className="text-xs text-[#a89880] truncate mt-0.5">{currentTrack.artist}</p>
-              <p className="text-[10px] font-mono text-[#5c5248] truncate">{currentTrack.storyChapter}</p>
+              <p className="text-xs text-[#a89880] truncate mt-0.5">{currentTrack.subtitle}</p>
+              <p className="text-[10px] font-mono text-[#5c5248] truncate">{currentTrack.storyChapter} · {currentTrack.period}</p>
             </div>
           </div>
 
@@ -152,18 +152,16 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
           <div className="flex flex-col items-center gap-1.5 flex-1 max-w-md">
             <div className="hidden sm:flex items-center gap-2 text-[10px] font-mono text-[#5c5248]">
               <span className="bg-[#1c1916] px-2 py-0.5 rounded border border-[#332d26] text-[#e8a045]">
-                {Math.round(clampedProgress)}% JOURNEY
+                {Math.round(clampedProgress)}% SCROLL
               </span>
-              <span>{currentTrack.genre}</span>
-              <span>·</span>
-              <span>{currentTrack.bpm} BPM</span>
+              <span>{currentTrack.role}</span>
             </div>
 
             <div className="flex items-center gap-5">
               <button
                 onClick={onPrevSection}
                 className="text-[#a89880] hover:text-[#f0ebe3] active:scale-90 transition-all cursor-pointer p-1.5 rounded-full hover:bg-[#1c1916]"
-                title="Previous Section (Shutter Wipe)"
+                title="Previous Section"
               >
                 <IconPrev />
               </button>
@@ -179,7 +177,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                     ? "0 0 20px rgba(29,185,84,0.4)"
                     : `0 0 20px ${currentTrack.artAccent}40`,
                 }}
-                title={isPlaying ? "Pause ambient tape" : "Play ambient tape"}
+                title={isPlaying ? "Pause ambient audio" : "Play ambient audio"}
               >
                 <span className="text-black">
                   {isPlaying ? <IconPause /> : <IconPlay />}
@@ -189,7 +187,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
               <button
                 onClick={onNextSection}
                 className="text-[#a89880] hover:text-[#f0ebe3] active:scale-90 transition-all cursor-pointer p-1.5 rounded-full hover:bg-[#1c1916]"
-                title="Next Section (Shutter Wipe)"
+                title="Next Section"
               >
                 <IconNext />
               </button>
@@ -212,7 +210,7 @@ export const PlayerBar: React.FC<PlayerBarProps> = ({
                   ? "bg-[#242018] border-[#e8a045] text-[#e8a045]"
                   : "bg-[#141210] border-[#332d26] text-[#5c5248] hover:text-[#a89880] hover:border-[#4a4035]"
               }`}
-              title="Open Playlist"
+              title="Open Project List"
             >
               <IconList />
             </button>

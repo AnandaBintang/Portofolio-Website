@@ -1,5 +1,4 @@
-import React, { useEffect, useRef } from "react";
-import { gsap } from "gsap";
+import React from "react";
 
 interface SectionTransitionCurtainProps {
   isTransitioning: boolean;
@@ -16,25 +15,21 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
   accentColor,
   onAnimationComplete,
 }) => {
-  const containerRef = useRef<HTMLDivElement | null>(null);
-  const cardRef = useRef<HTMLDivElement | null>(null);
-  const vinylDiscRef = useRef<HTMLDivElement | null>(null);
-  const tonearmRef = useRef<HTMLDivElement | null>(null);
+  const containerRef = React.useRef<HTMLDivElement | null>(null);
+  const cardRef = React.useRef<HTMLDivElement | null>(null);
+  const vinylDiscRef = React.useRef<HTMLDivElement | null>(null);
+  const tonearmRef = React.useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
+  React.useEffect(() => {
     if (!containerRef.current) return;
 
     if (isTransitioning) {
-      // 1. Instantly display backdrop
       containerRef.current.style.display = "flex";
       containerRef.current.style.pointerEvents = "auto";
 
-      const ctx = gsap.context(() => {
-        const tl = gsap.timeline();
+      const ctx = (window as any).gsap ? (window as any).gsap.context(() => {
+        const tl = (window as any).gsap.timeline();
 
-        // ════════════════════════════════════════════════════════════════════
-        // ENTRANCE SEQUENCE (~0.7s)
-        // ════════════════════════════════════════════════════════════════════
         tl.fromTo(
           containerRef.current,
           { opacity: 0 },
@@ -52,29 +47,18 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
             { rotate: 1800, duration: 3.5, ease: "power1.inOut" },
             0
           )
-          // Needle Drops onto the record
           .fromTo(
             tonearmRef.current,
             { rotate: -38, transformOrigin: "top right" },
             { rotate: 2, duration: 0.45, ease: "back.out(1.3)" },
             0.1
           )
-
-          // ════════════════════════════════════════════════════════════════════
-          // READING / CUEING PAUSE (0.6s)
-          // ════════════════════════════════════════════════════════════════════
-          .to({}, { duration: 0.6 })
-
-          // ════════════════════════════════════════════════════════════════════
-          // EXPLICIT EXIT SEQUENCE (~0.8s) - Needle Lifts & Card Slides Out
-          // ════════════════════════════════════════════════════════════════════
-          // 1. NEEDLE LIFTS CLEARLY OFF THE RECORD
+          .to({}, { duration: 0.5 })
           .to(tonearmRef.current, {
             rotate: -42,
             duration: 0.45,
             ease: "power3.inOut",
           })
-          // 2. Turntable + Cue text smoothly glide up and scale down
           .to(
             cardRef.current,
             {
@@ -86,7 +70,6 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
             },
             "-=0.2"
           )
-          // 3. Dark backdrop smoothly reveals the target stage
           .to(
             containerRef.current,
             {
@@ -105,9 +88,9 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
             },
             "-=0.15"
           );
-      }, containerRef);
+      }, containerRef) : null;
 
-      return () => ctx.revert();
+      return () => ctx?.revert();
     }
   }, [isTransitioning, onAnimationComplete]);
 
@@ -120,10 +103,8 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
         opacity: 0,
       }}
     >
-      {/* 100% Opaque Solid Base to isolate section underneath */}
       <div className="absolute inset-0 bg-[#090807] z-0 pointer-events-none" />
 
-      {/* Controlled Radial Atmosphere Glow */}
       <div
         className="absolute inset-0 opacity-20 pointer-events-none z-1"
         style={{
@@ -131,25 +112,19 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
         }}
       />
 
-      {/* Subtle Analog Tape Scanlines */}
       <div className="absolute inset-0 bg-[linear-gradient(to_bottom,transparent_50%,rgba(0,0,0,0.6)_51%)] bg-[length:100%_4px] pointer-events-none opacity-40 z-2" />
 
-      {/* Complete Synchronized Turntable & Cue Information Box */}
       <div
         ref={cardRef}
         className="relative z-10 flex flex-col items-center justify-center p-6 sm:p-8 max-w-xl mx-auto text-center space-y-6"
       >
-        {/* Turntable Platter Deck Graphic */}
         <div className="relative w-44 h-44 sm:w-52 sm:h-52 rounded-full border-4 border-[#24201a] bg-[#12100e] p-2.5 shadow-[0_0_80px_rgba(0,0,0,0.9)] flex items-center justify-center">
-          {/* Strobe Ring */}
           <div className="absolute inset-2 rounded-full border border-dashed border-[#3a332a] animate-[spin_10s_linear_infinite]" />
 
-          {/* Vinyl Record */}
           <div
             ref={vinylDiscRef}
             className="w-full h-full rounded-full border-2 border-[#332d26] bg-[radial-gradient(ellipse_at_center,#1c1916_0%,#0c0a08_40%,#181512_70%,#090807_100%)] flex items-center justify-center shadow-inner relative"
           >
-            {/* Center Label (Sticker) */}
             <div
               className="w-14 h-14 sm:w-18 sm:h-18 rounded-full border-2 flex flex-col items-center justify-center p-1 text-center shadow-md transition-colors duration-300"
               style={{
@@ -158,16 +133,15 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
               }}
             >
               <span className="text-[8px] sm:text-[9px] font-mono font-bold text-black uppercase leading-tight tracking-wider">
-                MASTER
+                PORTFOLIO
               </span>
               <span className="text-[7px] font-mono text-black/80 uppercase">
-                45 RPM
+                2026
               </span>
               <div className="w-2.5 h-2.5 rounded-full bg-[#090807] border border-[#332d26] mt-0.5" />
             </div>
           </div>
 
-          {/* Tonearm (Needle Drop & Lift) */}
           <div
             ref={tonearmRef}
             className="absolute top-2 right-4 w-6 h-32 sm:h-36 pointer-events-none"
@@ -184,16 +158,13 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
           </div>
         </div>
 
-        {/* Needle Drop Badge & Chapter Details (Always inlined together with vinyl) */}
         <div className="space-y-3">
           <div className="inline-flex items-center gap-2 px-3.5 py-1.5 rounded-full bg-[#1c1916] border border-[#332d26] text-xs font-mono tracking-widest text-[#a89880] shadow-inner">
             <span
               className="w-2 h-2 rounded-full animate-ping"
               style={{ background: accentColor }}
             />
-            <span className="text-[#f0ebe3] font-bold">DROPPING NEEDLE</span>
-            <span className="text-[#5c5248]">/</span>
-            <span>CUEING CHAPTER</span>
+            <span className="text-[#f0ebe3] font-bold">LOADING SECTION</span>
           </div>
 
           <div className="space-y-1">
@@ -209,7 +180,6 @@ export const SectionTransitionCurtain: React.FC<SectionTransitionCurtainProps> =
             </p>
           </div>
 
-          {/* Audio Equalizer Spectrum Bar */}
           <div className="flex items-center justify-center gap-1.5 pt-1.5">
             {[40, 75, 55, 90, 65, 80, 45, 95, 60, 85, 50, 70, 40, 60].map((h, i) => (
               <div
