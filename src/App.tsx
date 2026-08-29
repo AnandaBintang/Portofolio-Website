@@ -2,27 +2,24 @@ import { useEffect, useRef, useState, useCallback } from "react";
 import Lenis from "lenis";
 import {
   CaretRight,
-  ArrowUpRight,
   Cpu,
   GraduationCap,
   Briefcase,
-  Waveform as WaveformIcon,
   List,
 } from "@phosphor-icons/react";
 import {
   PLAYABLE_TRACKS,
-  PROJECTS,
   SKILLS,
   SESSIONS,
   PROFILE,
   type Track,
 } from "./data/tracks";
-import { StickyAudioDeck } from "./components/StickyAudioDeck";
 import { PlayerBar } from "./components/PlayerBar";
 import { SectionTransitionCurtain } from "./components/SectionTransitionCurtain";
 import { FullscreenMenuOverlay } from "./components/FullscreenMenuOverlay";
 import { CustomMusicCursor } from "./components/CustomMusicCursor";
 import { CenterStageHero } from "./components/CenterStageHero";
+import { ParallaxDiscography } from "./components/ParallaxDiscography";
 import { audio } from "./lib/audioEngine";
 
 interface TransitionState {
@@ -110,7 +107,7 @@ export default function App() {
     return audio.onStateChange(setIsPlaying);
   }, []);
 
-  // Initialize Lenis with Heavy Awwwards-tier smooth damping inside active container
+  // Initialize Lenis with Heavy Awwwards-tier smooth damping & track cards intersection observer
   useEffect(() => {
     const container = scrollContainerRef.current;
     if (!container) return;
@@ -119,11 +116,11 @@ export default function App() {
       wrapper: container,
       content: container.firstElementChild as HTMLElement,
       duration: 1.4, // Heavy inertia duration
-      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)), // Exponential deceleration
+      easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       orientation: "vertical",
       gestureOrientation: "vertical",
       smoothWheel: true,
-      wheelMultiplier: 0.85, // Luxurious heavy scroll feel
+      wheelMultiplier: 0.85,
       touchMultiplier: 1.2,
     });
 
@@ -150,7 +147,6 @@ export default function App() {
       const atBottom = e.limit > 0 ? e.scroll >= e.limit - 6 : true;
       const atTop = e.scroll <= 6;
 
-      // Track exact timestamp when bottom is reached
       if (atBottom) {
         if (reachedBottomAtTimeRef.current === null) {
           reachedBottomAtTimeRef.current = Date.now();
@@ -159,7 +155,6 @@ export default function App() {
         reachedBottomAtTimeRef.current = null;
       }
 
-      // Track exact timestamp when top is reached
       if (atTop) {
         if (reachedTopAtTimeRef.current === null) {
           reachedTopAtTimeRef.current = Date.now();
@@ -167,13 +162,33 @@ export default function App() {
       } else {
         reachedTopAtTimeRef.current = null;
       }
+
+      // In Section 1 (Discography): Dynamically update active track in turntable deck based on visible card
+      if (activeSectionIdxRef.current === 1) {
+        const cards = container.querySelectorAll(".project-parallax-card");
+        const containerRect = container.getBoundingClientRect();
+        const midY = containerRect.top + containerRect.height * 0.45;
+
+        cards.forEach((card) => {
+          const rect = card.getBoundingClientRect();
+          if (rect.top <= midY && rect.bottom >= midY) {
+            const idxStr = card.getAttribute("data-project-index");
+            if (idxStr !== null) {
+              const pIdx = parseInt(idxStr, 10);
+              if (!isNaN(pIdx) && pIdx !== activeTrackIdx) {
+                setActiveTrackIdx(pIdx);
+              }
+            }
+          }
+        });
+      }
     });
 
     return () => {
       lenis.destroy();
       cancelAnimationFrame(rafId);
     };
-  }, [activeSectionIdx]);
+  }, [activeSectionIdx, activeTrackIdx]);
 
   // Fullscreen Needle Drop Transition with self-contained autonomous sequence
   const goToSection = useCallback(
@@ -259,7 +274,6 @@ export default function App() {
         return;
       }
 
-      // Check current scroll position strictly from Lenis or container
       const currentScroll = lenisRef.current ? lenisRef.current.scroll : container.scrollTop;
       const maxScroll = lenisRef.current
         ? lenisRef.current.limit
@@ -539,7 +553,7 @@ export default function App() {
         <div className="max-w-[1400px] mx-auto px-4 md:px-8 py-4 md:py-6 min-h-full">
 
           {/* ════════════════════════════════════════════════════════════════════
-              STAGE 0: PROLOGUE (MODERN FULL-BLEED CENTER STAGE VINYL HUB)
+              STAGE 0: PROLOGUE (MODERN FULL-BLEED CENTER STAGE ALBUM HUB)
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 0 && (
             <CenterStageHero
@@ -550,156 +564,14 @@ export default function App() {
           )}
 
           {/* ════════════════════════════════════════════════════════════════════
-              STAGE 1: THE DISCOGRAPHY / PLAYABLE PROJECT TRACKS
+              STAGE 1: THE DISCOGRAPHY / SCROLL-DRIVEN PARALLAX PROJECT STREAM
           ════════════════════════════════════════════════════════════════════ */}
           {activeSectionIdx === 1 && (
-            <div className="space-y-10 md:space-y-12 animate-[fadeIn_0.5s_ease-out]">
-              {/* Section Header */}
-              <div className="space-y-3 pb-6 border-b border-[#2a2520]">
-                <div className="inline-flex items-center gap-2 px-3 py-1 rounded bg-[#1c1916] border border-[#332d26] text-xs font-mono text-[#4a9eff]">
-                  <WaveformIcon size={14} />
-                  <span>STUDIO DISCOGRAPHY · 4 MASTER TRACKS</span>
-                </div>
-                <h2 className="text-3xl sm:text-5xl font-bold tracking-tight text-[#f0ebe3]">
-                  SELECTED RELEASES.
-                </h2>
-                <p className="text-sm sm:text-base text-[#a89880] max-w-xl font-mono leading-relaxed">
-                  Switch tracks to engage the turntable deck, inspect architectural scopes, and examine deliverable ledgers.
-                </p>
-              </div>
-
-              {/* Two Column Layout: Sticky Deck + Track Card */}
-              <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 lg:gap-12 items-start">
-                
-                {/* Left: Sticky Turntable Deck */}
-                <div className="lg:col-span-5 hidden lg:block sticky top-6">
-                  <StickyAudioDeck
-                    currentTrack={currentTrack}
-                    isPlaying={isPlaying}
-                    activeSectionIdx={activeTrackIdx}
-                  />
-                </div>
-
-                {/* Right: Interactive Track Details */}
-                <div className="lg:col-span-7 space-y-6 sm:space-y-8">
-                  {/* Track Switcher Pills */}
-                  <div className="flex flex-wrap gap-2 pb-2">
-                    {PLAYABLE_TRACKS.map((t, tIdx) => (
-                      <button
-                        key={t.id}
-                        onClick={() => {
-                          audio.sfx("click");
-                          setActiveTrackIdx(tIdx);
-                        }}
-                        className={`px-3.5 sm:px-4 py-2 rounded-xl text-xs font-mono transition-all cursor-pointer flex items-center gap-2 ${
-                          tIdx === activeTrackIdx
-                            ? "bg-[#242018] text-white border border-[#4a4035] shadow-lg font-bold"
-                            : "bg-[#141210] text-[#a89880] border border-[#2a2520] hover:bg-[#1c1916]"
-                        }`}
-                      >
-                        <span style={{ color: t.artAccent }}>{t.trackNo}</span>
-                        <span>{t.title}</span>
-                      </button>
-                    ))}
-                  </div>
-
-                  {/* Active Track Showcase Card */}
-                  {(() => {
-                    const project = PROJECTS[currentTrack.id];
-                    return (
-                      <div className="bg-[#141210] border border-[#332d26] rounded-2xl p-5 sm:p-8 space-y-6 shadow-2xl">
-                        <div className="space-y-1">
-                          <span className="text-xs font-mono" style={{ color: currentTrack.artAccent }}>
-                            {currentTrack.storyChapter} · {currentTrack.bpm} BPM
-                          </span>
-                          <h3 className="text-2xl sm:text-4xl font-bold tracking-tight text-[#f0ebe3]">
-                            {currentTrack.title}
-                          </h3>
-                          <p className="text-sm font-mono text-[#a89880]">{project.tagline}</p>
-                        </div>
-
-                        <div className="space-y-2">
-                          <h4 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest">
-                            ARCHITECTURAL SCOPE
-                          </h4>
-                          <p className="text-sm sm:text-base text-[#a89880] leading-relaxed">
-                            {project.description}
-                          </p>
-                        </div>
-
-                        <div className="space-y-3">
-                          <h4 className="text-xs font-mono text-[#5c5248] uppercase tracking-widest">
-                            ENGINEERING DELIVERABLES
-                          </h4>
-                          <div className="grid grid-cols-1 gap-2.5">
-                            {project.deliverables.map((deliv, dIdx) => (
-                              <div
-                                key={dIdx}
-                                className="flex items-start gap-3 p-3 sm:p-3.5 rounded-xl bg-[#1c1916] border border-[#2a2520] text-xs sm:text-sm text-[#f0ebe3]"
-                              >
-                                <span
-                                  className="font-mono font-bold shrink-0 mt-0.5"
-                                  style={{ color: currentTrack.artAccent }}
-                                >
-                                  0{dIdx + 1}
-                                </span>
-                                <span className="leading-relaxed">{deliv}</span>
-                              </div>
-                            ))}
-                          </div>
-                        </div>
-
-                        {/* Stack & Outbound Links */}
-                        <div className="pt-4 border-t border-[#332d26] flex flex-wrap items-center justify-between gap-4">
-                          <div className="flex flex-wrap gap-2">
-                            {project.stack.map((tech, tIdx) => (
-                              <span
-                                key={tIdx}
-                                className="text-[11px] font-mono px-2.5 py-1 rounded bg-[#1c1916] border border-[#332d26] text-[#a89880]"
-                              >
-                                {tech}
-                              </span>
-                            ))}
-                          </div>
-
-                          <div className="flex items-center gap-3">
-                            {"liveUrl" in project && project.liveUrl && (
-                              <a
-                                href={project.liveUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full text-black text-xs font-mono font-bold hover:opacity-90 transition-all shadow-md"
-                                style={{ background: currentTrack.artAccent }}
-                              >
-                                <span>LIVE APP</span>
-                                <ArrowUpRight size={13} weight="bold" />
-                              </a>
-                            )}
-
-                            {"githubUrl" in project && project.githubUrl && (
-                              <a
-                                href={project.githubUrl}
-                                target="_blank"
-                                rel="noopener noreferrer"
-                                className="inline-flex items-center gap-1.5 px-4 py-2 rounded-full border text-xs font-mono font-bold hover:bg-white/10 transition-all"
-                                style={{
-                                  borderColor: currentTrack.artAccent,
-                                  color: currentTrack.artAccent,
-                                }}
-                              >
-                                <span>SOURCE REPO</span>
-                                <ArrowUpRight size={13} weight="bold" />
-                              </a>
-                            )}
-                          </div>
-                        </div>
-                      </div>
-                    );
-                  })()}
-                </div>
-
-              </div>
-            </div>
+            <ParallaxDiscography
+              activeTrackIdx={activeTrackIdx}
+              currentTrack={currentTrack}
+              isPlaying={isPlaying}
+            />
           )}
 
           {/* ════════════════════════════════════════════════════════════════════
