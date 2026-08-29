@@ -125,7 +125,7 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
 
       <div
         ref={contentRef}
-        className="relative z-20 w-full h-full flex flex-col justify-between p-6 sm:p-12 overflow-y-auto"
+        className="relative z-20 w-full h-full flex flex-col justify-between p-4 sm:p-8 md:p-12 overflow-y-auto scrollable"
         style={{
           backgroundImage: `radial-gradient(ellipse 70% 50% at 80% 20%, ${currentHoverAccent}18 0%, transparent 65%)`,
           transition: "background 0.5s ease",
@@ -133,11 +133,12 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
       >
         <div className="grain" />
 
-        <div className="flex items-center justify-between border-b border-[#332d26] pb-6 relative z-10">
+        {/* Top Header */}
+        <div className="flex items-center justify-between border-b border-[#332d26] pb-4 sm:pb-6 relative z-10 shrink-0">
           <div className="flex items-center gap-3">
-            <div className="w-9 h-9 rounded-full border border-[#4a4035] bg-[#1c1916] flex items-center justify-center text-white shadow-inner">
+            <div className="w-8 h-8 sm:w-9 sm:h-9 rounded-full border border-[#4a4035] bg-[#1c1916] flex items-center justify-center text-white shadow-inner shrink-0">
               <Disc
-                size={20}
+                size={18}
                 className={`transition-all duration-700 ${isPlaying ? "animate-spin text-[#1db954]" : "text-[#e8a045]"}`}
                 style={{ animationDuration: "4s" }}
               />
@@ -146,7 +147,7 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
               <span className="text-xs font-mono font-bold tracking-wider text-[#f0ebe3] block uppercase">
                 NAVIGATION
               </span>
-              <span className="text-[10px] font-mono text-[#5c5248] tracking-wider block uppercase">
+              <span className="text-[9px] sm:text-[10px] font-mono text-[#5c5248] tracking-wider block uppercase">
                 ANANDA BINTANG PORTFOLIO
               </span>
             </div>
@@ -154,16 +155,17 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
 
           <button
             onClick={onClose}
-            className="flex items-center gap-2 px-4 py-2 rounded-full border border-[#4a4035] bg-[#1c1916] text-[#a89880] hover:text-[#f0ebe3] hover:border-[#e8a045] active:scale-95 transition-all cursor-pointer shadow-lg group"
+            className="flex items-center gap-2 px-3.5 py-1.5 sm:px-4 sm:py-2 rounded-full border border-[#4a4035] bg-[#1c1916] text-[#a89880] hover:text-[#f0ebe3] hover:border-[#e8a045] active:scale-95 transition-all cursor-pointer shadow-lg group"
             aria-label="Close Navigation"
           >
-            <span className="text-xs font-mono">CLOSE</span>
-            <X size={16} weight="bold" className="group-hover:rotate-90 transition-transform" />
+            <span className="text-xs font-mono">CLOSE [ESC]</span>
+            <X size={15} weight="bold" className="group-hover:rotate-90 transition-transform" />
           </button>
         </div>
 
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 items-center py-8 my-auto relative z-10">
-          <div className="lg:col-span-8 space-y-4 sm:space-y-6">
+        {/* Main Links List + Desktop Audio Monitor */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 sm:gap-10 items-center py-6 sm:py-8 my-auto relative z-10">
+          <div className="lg:col-span-8 space-y-3 sm:space-y-5">
             {sections.map((sec, idx) => {
               const isActive = idx === activeSectionIdx;
               const isHovered = idx === hoveredIdx;
@@ -177,7 +179,7 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
                   onMouseEnter={() => setHoveredIdx(idx)}
                   onMouseLeave={() => setHoveredIdx(null)}
                   onClick={() => onSelectSection(idx)}
-                  className="group flex flex-col sm:flex-row sm:items-baseline gap-2 sm:gap-6 cursor-pointer py-2 border-b border-[#2a2520] transition-all"
+                  className="group flex flex-col sm:flex-row sm:items-baseline gap-1.5 sm:gap-6 cursor-pointer py-2 border-b border-[#2a2520] transition-all"
                 >
                   <span
                     className="text-xs sm:text-sm font-mono font-bold tracking-widest transition-colors duration-300"
@@ -188,31 +190,31 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
                     0{idx}
                   </span>
 
-                  <div className="flex-1">
+                  <div className="flex-1 min-w-0">
                     <h2
-                      className="text-3xl sm:text-5xl md:text-6xl font-bold tracking-tight transition-all duration-300 leading-none group-hover:translate-x-3"
+                      className="text-2xl sm:text-4xl md:text-5xl lg:text-6xl font-bold tracking-tight transition-all duration-300 leading-tight group-hover:translate-x-2 sm:group-hover:translate-x-3 truncate"
                       style={{
                         color: isHovered || isActive ? "#f0ebe3" : "#7a6e62",
                       }}
                     >
                       {sec.name}
                     </h2>
-                    <p className="text-xs sm:text-sm font-mono text-[#5c5248] group-hover:text-[#a89880] transition-colors mt-1.5">
+                    <p className="text-[11px] sm:text-xs md:text-sm font-mono text-[#5c5248] group-hover:text-[#a89880] transition-colors mt-0.5 sm:mt-1 truncate">
                       {sec.subtitle}
                     </p>
                   </div>
 
                   <div className="shrink-0 flex items-center gap-2 pt-1 sm:pt-0">
                     {isActive && (
-                      <span className="text-[10px] font-mono font-bold px-2.5 py-1 rounded-full bg-[#1db954] text-black shadow-md">
+                      <span className="text-[9px] sm:text-[10px] font-mono font-bold px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full bg-[#1db954] text-black shadow-md">
                         CURRENT
                       </span>
                     )}
                     <span
-                      className="w-8 h-8 rounded-full border border-[#332d26] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                      className="w-7 h-7 sm:w-8 sm:h-8 rounded-full border border-[#332d26] flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
                       style={{ background: `${sec.accent}20`, borderColor: sec.accent }}
                     >
-                      <ArrowUpRight size={14} style={{ color: sec.accent }} />
+                      <ArrowUpRight size={13} style={{ color: sec.accent }} />
                     </span>
                   </div>
                 </div>
@@ -220,9 +222,10 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
             })}
           </div>
 
+          {/* Desktop Right Turntable Monitor */}
           <div
             ref={deckRef}
-            className="lg:col-span-4 hidden lg:flex flex-col items-center justify-center p-8 rounded-3xl bg-[#141210]/95 border border-[#332d26] shadow-2xl space-y-6"
+            className="lg:col-span-4 hidden lg:flex flex-col items-center justify-center p-6 sm:p-8 rounded-3xl bg-[#141210]/95 border border-[#332d26] shadow-2xl space-y-5"
           >
             <div className="flex items-center justify-between w-full border-b border-[#2a2520] pb-3 text-xs font-mono text-[#5c5248]">
               <span className="flex items-center gap-2">
@@ -236,13 +239,13 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
             </div>
 
             <div
-              className={`w-44 h-44 rounded-full border border-[#4a4035] bg-gradient-to-tr from-[#12100e] via-[#1c1916] to-[#0a0908] shadow-[0_0_40px_rgba(0,0,0,0.8)] flex items-center justify-center transition-transform duration-1000 ${
+              className={`w-36 h-36 sm:w-44 sm:h-44 rounded-full border border-[#4a4035] bg-gradient-to-tr from-[#12100e] via-[#1c1916] to-[#0a0908] shadow-[0_0_40px_rgba(0,0,0,0.8)] flex items-center justify-center transition-transform duration-1000 ${
                 isPlaying ? "animate-spin" : ""
               }`}
               style={{ animationDuration: "5s" }}
             >
               <div
-                className="w-18 h-18 rounded-full border flex items-center justify-center p-2 text-center transition-colors duration-500"
+                className="w-16 h-16 sm:w-18 sm:h-18 rounded-full border flex items-center justify-center p-2 text-center transition-colors duration-500"
                 style={{
                   background: `radial-gradient(circle, ${currentHoverAccent}35 0%, #1c1916 100%)`,
                   borderColor: currentHoverAccent,
@@ -259,7 +262,7 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
 
               <button
                 onClick={onTogglePlay}
-                className="w-full py-3 rounded-xl border border-[#4a4035] bg-[#1c1916] hover:bg-[#242018] text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98"
+                className="w-full py-2.5 sm:py-3 rounded-xl border border-[#4a4035] bg-[#1c1916] hover:bg-[#242018] text-xs font-mono font-bold flex items-center justify-center gap-2 transition-all cursor-pointer active:scale-98"
               >
                 {isPlaying ? (
                   <>
@@ -277,7 +280,8 @@ export const FullscreenMenuOverlay: React.FC<FullscreenMenuOverlayProps> = ({
           </div>
         </div>
 
-        <div className="border-t border-[#332d26] pt-6 flex flex-wrap items-center justify-between gap-4 text-xs font-mono text-[#5c5248] relative z-10">
+        {/* Footer info */}
+        <div className="border-t border-[#332d26] pt-4 sm:pt-6 flex flex-wrap items-center justify-between gap-3 text-xs font-mono text-[#5c5248] relative z-10 shrink-0">
           <div>
             <span className="text-[#a89880]">ESC to Close · SPACE to Play/Pause</span>
           </div>
