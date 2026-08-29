@@ -20,6 +20,7 @@ import { FullscreenMenuOverlay } from "./components/FullscreenMenuOverlay";
 import { CustomMusicCursor } from "./components/CustomMusicCursor";
 import { CenterStageHero } from "./components/CenterStageHero";
 import { ParallaxDiscography } from "./components/ParallaxDiscography";
+import { ContactModal } from "./components/ContactModal";
 import { audio } from "./lib/audioEngine";
 
 interface TransitionState {
@@ -73,6 +74,7 @@ export default function App() {
   const [activeTrackIdx, setActiveTrackIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [contactOpen, setContactOpen] = useState(false);
   const [scrollProgress, setScrollProgress] = useState(0);
   const [transitionState, setTransitionState] = useState<TransitionState>({
     isTransitioning: false,
@@ -234,7 +236,7 @@ export default function App() {
     if (!isPlaying) return;
 
     const interval = setInterval(() => {
-      if (isTransitioningRef.current || Date.now() < transitionLockUntilRef.current || menuOpen) {
+      if (isTransitioningRef.current || Date.now() < transitionLockUntilRef.current || menuOpen || contactOpen) {
         return;
       }
 
@@ -255,7 +257,7 @@ export default function App() {
     }, 120);
 
     return () => clearInterval(interval);
-  }, [isPlaying, goToSection, menuOpen]);
+  }, [isPlaying, goToSection, menuOpen, contactOpen]);
 
   // ── Scrubber Seeking via Trackline Click (0 to 100%) ──
   const handleSeekProgress = useCallback(
@@ -294,13 +296,14 @@ export default function App() {
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === "Escape" && menuOpen) {
-        setMenuOpen(false);
+      if (e.key === "Escape") {
+        if (menuOpen) setMenuOpen(false);
+        if (contactOpen) setContactOpen(false);
       }
     };
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [menuOpen]);
+  }, [menuOpen, contactOpen]);
 
   // Two-Step Boundary Guard Wheel Listener
   useEffect(() => {
@@ -312,7 +315,7 @@ export default function App() {
 
     const onWheel = (e: WheelEvent) => {
       const now = Date.now();
-      if (isTransitioningRef.current || now < transitionLockUntilRef.current || menuOpen) {
+      if (isTransitioningRef.current || now < transitionLockUntilRef.current || menuOpen || contactOpen) {
         e.preventDefault();
         return;
       }
@@ -397,7 +400,7 @@ export default function App() {
 
     const onTouchMove = (e: TouchEvent) => {
       const now = Date.now();
-      if (isTransitioningRef.current || now < transitionLockUntilRef.current || menuOpen) {
+      if (isTransitioningRef.current || now < transitionLockUntilRef.current || menuOpen || contactOpen) {
         return;
       }
 
@@ -467,7 +470,7 @@ export default function App() {
       container.removeEventListener("touchmove", onTouchMove);
       if (wheelDebounceTimeout) clearTimeout(wheelDebounceTimeout);
     };
-  }, [goToSection, menuOpen]);
+  }, [goToSection, menuOpen, contactOpen]);
 
   const handlePrevSection = () => {
     const cur = activeSectionIdxRef.current;
@@ -512,6 +515,12 @@ export default function App() {
           audio.sfx("click");
           audio.toggle();
         }}
+      />
+
+      {/* ── Contact & Resume Modal ── */}
+      <ContactModal
+        isOpen={contactOpen}
+        onClose={() => setContactOpen(false)}
       />
 
       {/* ── Fullscreen Autonomous Turntable Transition Sequence ── */}
@@ -595,6 +604,7 @@ export default function App() {
             <CenterStageHero
               isPlaying={isPlaying}
               onExploreTracks={() => goToSection(1)}
+              onOpenContact={() => setContactOpen(true)}
               accentColor={currentSectionConfig.accent}
             />
           )}

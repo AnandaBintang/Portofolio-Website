@@ -1,16 +1,18 @@
 import React, { useState, useEffect } from "react";
-import { ArrowDown, EnvelopeSimple, Sparkle } from "@phosphor-icons/react";
+import { ArrowDown, EnvelopeSimple, Sparkle, FilePdf } from "@phosphor-icons/react";
 import { PROFILE } from "../data/tracks";
 
 interface CenterStageHeroProps {
   isPlaying: boolean;
   onExploreTracks: () => void;
+  onOpenContact: () => void;
   accentColor: string;
 }
 
 export const CenterStageHero: React.FC<CenterStageHeroProps> = ({
   isPlaying,
   onExploreTracks,
+  onOpenContact,
   accentColor,
 }) => {
   const [tilt, setTilt] = useState({ rotateX: 0, rotateY: 0 });
@@ -172,22 +174,31 @@ export const CenterStageHero: React.FC<CenterStageHeroProps> = ({
           <span>Building high-scale services & APIs.</span>
         </div>
 
-        <div className="flex items-center gap-3 w-full sm:w-auto justify-center">
+        <div className="flex flex-wrap items-center gap-3 w-full sm:w-auto justify-center">
           <button
             onClick={onExploreTracks}
-            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#e8a045] text-black font-semibold text-xs font-mono hover:bg-[#f0b055] transition-all cursor-pointer shadow-lg active:scale-95"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#e8a045] text-black font-semibold text-xs font-mono hover:bg-[#f0b055] transition-all cursor-pointer shadow-lg active:scale-95"
           >
             <span>VIEW PROJECTS</span>
             <ArrowDown size={14} weight="bold" />
           </button>
 
           <a
-            href={`mailto:${PROFILE.email}`}
-            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-6 py-3 rounded-full bg-[#1c1916] border border-[#4a4035] text-[#f0ebe3] font-mono text-xs hover:border-[#e8a045] transition-all cursor-pointer shadow-md"
+            href={PROFILE.resumeUrl}
+            download="Ananda_Bintang_Saputra_CV.pdf"
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#1c1916] border border-[#4a4035] text-[#f0ebe3] font-mono text-xs hover:border-[#e8a045] transition-all cursor-pointer shadow-md"
           >
-            <EnvelopeSimple size={14} />
-            <span>CONTACT ME</span>
+            <FilePdf size={15} />
+            <span>DOWNLOAD CV</span>
           </a>
+
+          <button
+            onClick={onOpenContact}
+            className="flex-1 sm:flex-none inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-full bg-[#1c1916] border border-[#4a4035] text-[#f0ebe3] font-mono text-xs hover:border-[#e8a045] transition-all cursor-pointer shadow-md"
+          >
+            <EnvelopeSimple size={15} />
+            <span>CONTACT ME</span>
+          </button>
         </div>
 
       </div>
