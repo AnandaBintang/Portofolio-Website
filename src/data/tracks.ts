@@ -216,11 +216,12 @@ export const PROFILE = {
   subheadline:
     "Backend Engineer focused on building reliable microservices, high-throughput REST APIs, and optimized database queries. Currently working on retail and operations platforms at Weekend Inc. for PT HM Sampoerna.",
   location: "Sidoarjo, East Java, Indonesia",
-  phone: "+62 853-3063-2334",
+  phone: "085330632334",
   email: "anandabintang4@gmail.com",
   github: "https://github.com/AnandaBintang",
-  linkedin: "https://linkedin.com/in/anandabintang",
-  instagram: "https://instagram.com/anandabintang4",
+  linkedin: "https://www.linkedin.com/in/ananda-bintang-7a7400229/",
+  instagram: "https://instagram.com/bn.tang",
+  instagramHandle: "@bn.tang",
   resumeUrl: "/Ananda_Bintang_Saputra_CV.pdf",
   education: {
     degree: "Associate Degree in Computer Science (D3)",

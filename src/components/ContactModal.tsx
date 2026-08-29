@@ -66,7 +66,7 @@ export const ContactModal: React.FC<{ isOpen: boolean; onClose: () => void }> = 
         <div className="space-y-3 font-mono text-xs">
           
           {/* Location */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-[#1c1916] border border-[#2a2520]">
+          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#1c1916] border border-[#2a2520]">
             <div className="flex items-center gap-3">
               <MapPin size={18} className="text-[#e8a045]" />
               <span className="text-[#a89880]">Location</span>
@@ -75,7 +75,7 @@ export const ContactModal: React.FC<{ isOpen: boolean; onClose: () => void }> = 
           </div>
 
           {/* Email */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-[#1c1916] border border-[#2a2520]">
+          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#1c1916] border border-[#2a2520]">
             <div className="flex items-center gap-3">
               <EnvelopeSimple size={18} className="text-[#e8a045]" />
               <span className="text-[#a89880]">Email</span>
@@ -89,7 +89,7 @@ export const ContactModal: React.FC<{ isOpen: boolean; onClose: () => void }> = 
               </a>
               <button
                 onClick={() => handleCopy(PROFILE.email, "email")}
-                className="p-1 rounded bg-[#242018] text-[#a89880] hover:text-white transition-colors cursor-pointer"
+                className="px-2 py-0.5 rounded bg-[#242018] text-[#a89880] hover:text-white transition-colors cursor-pointer text-[11px]"
                 title="Copy Email"
               >
                 {copiedEmail ? <Check size={12} className="text-[#1db954]" /> : "Copy"}
@@ -98,14 +98,14 @@ export const ContactModal: React.FC<{ isOpen: boolean; onClose: () => void }> = 
           </div>
 
           {/* Phone */}
-          <div className="flex items-center justify-between p-3 rounded-2xl bg-[#1c1916] border border-[#2a2520]">
+          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#1c1916] border border-[#2a2520]">
             <div className="flex items-center gap-3">
               <Phone size={18} className="text-[#e8a045]" />
               <span className="text-[#a89880]">Phone / WA</span>
             </div>
             <div className="flex items-center gap-2">
               <a
-                href={`https://wa.me/${PROFILE.phone.replace(/[^0-9]/g, "")}`}
+                href="https://wa.me/6285330632334"
                 target="_blank"
                 rel="noopener noreferrer"
                 className="text-[#f0ebe3] hover:text-[#e8a045] transition-colors font-medium"
@@ -114,7 +114,7 @@ export const ContactModal: React.FC<{ isOpen: boolean; onClose: () => void }> = 
               </a>
               <button
                 onClick={() => handleCopy(PROFILE.phone, "phone")}
-                className="p-1 rounded bg-[#242018] text-[#a89880] hover:text-white transition-colors cursor-pointer"
+                className="px-2 py-0.5 rounded bg-[#242018] text-[#a89880] hover:text-white transition-colors cursor-pointer text-[11px]"
                 title="Copy Phone"
               >
                 {copiedPhone ? <Check size={12} className="text-[#1db954]" /> : "Copy"}
@@ -122,10 +122,26 @@ export const ContactModal: React.FC<{ isOpen: boolean; onClose: () => void }> = 
             </div>
           </div>
 
+          {/* Instagram */}
+          <div className="flex items-center justify-between p-3.5 rounded-2xl bg-[#1c1916] border border-[#2a2520]">
+            <div className="flex items-center gap-3">
+              <InstagramLogo size={18} className="text-[#e8a045]" />
+              <span className="text-[#a89880]">Instagram</span>
+            </div>
+            <a
+              href={PROFILE.instagram}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-[#f0ebe3] hover:text-[#e8a045] transition-colors font-medium"
+            >
+              {PROFILE.instagramHandle}
+            </a>
+          </div>
+
         </div>
 
         {/* Download Resume / CV CTA */}
-        <div className="pt-2">
+        <div className="pt-1">
           <a
             href={PROFILE.resumeUrl}
             download="Ananda_Bintang_Saputra_CV.pdf"
@@ -139,37 +155,29 @@ export const ContactModal: React.FC<{ isOpen: boolean; onClose: () => void }> = 
 
         {/* Social Links Row */}
         <div className="border-t border-[#2a2520] pt-4 flex items-center justify-between gap-3 text-xs font-mono">
-          <span className="text-[#5c5248]">SOCIAL CHANNELS:</span>
+          <span className="text-[#5c5248]">PROFILES:</span>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5">
             <a
               href={PROFILE.github}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2.5 rounded-xl bg-[#1c1916] border border-[#2a2520] text-[#a89880] hover:text-white hover:border-[#4a4035] transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1c1916] border border-[#2a2520] text-[#a89880] hover:text-white hover:border-[#4a4035] transition-all"
               title="GitHub Profile"
             >
-              <GithubLogo size={16} />
+              <GithubLogo size={15} />
+              <span>GitHub</span>
             </a>
 
             <a
               href={PROFILE.linkedin}
               target="_blank"
               rel="noopener noreferrer"
-              className="p-2.5 rounded-xl bg-[#1c1916] border border-[#2a2520] text-[#a89880] hover:text-[#0a66c2] hover:border-[#4a4035] transition-all"
+              className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-xl bg-[#1c1916] border border-[#2a2520] text-[#a89880] hover:text-[#0a66c2] hover:border-[#4a4035] transition-all"
               title="LinkedIn Profile"
             >
-              <LinkedinLogo size={16} />
-            </a>
-
-            <a
-              href={PROFILE.instagram}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="p-2.5 rounded-xl bg-[#1c1916] border border-[#2a2520] text-[#a89880] hover:text-[#e4405f] hover:border-[#4a4035] transition-all"
-              title="Instagram Profile"
-            >
-              <InstagramLogo size={16} />
+              <LinkedinLogo size={15} />
+              <span>LinkedIn</span>
             </a>
           </div>
         </div>
