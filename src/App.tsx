@@ -21,6 +21,7 @@ import { CustomMusicCursor } from "./components/CustomMusicCursor";
 import { CenterStageHero } from "./components/CenterStageHero";
 import { ParallaxDiscography } from "./components/ParallaxDiscography";
 import { ContactModal } from "./components/ContactModal";
+import { Preloader } from "./components/Preloader";
 import { audio } from "./lib/audioEngine";
 
 interface TransitionState {
@@ -70,6 +71,7 @@ const SECTIONS_CONFIG = [
 ];
 
 export default function App() {
+  const [loading, setLoading] = useState(true);
   const [activeSectionIdx, setActiveSectionIdx] = useState(0);
   const [activeTrackIdx, setActiveTrackIdx] = useState(0);
   const [isPlaying, setIsPlaying] = useState(false);
@@ -107,6 +109,8 @@ export default function App() {
 
   // Initialize Lenis with Heavy Awwwards-tier smooth damping & track cards intersection observer
   useEffect(() => {
+    if (loading) return;
+
     const container = scrollContainerRef.current;
     if (!container) return;
 
@@ -185,7 +189,7 @@ export default function App() {
       lenis.destroy();
       cancelAnimationFrame(rafId);
     };
-  }, [activeSectionIdx, activeTrackIdx]);
+  }, [loading, activeSectionIdx, activeTrackIdx]);
 
   // Fullscreen Needle Drop Transition
   const goToSection = useCallback(
@@ -233,7 +237,7 @@ export default function App() {
 
   // ── Auto-Scroll Drive: Automatically scrolls page forward as Ambient Music plays ──
   useEffect(() => {
-    if (!isPlaying) return;
+    if (!isPlaying || loading) return;
 
     const interval = setInterval(() => {
       if (isTransitioningRef.current || Date.now() < transitionLockUntilRef.current || menuOpen || contactOpen) {
@@ -257,7 +261,7 @@ export default function App() {
     }, 120);
 
     return () => clearInterval(interval);
-  }, [isPlaying, goToSection, menuOpen, contactOpen]);
+  }, [isPlaying, loading, goToSection, menuOpen, contactOpen]);
 
   // ── Scrubber Seeking via Trackline Click (0 to 100%) ──
   const handleSeekProgress = useCallback(
@@ -308,7 +312,7 @@ export default function App() {
   // Two-Step Boundary Guard Wheel Listener
   useEffect(() => {
     const container = scrollContainerRef.current;
-    if (!container) return;
+    if (!container || loading) return;
 
     let wheelDebounceTimeout: ReturnType<typeof setTimeout> | null = null;
     let accumulatedDeltaY = 0;
@@ -470,7 +474,7 @@ export default function App() {
       container.removeEventListener("touchmove", onTouchMove);
       if (wheelDebounceTimeout) clearTimeout(wheelDebounceTimeout);
     };
-  }, [goToSection, menuOpen, contactOpen]);
+  }, [loading, goToSection, menuOpen, contactOpen]);
 
   const handlePrevSection = () => {
     const cur = activeSectionIdxRef.current;
@@ -496,6 +500,14 @@ export default function App() {
     >
       {/* Film Grain Texture */}
       <div className="grain" />
+
+      {/* ── Initial Cinematic Preloader ── */}
+      {loading && (
+        <Preloader
+          onComplete={() => setLoading(false)}
+          callsign={PROFILE.callsign}
+        />
+      )}
 
       {/* ── Custom Interactive Music Stylus & Vinyl Cursor ── */}
       <CustomMusicCursor
@@ -644,9 +656,10 @@ export default function App() {
                   {SESSIONS.map((session, i) => (
                     <div
                       key={i}
-                      className={`bg-[#141210] border rounded-2xl p-5 sm:p-8 transition-all shadow-xl ${
+                      className={`bg-[#141210] border rounded-2xl p-5 sm:p-8 transition-all shadow-xl animate-fade-in-up ${
                         session.active ? "border-[#f472b6]/50" : "border-[#332d26]"
                       }`}
+                      style={{ animationDelay: `${i * 80}ms` }}
                     >
                       <div className="flex flex-wrap items-center justify-between gap-2 border-b border-[#2a2520] pb-4 mb-4">
                         <div>
@@ -702,7 +715,7 @@ export default function App() {
 
                 {/* Sidebar: Education */}
                 <div className="lg:col-span-4 space-y-6">
-                  <div className="bg-[#141210] border border-[#332d26] rounded-2xl p-6 space-y-6 shadow-xl">
+                  <div className="bg-[#141210] border border-[#332d26] rounded-2xl p-6 space-y-6 shadow-xl animate-fade-in-up stagger-2">
                     <div className="flex items-center gap-2 text-xs font-mono text-[#5c5248] uppercase border-b border-[#2a2520] pb-3">
                       <GraduationCap size={16} className="text-[#e8a045]" />
                       <span>EDUCATION</span>
@@ -723,7 +736,7 @@ export default function App() {
                     </div>
                   </div>
 
-                  <div className="bg-[#1c1916] border border-[#332d26] rounded-2xl p-6 space-y-3 shadow-lg">
+                  <div className="bg-[#1c1916] border border-[#332d26] rounded-2xl p-6 space-y-3 shadow-lg animate-fade-in-up stagger-3">
                     <div className="flex items-center gap-2 text-xs font-mono text-[#5c5248] uppercase">
                       <Cpu size={15} className="text-[#e8a045]" />
                       <span>DEVELOPMENT PRINCIPLES</span>
@@ -759,7 +772,8 @@ export default function App() {
                 {SKILLS.map((cat, i) => (
                   <div
                     key={i}
-                    className="bg-[#141210] border border-[#332d26] rounded-2xl p-6 hover:border-[#4a4035] transition-colors space-y-4 shadow-lg"
+                    className="bg-[#141210] border border-[#332d26] rounded-2xl p-6 hover:border-[#4a4035] transition-colors space-y-4 shadow-lg animate-fade-in-up"
+                    style={{ animationDelay: `${i * 60}ms` }}
                   >
                     <div className="border-b border-[#2a2520] pb-3">
                       <h3 className="text-sm font-bold text-[#f0ebe3] uppercase">

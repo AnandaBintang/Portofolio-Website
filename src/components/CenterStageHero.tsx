@@ -42,8 +42,8 @@ export const CenterStageHero: React.FC<CenterStageHeroProps> = ({
   return (
     <div className="w-full flex flex-col justify-between py-2 space-y-8 select-none">
       
-      {/* ── Top Status Bar ── */}
-      <div className="flex items-center justify-between text-xs font-mono text-[#5c5248] pb-3 border-b border-[#2a2520] w-full">
+      {/* ── Top Status Bar (Animated Entrance) ── */}
+      <div className="flex items-center justify-between text-xs font-mono text-[#5c5248] pb-3 border-b border-[#2a2520] w-full animate-fade-in-down">
         <div className="flex items-center gap-2.5">
           <span className="w-2 h-2 rounded-full bg-[#1db954] animate-ping shrink-0" />
           <span className="text-[#1db954] font-medium tracking-wider text-[11px] sm:text-xs">
@@ -63,7 +63,7 @@ export const CenterStageHero: React.FC<CenterStageHeroProps> = ({
       <div className="relative flex flex-col items-center justify-center py-6 sm:py-10">
         
         {/* Layer 1: Background Kinetic Display Typography */}
-        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0 overflow-hidden">
+        <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none z-0 overflow-hidden animate-scale-in stagger-1">
           <span className="text-[14vw] font-bold tracking-tighter text-[#161310] leading-none uppercase select-none opacity-60">
             ANANDA
           </span>
@@ -74,7 +74,7 @@ export const CenterStageHero: React.FC<CenterStageHeroProps> = ({
 
         {/* Layer 2: Center Stage Floating 3D Album Cover */}
         <div
-          className="relative z-10 flex items-center justify-center group cursor-pointer my-2"
+          className="relative z-10 flex items-center justify-center group cursor-pointer my-2 animate-scale-in stagger-2"
           style={{
             perspective: "1000px",
             transform: `rotateX(${tilt.rotateX}deg) rotateY(${tilt.rotateY}deg)`,
@@ -155,7 +155,7 @@ export const CenterStageHero: React.FC<CenterStageHeroProps> = ({
         </div>
 
         {/* Layer 3: Clear Professional Headline Below Card */}
-        <div className="relative z-20 text-center space-y-2 mt-4 max-w-xl mx-auto">
+        <div className="relative z-20 text-center space-y-2 mt-4 max-w-xl mx-auto animate-fade-in-up stagger-3">
           <div className="inline-flex items-center gap-2 px-4 py-1.5 rounded-full bg-[#141210] border border-[#332d26] text-xs font-mono tracking-wider text-[#e8a045] shadow-lg">
             <span>BACKEND ENGINEER & WEB DEVELOPER</span>
           </div>
@@ -167,7 +167,7 @@ export const CenterStageHero: React.FC<CenterStageHeroProps> = ({
       </div>
 
       {/* ── Bottom Action Deck ── */}
-      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#262630]/60 w-full">
+      <div className="flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-[#262630]/60 w-full animate-fade-in-up stagger-4">
         
         <div className="flex items-center gap-2 text-xs font-mono text-[#a89880]">
           <Sparkle size={14} className="text-[#e8a045] shrink-0" />
