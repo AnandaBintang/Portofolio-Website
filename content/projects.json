@@ -1,10 +1,20 @@
 {
   "projects": [
     {
-      "id": "meda-billing",
-      "type": "work",
-      "year": "Oct 2026 – now",
+      "demo": "",
       "color": "#ffb44a",
+      "id_": {
+        "title": "Meda Billing",
+        "role": "Magang Backend Engineer · Meda Technology",
+        "summary": "Billing dan pendaftaran siswa baru (PPDB) multi-tenant untuk yayasan sekolah di Indonesia, ditulis dengan Go.",
+        "about": "Meda Billing menghubungkan yayasan, sekolah-sekolahnya, orang tua, dan siswa dalam satu backend. Aplikasi ini menjalankan PPDB dengan formulir yang bisa diatur tiap sekolah, lalu mengubah SPP dan biaya lain menjadi tagihan rutin, sekali bayar, atau cicilan yang dibayar orang tua secara online.",
+        "did": [
+          "Ikut menentukan stack dan arsitekturnya: Go dengan Echo, PostgreSQL lewat GORM, Redis untuk session, cache, dan antrean task, dibagi ke layer domain, repository, usecase, dan handler.",
+          "Mengintegrasikan Xendit untuk pembayaran online, lalu memigrasikan seluruh alur pembayaran ke DOKU sendiri.",
+          "Membangun modul backend dan REST API yang semua nilai uangnya lewat shopspring/decimal, tidak pernah float."
+        ],
+        "noDemo": "Belum ada link demo publik yang bisa dibagikan."
+      },
       "stack": [
         "Go",
         "Echo v4",
@@ -14,9 +24,6 @@
         "shopspring/decimal",
         "Xendit → DOKU"
       ],
-      "images": [],
-      "demo": "",
-      "source": "",
       "en": {
         "title": "Meda Billing",
         "role": "Backend Engineer Intern · Meda Technology",
@@ -29,33 +36,32 @@
         ],
         "noDemo": "No public demo link to share yet."
       },
-      "id_": {
-        "title": "Meda Billing",
-        "role": "Magang Backend Engineer · Meda Technology",
-        "summary": "Billing dan pendaftaran siswa baru (PPDB) multi-tenant untuk yayasan sekolah di Indonesia, ditulis dengan Go.",
-        "about": "Meda Billing menghubungkan yayasan, sekolah-sekolahnya, orang tua, dan siswa dalam satu backend. Aplikasi ini menjalankan PPDB dengan formulir yang bisa diatur tiap sekolah, lalu mengubah SPP dan biaya lain menjadi tagihan rutin, sekali bayar, atau cicilan yang dibayar orang tua secara online.",
-        "did": [
-          "Ikut menentukan stack dan arsitekturnya: Go dengan Echo, PostgreSQL lewat GORM, Redis untuk session, cache, dan antrean task, dibagi ke layer domain, repository, usecase, dan handler.",
-          "Mengintegrasikan Xendit untuk pembayaran online, lalu memigrasikan seluruh alur pembayaran ke DOKU sendiri.",
-          "Membangun modul backend dan REST API yang semua nilai uangnya lewat shopspring/decimal, tidak pernah float."
-        ],
-        "noDemo": "Belum ada link demo publik yang bisa dibagikan."
-      }
+      "images": [],
+      "type": "work",
+      "source": "",
+      "id": "meda-billing",
+      "year": "Oct 2026 – now"
     },
     {
-      "id": "waras",
-      "type": "work",
-      "year": "Oct 2026 – now",
+      "demo": "",
       "color": "#7fd1b9",
+      "id_": {
+        "title": "Waras",
+        "role": "Magang Backend Engineer · Meda Technology",
+        "summary": "Aplikasi telemedicine tempat konsultasi pertamamu dilakukan dengan AI.",
+        "about": "Waras adalah aplikasi konsultasi kesehatan yang dibangun di sekitar AI. Pengguna menceritakan keluhannya lalu mendapat konsultasi dari AI. Saya mengerjakan backend Go di baliknya.",
+        "did": [
+          "Ikut menentukan tech stack dan arsitekturnya.",
+          "Membangun service dan API backend dengan Go, didampingi Redis."
+        ],
+        "noDemo": "Belum ada link demo publik yang bisa dibagikan."
+      },
       "stack": [
         "Go",
         "Redis",
         "REST API",
         "AI consultation"
       ],
-      "images": [],
-      "demo": "",
-      "source": "",
       "en": {
         "title": "Waras",
         "role": "Backend Engineer Intern · Meda Technology",
@@ -67,23 +73,28 @@
         ],
         "noDemo": "No public demo link to share yet."
       },
-      "id_": {
-        "title": "Waras",
-        "role": "Magang Backend Engineer · Meda Technology",
-        "summary": "Aplikasi telemedicine tempat konsultasi pertamamu dilakukan dengan AI.",
-        "about": "Waras adalah aplikasi konsultasi kesehatan yang dibangun di sekitar AI. Pengguna menceritakan keluhannya lalu mendapat konsultasi dari AI. Saya mengerjakan backend Go di baliknya.",
-        "did": [
-          "Ikut menentukan tech stack dan arsitekturnya.",
-          "Membangun service dan API backend dengan Go, didampingi Redis."
-        ],
-        "noDemo": "Belum ada link demo publik yang bisa dibagikan."
-      }
+      "images": [],
+      "type": "work",
+      "source": "",
+      "id": "waras",
+      "year": "Oct 2026 – now"
     },
     {
-      "id": "ayo-kasir",
-      "type": "work",
-      "year": "2025 – 2026",
+      "demo": "https://ayo.src.id",
       "color": "#2f54eb",
+      "id_": {
+        "title": "AYO Kasir by SRC",
+        "role": "Backend Engineer · Weekend Inc.",
+        "summary": "Microservice POS dan ritel untuk jaringan toko PT HM Sampoerna.",
+        "about": "AYO Kasir adalah sisi kasir dari program ritel Sampoerna: toko menjalankan penjualan dan stoknya di sini, dan mitra grosir tersambung ke sistem yang sama. Saya dulu mengerjakan service Laravel di baliknya sebagai bagian dari tim Weekend Inc.",
+        "did": [
+          "Membangun dan merawat modul staf, coach, dan order.",
+          "Memburu query N+1 dan menata ulang index di endpoint yang lambat.",
+          "Memasang Husky, Commitlint, dan linting berbasis diff supaya commit yang bermasalah tertahan sebelum review.",
+          "Deploy lewat pipeline Jenkins ke AWS."
+        ],
+        "noDemo": ""
+      },
       "stack": [
         "Laravel",
         "PHP",
@@ -92,9 +103,6 @@
         "AWS EC2/S3",
         "Jenkins"
       ],
-      "images": [],
-      "demo": "https://ayo.src.id",
-      "source": "",
       "en": {
         "title": "AYO Kasir by SRC",
         "role": "Backend Engineer · Weekend Inc.",
@@ -108,25 +116,28 @@
         ],
         "noDemo": ""
       },
-      "id_": {
-        "title": "AYO Kasir by SRC",
-        "role": "Backend Engineer · Weekend Inc.",
-        "summary": "Microservice POS dan ritel untuk jaringan toko PT HM Sampoerna.",
-        "about": "AYO Kasir adalah sisi kasir dari program ritel Sampoerna: toko menjalankan penjualan dan stoknya di sini, dan mitra grosir tersambung ke sistem yang sama. Saya dulu mengerjakan service Laravel di baliknya sebagai bagian dari tim Weekend Inc.",
-        "did": [
-          "Membangun dan merawat modul staf, coach, dan order.",
-          "Memburu query N+1 dan menata ulang index di endpoint yang lambat.",
-          "Memasang Husky, Commitlint, dan linting berbasis diff supaya commit yang bermasalah tertahan sebelum review.",
-          "Deploy lewat pipeline Jenkins ke AWS."
-        ],
-        "noDemo": ""
-      }
+      "images": [],
+      "type": "work",
+      "source": "",
+      "id": "ayo-kasir",
+      "year": "2025 – 2026"
     },
     {
-      "id": "ayo-qoncierge",
-      "type": "work",
-      "year": "2025 – 2026",
+      "demo": "",
       "color": "#ff5a36",
+      "id_": {
+        "title": "AYO Qoncierge by SRC",
+        "role": "Backend Engineer · Weekend Inc.",
+        "summary": "Platform operasional untuk coach lapangan dan staf, dengan peran dan jejak audit.",
+        "about": "Coach lapangan dan staf yang mereka dampingi memakai Qoncierge di seluruh jaringan ritel Sampoerna, jadi aplikasinya butuh izin akses yang jelas dan catatan siapa mengubah apa. Kodenya mengikuti clean architecture supaya tiap domain tetap di jalurnya sendiri.",
+        "did": [
+          "Merancang service layer dengan batas domain yang jelas dan dependency inversion.",
+          "Membangun otorisasi berbasis peran untuk staf dan coach.",
+          "Menambahkan audit log terstruktur dan error handling di sekitar perubahan kritis.",
+          "Menjaga kontrak REST tetap stabil untuk frontend dan konsumen pihak ketiga."
+        ],
+        "noDemo": "Platform internal, jadi tidak ada demo publik."
+      },
       "stack": [
         "Laravel",
         "Node.js",
@@ -135,9 +146,6 @@
         "REST API",
         "Docker"
       ],
-      "images": [],
-      "demo": "",
-      "source": "",
       "en": {
         "title": "AYO Qoncierge by SRC",
         "role": "Backend Engineer · Weekend Inc.",
@@ -151,25 +159,28 @@
         ],
         "noDemo": "Internal platform, so there's no public demo."
       },
-      "id_": {
-        "title": "AYO Qoncierge by SRC",
-        "role": "Backend Engineer · Weekend Inc.",
-        "summary": "Platform operasional untuk coach lapangan dan staf, dengan peran dan jejak audit.",
-        "about": "Coach lapangan dan staf yang mereka dampingi memakai Qoncierge di seluruh jaringan ritel Sampoerna, jadi aplikasinya butuh izin akses yang jelas dan catatan siapa mengubah apa. Kodenya mengikuti clean architecture supaya tiap domain tetap di jalurnya sendiri.",
-        "did": [
-          "Merancang service layer dengan batas domain yang jelas dan dependency inversion.",
-          "Membangun otorisasi berbasis peran untuk staf dan coach.",
-          "Menambahkan audit log terstruktur dan error handling di sekitar perubahan kritis.",
-          "Menjaga kontrak REST tetap stabil untuk frontend dan konsumen pihak ketiga."
-        ],
-        "noDemo": "Platform internal, jadi tidak ada demo publik."
-      }
+      "images": [],
+      "type": "work",
+      "source": "",
+      "id": "ayo-qoncierge",
+      "year": "2025 – 2026"
     },
     {
-      "id": "e-wallet",
-      "type": "personal",
-      "year": "2026",
+      "demo": "",
       "color": "#7b5cff",
+      "id_": {
+        "title": "E-Wallet Multi-Mata-Uang",
+        "role": "Backend · proyek pribadi",
+        "summary": "API dompet berbasis ledger yang uangnya tidak pernah lewat float JavaScript.",
+        "about": "Backend untuk dompet digital dengan beberapa mata uang, dibangun di atas tabel ledger di PostgreSQL. Top-up, pembayaran, dan transfer sesama mata uang masing-masing berjalan dalam satu transaksi database, dan request ulang dengan Idempotency-Key yang sama mendapat respons aslinya tanpa menagih dua kali.",
+        "did": [
+          "Semua hitungan uang pakai decimal.js dan disimpan sebagai NUMERIC(20,2), dibulatkan half-up ke dua desimal.",
+          "Mengunci baris dengan SELECT ... FOR UPDATE, dan mengunci dompet saat transfer berdasarkan urutan ID supaya dua transfer tidak saling deadlock.",
+          "Menambahkan index komposit dan parsial untuk halaman ledger dan pencarian dompet aktif.",
+          "Mendokumentasikan semua endpoint dengan OpenAPI 3 dan Swagger UI."
+        ],
+        "noDemo": "Hanya API; dijalankan lokal dengan Swagger UI di /api-docs."
+      },
       "stack": [
         "Express.js",
         "PostgreSQL",
@@ -177,9 +188,6 @@
         "decimal.js",
         "OpenAPI / Swagger"
       ],
-      "images": [],
-      "demo": "",
-      "source": "https://github.com/AnandaBintang/e-wallet",
       "en": {
         "title": "Multi-Currency E-Wallet",
         "role": "Backend · personal project",
@@ -193,25 +201,27 @@
         ],
         "noDemo": "API only; it runs locally with Swagger UI at /api-docs."
       },
-      "id_": {
-        "title": "E-Wallet Multi-Mata-Uang",
-        "role": "Backend · proyek pribadi",
-        "summary": "API dompet berbasis ledger yang uangnya tidak pernah lewat float JavaScript.",
-        "about": "Backend untuk dompet digital dengan beberapa mata uang, dibangun di atas tabel ledger di PostgreSQL. Top-up, pembayaran, dan transfer sesama mata uang masing-masing berjalan dalam satu transaksi database, dan request ulang dengan Idempotency-Key yang sama mendapat respons aslinya tanpa menagih dua kali.",
-        "did": [
-          "Semua hitungan uang pakai decimal.js dan disimpan sebagai NUMERIC(20,2), dibulatkan half-up ke dua desimal.",
-          "Mengunci baris dengan SELECT ... FOR UPDATE, dan mengunci dompet saat transfer berdasarkan urutan ID supaya dua transfer tidak saling deadlock.",
-          "Menambahkan index komposit dan parsial untuk halaman ledger dan pencarian dompet aktif.",
-          "Mendokumentasikan semua endpoint dengan OpenAPI 3 dan Swagger UI."
-        ],
-        "noDemo": "Hanya API; dijalankan lokal dengan Swagger UI di /api-docs."
-      }
+      "images": [],
+      "type": "personal",
+      "source": "https://github.com/AnandaBintang/e-wallet",
+      "id": "e-wallet",
+      "year": "2026"
     },
     {
-      "id": "order-management-system",
-      "type": "personal",
-      "year": "2026",
+      "demo": "",
       "color": "#00a7a0",
+      "id_": {
+        "title": "Order Management System",
+        "role": "Backend · proyek pribadi",
+        "summary": "API order dengan Go, clean architecture, dan worker di background.",
+        "about": "API order yang ditulis dengan Go di atas net/http bawaan, tanpa web framework. Order baru disimpan sebagai PENDING lalu diserahkan ke worker di background lewat buffered channel, jadi request HTTP langsung selesai sementara prosesnya jalan terus.",
+        "did": [
+          "Memisahkan kode ke layer handler, service, dan repository yang hanya berkomunikasi lewat interface.",
+          "Memvalidasi user dan produk secara bersamaan dengan goroutine dan WaitGroup.",
+          "Menambahkan autentikasi JWT dengan password ber-hash bcrypt, plus dokumentasi Swagger dari swag."
+        ],
+        "noDemo": "Hanya API; dijalankan lokal dengan Swagger UI."
+      },
       "stack": [
         "Go",
         "net/http",
@@ -220,9 +230,6 @@
         "JWT",
         "Swagger"
       ],
-      "images": [],
-      "demo": "",
-      "source": "https://github.com/AnandaBintang/order-management-system",
       "en": {
         "title": "Order Management System",
         "role": "Backend · personal project",
@@ -235,24 +242,28 @@
         ],
         "noDemo": "API only; it runs locally with Swagger UI."
       },
-      "id_": {
-        "title": "Order Management System",
-        "role": "Backend · proyek pribadi",
-        "summary": "API order dengan Go, clean architecture, dan worker di background.",
-        "about": "API order yang ditulis dengan Go di atas net/http bawaan, tanpa web framework. Order baru disimpan sebagai PENDING lalu diserahkan ke worker di background lewat buffered channel, jadi request HTTP langsung selesai sementara prosesnya jalan terus.",
-        "did": [
-          "Memisahkan kode ke layer handler, service, dan repository yang hanya berkomunikasi lewat interface.",
-          "Memvalidasi user dan produk secara bersamaan dengan goroutine dan WaitGroup.",
-          "Menambahkan autentikasi JWT dengan password ber-hash bcrypt, plus dokumentasi Swagger dari swag."
-        ],
-        "noDemo": "Hanya API; dijalankan lokal dengan Swagger UI."
-      }
+      "images": [],
+      "type": "personal",
+      "source": "https://github.com/AnandaBintang/order-management-system",
+      "id": "order-management-system",
+      "year": "2026"
     },
     {
-      "id": "moneymate",
-      "type": "personal",
-      "year": "2025",
+      "demo": "https://moneymate-abp.netlify.app/",
       "color": "#1f9d6b",
+      "id_": {
+        "title": "MoneyMate",
+        "role": "Full Stack · proyek pribadi",
+        "summary": "Aplikasi keuangan pribadi dengan scan struk berbasis AI dan anggaran yang terbawa ke bulan berikutnya.",
+        "about": "Aplikasi web keuangan pribadi dengan front end React dan API Express. Foto struknya, Gemini Vision membaca apa saja yang kamu beli, dan sisa anggaran yang tidak terpakai pindah ke bulan berikutnya.",
+        "did": [
+          "Menulis mesin anggaran carry-over dan perhitungan saldo per periode.",
+          "Menyambungkan Gemini Vision untuk membaca struk secara otomatis.",
+          "Menambahkan rate limiting, pencabutan JWT, dan proteksi HPP di API.",
+          "Deploy front end di Netlify dan API di container dengan database persisten."
+        ],
+        "noDemo": ""
+      },
       "stack": [
         "React",
         "Vite",
@@ -263,12 +274,6 @@
         "Firebase Auth",
         "Docker"
       ],
-      "images": [
-        "assets/img/projects/moneymate-1.jpg",
-        "assets/img/projects/moneymate-2.jpg"
-      ],
-      "demo": "https://moneymate-abp.netlify.app/",
-      "source": "https://github.com/MoneyMate-ABP/moneymate-api",
       "en": {
         "title": "MoneyMate",
         "role": "Full Stack · personal project",
@@ -282,25 +287,30 @@
         ],
         "noDemo": ""
       },
-      "id_": {
-        "title": "MoneyMate",
-        "role": "Full Stack · proyek pribadi",
-        "summary": "Aplikasi keuangan pribadi dengan scan struk berbasis AI dan anggaran yang terbawa ke bulan berikutnya.",
-        "about": "Aplikasi web keuangan pribadi dengan front end React dan API Express. Foto struknya, Gemini Vision membaca apa saja yang kamu beli, dan sisa anggaran yang tidak terpakai pindah ke bulan berikutnya.",
-        "did": [
-          "Menulis mesin anggaran carry-over dan perhitungan saldo per periode.",
-          "Menyambungkan Gemini Vision untuk membaca struk secara otomatis.",
-          "Menambahkan rate limiting, pencabutan JWT, dan proteksi HPP di API.",
-          "Deploy front end di Netlify dan API di container dengan database persisten."
-        ],
-        "noDemo": ""
-      }
+      "images": [
+        "assets/img/projects/moneymate-1.jpg",
+        "assets/img/projects/moneymate-2.jpg"
+      ],
+      "type": "personal",
+      "source": "https://github.com/MoneyMate-ABP/moneymate-api",
+      "id": "moneymate",
+      "year": "2025"
     },
     {
-      "id": "topup-store",
-      "type": "freelance",
-      "year": "2023 – 2025",
+      "demo": "https://synnmlbb.com",
       "color": "#e0a100",
+      "id_": {
+        "title": "Synn Store",
+        "role": "Full Stack · freelance",
+        "summary": "Toko top-up game untuk pemain di Malaysia, dibayar lewat webhook yang tidak pernah menghitung pembayaran yang sama dua kali.",
+        "about": "Synn Store menjual voucher dan top-up game seperti Mobile Legends dan Genshin Impact tanpa perlu membuat akun. Saya membangunnya sebagai freelancer. Pembayaran masuk lewat webhook, jadi setiap handler mengecek dulu apakah pembayaran itu pernah diproses sebelum menyentuh order.",
+        "did": [
+          "Menulis webhook handler yang idempoten supaya retry tidak pernah menambah saldo order dua kali.",
+          "Menyetel index untuk pencarian order dan laporan transaksi.",
+          "Membangun panel admin untuk penjualan, stok, dan invoice."
+        ],
+        "noDemo": ""
+      },
       "stack": [
         "PHP",
         "Laravel",
@@ -309,12 +319,6 @@
         "Payment webhooks",
         "REST API"
       ],
-      "images": [
-        "assets/img/projects/synn-store-1.jpg",
-        "assets/img/projects/synn-store-2.jpg"
-      ],
-      "demo": "https://synnmlbb.com",
-      "source": "",
       "en": {
         "title": "Synn Store",
         "role": "Full Stack · freelance",
@@ -327,24 +331,31 @@
         ],
         "noDemo": ""
       },
-      "id_": {
-        "title": "Synn Store",
-        "role": "Full Stack · freelance",
-        "summary": "Toko top-up game untuk pemain di Malaysia, dibayar lewat webhook yang tidak pernah menghitung pembayaran yang sama dua kali.",
-        "about": "Synn Store menjual voucher dan top-up game seperti Mobile Legends dan Genshin Impact tanpa perlu membuat akun. Saya membangunnya sebagai freelancer. Pembayaran masuk lewat webhook, jadi setiap handler mengecek dulu apakah pembayaran itu pernah diproses sebelum menyentuh order.",
-        "did": [
-          "Menulis webhook handler yang idempoten supaya retry tidak pernah menambah saldo order dua kali.",
-          "Menyetel index untuk pencarian order dan laporan transaksi.",
-          "Membangun panel admin untuk penjualan, stok, dan invoice."
-        ],
-        "noDemo": ""
-      }
+      "images": [
+        "assets/img/projects/synn-store-1.jpg",
+        "assets/img/projects/synn-store-2.jpg"
+      ],
+      "type": "freelance",
+      "source": "",
+      "id": "topup-store",
+      "year": "2023 – 2025"
     },
     {
-      "id": "indo-optik",
-      "type": "personal",
-      "year": "2026",
+      "demo": "https://indooptik.web.id",
       "color": "#2bb3a3",
+      "id_": {
+        "title": "IndoOptik",
+        "role": "Full Stack",
+        "summary": "Katalog toko optik yang checkout-nya lewat WhatsApp.",
+        "about": "Katalog untuk toko optik: pelanggan memilih frame, mengatur lensanya, mengisi keranjang, lalu menyelesaikan pesanan lewat chat WhatsApp dengan toko. Sengaja tidak ada pembayaran di aplikasi; sisi admin mengurus produk, kode promo, testimoni, dan pengaturan situs.",
+        "did": [
+          "Membangun etalase, pilihan lensa, dan keranjang berbasis session.",
+          "Menulis checkout WhatsApp untuk pesanan dan booking janji temu.",
+          "Menambahkan middleware security header untuk CSP, proteksi frame, referrer, dan permissions policy.",
+          "Mengemas aplikasi di Docker dengan PHP-FPM, Nginx, dan MySQL untuk VPS."
+        ],
+        "noDemo": ""
+      },
       "stack": [
         "Laravel 12",
         "Tailwind CSS 4",
@@ -353,13 +364,6 @@
         "Docker",
         "Pest"
       ],
-      "images": [
-        "assets/img/projects/indo-optik-1.jpg",
-        "assets/img/projects/indo-optik-2.jpg",
-        "assets/img/projects/indo-optik-3.jpg"
-      ],
-      "demo": "https://indooptik.web.id",
-      "source": "https://github.com/AnandaBintang/indo-optik",
       "en": {
         "title": "IndoOptik",
         "role": "Full Stack",
@@ -373,47 +377,19 @@
         ],
         "noDemo": ""
       },
-      "id_": {
-        "title": "IndoOptik",
-        "role": "Full Stack",
-        "summary": "Katalog toko optik yang checkout-nya lewat WhatsApp.",
-        "about": "Katalog untuk toko optik: pelanggan memilih frame, mengatur lensanya, mengisi keranjang, lalu menyelesaikan pesanan lewat chat WhatsApp dengan toko. Sengaja tidak ada pembayaran di aplikasi; sisi admin mengurus produk, kode promo, testimoni, dan pengaturan situs.",
-        "did": [
-          "Membangun etalase, pilihan lensa, dan keranjang berbasis session.",
-          "Menulis checkout WhatsApp untuk pesanan dan booking janji temu.",
-          "Menambahkan middleware security header untuk CSP, proteksi frame, referrer, dan permissions policy.",
-          "Mengemas aplikasi di Docker dengan PHP-FPM, Nginx, dan MySQL untuk VPS."
-        ],
-        "noDemo": ""
-      }
+      "images": [
+        "assets/img/projects/indo-optik-1.jpg",
+        "assets/img/projects/indo-optik-2.jpg",
+        "assets/img/projects/indo-optik-3.jpg"
+      ],
+      "type": "personal",
+      "source": "https://github.com/AnandaBintang/indo-optik",
+      "id": "indo-optik",
+      "year": "2026"
     },
     {
-      "id": "nikel-rent-car",
-      "type": "personal",
-      "year": "2026",
-      "color": "#c48a5a",
-      "stack": [
-        "Laravel 13",
-        "PHP 8.3",
-        "MySQL",
-        "Tailwind CSS",
-        "Chart.js"
-      ],
-      "images": [],
       "demo": "",
-      "source": "https://github.com/AnandaBintang/nikel-rent-car",
-      "en": {
-        "title": "Vehicle Booking · PT NikelIndo Mining",
-        "role": "Full Stack",
-        "summary": "Company vehicle bookings for a nickel mine, approved level by level.",
-        "about": "A web app for booking and monitoring company vehicles at a nickel mining company. An admin books a vehicle and a driver and picks at least two approvers; the request only reaches the next level once the level before it says yes, and one rejection anywhere closes it.",
-        "did": [
-          "Built the multi-level approval flow, where each approver unlocks the next one.",
-          "Made a dashboard with four Chart.js charts, including bookings per month and fuel use.",
-          "Added vehicle and driver management with report export."
-        ],
-        "noDemo": "No public demo; it runs locally with seeded accounts."
-      },
+      "color": "#c48a5a",
       "id_": {
         "title": "Pemesanan Kendaraan · PT NikelIndo Mining",
         "role": "Full Stack",
@@ -425,13 +401,47 @@
           "Menambahkan manajemen kendaraan dan driver beserta export laporan."
         ],
         "noDemo": "Tidak ada demo publik; dijalankan lokal dengan akun hasil seeder."
-      }
+      },
+      "stack": [
+        "Laravel 13",
+        "PHP 8.3",
+        "MySQL",
+        "Tailwind CSS",
+        "Chart.js"
+      ],
+      "en": {
+        "title": "Vehicle Booking",
+        "role": "Full Stack",
+        "summary": "Company vehicle bookings for a nickel mine, approved level by level.",
+        "about": "A web app for booking and monitoring company vehicles at a nickel mining company. An admin books a vehicle and a driver and picks at least two approvers; the request only reaches the next level once the level before it says yes, and one rejection anywhere closes it.",
+        "did": [
+          "Built the multi-level approval flow, where each approver unlocks the next one.",
+          "Made a dashboard with four Chart.js charts, including bookings per month and fuel use.",
+          "Added vehicle and driver management with report export."
+        ],
+        "noDemo": "No public demo; it runs locally with seeded accounts."
+      },
+      "images": [],
+      "type": "personal",
+      "source": "https://github.com/AnandaBintang/nikel-rent-car",
+      "id": "nikel-rent-car",
+      "year": "2026"
     },
     {
-      "id": "simabima",
-      "type": "personal",
-      "year": "2026",
+      "demo": "",
       "color": "#ff8fb1",
+      "id_": {
+        "title": "SIMABIMA",
+        "role": "Full Stack",
+        "summary": "Sistem arsip digital yang dijelajahi sesuai struktur organisasi kantornya.",
+        "about": "SIMABIMA menyimpan dokumen arsip dan membantu orang menemukannya dengan mengikuti struktur organisasi: grup, unit, sub unit, lalu tabel arsipnya. Administrator mengelola semuanya, sedangkan staf bisa menjelajah, mengunduh, dan mengunggah arsip mereka sendiri.",
+        "did": [
+          "Memodelkan hierarki unit supaya pohon arsip sama dengan struktur organisasi aslinya.",
+          "Membangun fitur unggah, ubah, dan unduh, dengan penghitung unduhan di setiap dokumen.",
+          "Menambahkan dashboard statistik berisi unggahan per bulan dan dokumen terpopuler, plus reset password lewat email."
+        ],
+        "noDemo": "Tidak ada demo publik; dijalankan lokal dengan akun admin hasil seeder."
+      },
       "stack": [
         "Laravel 12",
         "Filament v5",
@@ -439,9 +449,6 @@
         "Tailwind CSS v4",
         "MySQL"
       ],
-      "images": [],
-      "demo": "",
-      "source": "https://github.com/AnandaBintang/simabima-archive",
       "en": {
         "title": "SIMABIMA",
         "role": "Full Stack",
@@ -454,24 +461,27 @@
         ],
         "noDemo": "No public demo; it runs locally with a seeded admin account."
       },
-      "id_": {
-        "title": "SIMABIMA",
-        "role": "Full Stack",
-        "summary": "Sistem arsip digital yang dijelajahi sesuai struktur organisasi kantornya.",
-        "about": "SIMABIMA menyimpan dokumen arsip dan membantu orang menemukannya dengan mengikuti struktur organisasi: grup, unit, sub unit, lalu tabel arsipnya. Administrator mengelola semuanya, sedangkan staf bisa menjelajah, mengunduh, dan mengunggah arsip mereka sendiri.",
-        "did": [
-          "Memodelkan hierarki unit supaya pohon arsip sama dengan struktur organisasi aslinya.",
-          "Membangun fitur unggah, ubah, dan unduh, dengan penghitung unduhan di setiap dokumen.",
-          "Menambahkan dashboard statistik berisi unggahan per bulan dan dokumen terpopuler, plus reset password lewat email."
-        ],
-        "noDemo": "Tidak ada demo publik; dijalankan lokal dengan akun admin hasil seeder."
-      }
+      "images": [],
+      "type": "personal",
+      "source": "https://github.com/AnandaBintang/simabima-archive",
+      "id": "simabima",
+      "year": "2026"
     },
     {
-      "id": "lembah-outdoor",
-      "type": "personal",
-      "year": "2026",
+      "demo": "",
       "color": "#7fa650",
+      "id_": {
+        "title": "Lembah Outdoor Surabaya",
+        "role": "Frontend",
+        "summary": "Persewaan alat camping dengan pemilihan tanggal ala aplikasi travel dan stok real-time.",
+        "about": "Situs persewaan alat camping dan hiking di Surabaya. Kamu memilih tanggal ambil dan kembali seperti di aplikasi travel, harganya mengikuti paket sewa berjenjang, dan barang yang habis tidak bisa masuk keranjang.",
+        "did": [
+          "Membangun pemilih rentang tanggal dan tarif berjenjang, termasuk aturan akhir pekan di mana Sabtu sampai Minggu dihitung satu hari.",
+          "Menambahkan varian produk untuk ukuran sepatu, ukuran pakaian, dan warna, masing-masing dengan indikator stok sendiri.",
+          "Membuat simulator pembayaran dengan opsi QRIS dan virtual account supaya alur checkout bisa dicoba dari awal sampai akhir."
+        ],
+        "noDemo": "Belum ada link demo publik."
+      },
       "stack": [
         "React 19",
         "Vite",
@@ -479,9 +489,6 @@
         "Tailwind CSS",
         "Netlify"
       ],
-      "images": [],
-      "demo": "",
-      "source": "https://github.com/AnandaBintang/lembah-outdoor",
       "en": {
         "title": "Lembah Outdoor Surabaya",
         "role": "Frontend",
@@ -494,33 +501,32 @@
         ],
         "noDemo": "No public demo link yet."
       },
-      "id_": {
-        "title": "Lembah Outdoor Surabaya",
-        "role": "Frontend",
-        "summary": "Persewaan alat camping dengan pemilihan tanggal ala aplikasi travel dan stok real-time.",
-        "about": "Situs persewaan alat camping dan hiking di Surabaya. Kamu memilih tanggal ambil dan kembali seperti di aplikasi travel, harganya mengikuti paket sewa berjenjang, dan barang yang habis tidak bisa masuk keranjang.",
-        "did": [
-          "Membangun pemilih rentang tanggal dan tarif berjenjang, termasuk aturan akhir pekan di mana Sabtu sampai Minggu dihitung satu hari.",
-          "Menambahkan varian produk untuk ukuran sepatu, ukuran pakaian, dan warna, masing-masing dengan indikator stok sendiri.",
-          "Membuat simulator pembayaran dengan opsi QRIS dan virtual account supaya alur checkout bisa dicoba dari awal sampai akhir."
-        ],
-        "noDemo": "Belum ada link demo publik."
-      }
+      "images": [],
+      "type": "personal",
+      "source": "https://github.com/AnandaBintang/lembah-outdoor",
+      "id": "lembah-outdoor",
+      "year": "2026"
     },
     {
-      "id": "desa-bantengputih",
-      "type": "personal",
-      "year": "2025",
+      "demo": "",
       "color": "#ffb44a",
+      "id_": {
+        "title": "Website Desa Banteng Putih",
+        "role": "Full Stack",
+        "summary": "Website desa dengan panel admin untuk berita, produk, dan layanan.",
+        "about": "Website untuk Desa Banteng Putih. Berita, produk lokal, layanan, galeri, dan testimoni semuanya diatur dari panel admin Filament, jadi mengganti konten tidak perlu menyentuh kode.",
+        "did": [
+          "Membangun panel admin dengan Filament serta halaman dan form interaktif dengan Livewire.",
+          "Menangani unggahan gambar dan file lewat Spatie Media Library."
+        ],
+        "noDemo": "Belum ada link demo publik."
+      },
       "stack": [
         "Laravel 11",
         "Filament v3",
         "Livewire v3",
         "Spatie Media Library"
       ],
-      "images": [],
-      "demo": "",
-      "source": "https://github.com/AnandaBintang/desa-bantengputih",
       "en": {
         "title": "Desa Banteng Putih Website",
         "role": "Full Stack",
@@ -532,23 +538,27 @@
         ],
         "noDemo": "No public demo link yet."
       },
-      "id_": {
-        "title": "Website Desa Banteng Putih",
-        "role": "Full Stack",
-        "summary": "Website desa dengan panel admin untuk berita, produk, dan layanan.",
-        "about": "Website untuk Desa Banteng Putih. Berita, produk lokal, layanan, galeri, dan testimoni semuanya diatur dari panel admin Filament, jadi mengganti konten tidak perlu menyentuh kode.",
-        "did": [
-          "Membangun panel admin dengan Filament serta halaman dan form interaktif dengan Livewire.",
-          "Menangani unggahan gambar dan file lewat Spatie Media Library."
-        ],
-        "noDemo": "Belum ada link demo publik."
-      }
+      "images": [],
+      "type": "personal",
+      "source": "https://github.com/AnandaBintang/desa-bantengputih",
+      "id": "desa-bantengputih",
+      "year": "2025"
     },
     {
-      "id": "rag-alpro",
-      "type": "personal",
-      "year": "2026",
+      "demo": "",
       "color": "#4a9eff",
+      "id_": {
+        "title": "RAG Modul Praktikum Alpro",
+        "role": "AI · proyek pribadi",
+        "summary": "Tanya jawab soal modul praktikum Alpro Telkom University, dijawab dari isi modulnya sendiri.",
+        "about": "Pipeline retrieval-augmented generation untuk modul praktikum Algoritma & Pemrograman Telkom University. Modulnya dipecah jadi potongan yang saling tumpang tindih, di-embed, lalu disimpan di FAISS; setiap pertanyaan mengambil tiga potongan terdekat, dan Llama 3.3 70B di Groq menjawab berdasarkan potongan itu.",
+        "did": [
+          "Mengubah modul ke TXT dan JSONL, lalu memotongnya dengan ukuran 500 dan overlap 100.",
+          "Meng-embed potongan dengan model MiniLM multibahasa dan mencarinya dengan cosine similarity di FAISS.",
+          "Menulis notebook yang bisa jalan di Google Colab maupun Jupyter lokal."
+        ],
+        "noDemo": "Tidak ada demo online; notebook-nya bisa dijalankan di Colab dengan Groq key sendiri."
+      },
       "stack": [
         "Python",
         "FAISS",
@@ -556,9 +566,6 @@
         "Groq",
         "Llama 3.3 70B"
       ],
-      "images": [],
-      "demo": "",
-      "source": "https://github.com/AnandaBintang/rag-genai",
       "en": {
         "title": "RAG for the Alpro Lab Module",
         "role": "AI · personal project",
@@ -571,32 +578,32 @@
         ],
         "noDemo": "No hosted demo; the notebook runs in Colab with your own Groq key."
       },
-      "id_": {
-        "title": "RAG Modul Praktikum Alpro",
-        "role": "AI · proyek pribadi",
-        "summary": "Tanya jawab soal modul praktikum Alpro Telkom University, dijawab dari isi modulnya sendiri.",
-        "about": "Pipeline retrieval-augmented generation untuk modul praktikum Algoritma & Pemrograman Telkom University. Modulnya dipecah jadi potongan yang saling tumpang tindih, di-embed, lalu disimpan di FAISS; setiap pertanyaan mengambil tiga potongan terdekat, dan Llama 3.3 70B di Groq menjawab berdasarkan potongan itu.",
-        "did": [
-          "Mengubah modul ke TXT dan JSONL, lalu memotongnya dengan ukuran 500 dan overlap 100.",
-          "Meng-embed potongan dengan model MiniLM multibahasa dan mencarinya dengan cosine similarity di FAISS.",
-          "Menulis notebook yang bisa jalan di Google Colab maupun Jupyter lokal."
-        ],
-        "noDemo": "Tidak ada demo online; notebook-nya bisa dijalankan di Colab dengan Groq key sendiri."
-      }
+      "images": [],
+      "type": "personal",
+      "source": "https://github.com/AnandaBintang/rag-genai",
+      "id": "rag-alpro",
+      "year": "2026"
     },
     {
-      "id": "premier-league",
-      "type": "personal",
-      "year": "2026",
+      "demo": "",
       "color": "#b28cff",
+      "id_": {
+        "title": "Dashboard Premier League 2025/26",
+        "role": "Frontend · proyek pribadi",
+        "summary": "Dashboard statistik interaktif untuk musim Premier League 2025/26.",
+        "about": "Klasemen, rekor gol, papan peringkat pemain, dan profil klub Premier League 2025/26 dalam satu aplikasi single-page. Klik satu klub di tabel dan halaman langsung pindah ke profil klub itu.",
+        "did": [
+          "Membangun grafik poin dengan zona Liga Champions, Liga Europa, dan degradasi.",
+          "Menambahkan papan peringkat top skor dan assist.",
+          "Menghitung persentase menang, persentase seri, dan rata-rata gol per pertandingan untuk setiap profil klub."
+        ],
+        "noDemo": "Belum ada link demo publik."
+      },
       "stack": [
         "React",
         "Vite",
         "Chart.js"
       ],
-      "images": [],
-      "demo": "",
-      "source": "https://github.com/AnandaBintang/premiere-league-football-statistics",
       "en": {
         "title": "Premier League 2025/26 Dashboard",
         "role": "Frontend · personal project",
@@ -609,18 +616,11 @@
         ],
         "noDemo": "No public demo link yet."
       },
-      "id_": {
-        "title": "Dashboard Premier League 2025/26",
-        "role": "Frontend · proyek pribadi",
-        "summary": "Dashboard statistik interaktif untuk musim Premier League 2025/26.",
-        "about": "Klasemen, rekor gol, papan peringkat pemain, dan profil klub Premier League 2025/26 dalam satu aplikasi single-page. Klik satu klub di tabel dan halaman langsung pindah ke profil klub itu.",
-        "did": [
-          "Membangun grafik poin dengan zona Liga Champions, Liga Europa, dan degradasi.",
-          "Menambahkan papan peringkat top skor dan assist.",
-          "Menghitung persentase menang, persentase seri, dan rata-rata gol per pertandingan untuk setiap profil klub."
-        ],
-        "noDemo": "Belum ada link demo publik."
-      }
+      "images": [],
+      "type": "personal",
+      "source": "https://github.com/AnandaBintang/premiere-league-football-statistics",
+      "id": "premier-league",
+      "year": "2026"
     }
   ]
 }
