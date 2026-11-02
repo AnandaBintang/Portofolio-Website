@@ -6,7 +6,7 @@ Live: https://ananda-bintang.netlify.app
 
 ## Stack
 
-Plain HTML, CSS and JavaScript. No build step.
+Plain HTML, CSS and JavaScript. No bundler; on Netlify the "build" only copies the site files into `dist/` (see `netlify.toml`).
 
 - [GSAP](https://gsap.com) + ScrollTrigger for the scroll-driven scenes
 - [Lenis](https://lenis.darkroom.engineering) for smooth scrolling

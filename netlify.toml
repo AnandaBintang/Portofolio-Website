@@ -1,11 +1,13 @@
-# Plain static site: no build step, publish the repository root.
+# Static site. Netlify won't publish the repository root when a framework plugin is attached,
+# so the "build" just copies the site files into dist/ and publishes that.
 [build]
-  command = "echo 'Static site, nothing to build'"
-  publish = "."
+  command = "rm -rf dist && mkdir dist && cp -R index.html assets Ananda_Bintang_Saputra_CV.pdf dist/"
+  publish = "dist"
 
 [build.environment]
   # The site used to be a Next.js / Vite app; keep Netlify's Next plugin out of the way.
   NETLIFY_NEXT_PLUGIN_SKIP = "true"
+  NODE_VERSION = "20"
 
 [[headers]]
   for = "/assets/audio/*"
