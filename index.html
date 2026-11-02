@@ -1,15 +1,558 @@
 <!doctype html>
 <html lang="en">
-  <head>
-    <meta charset="UTF-8" />
-    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>Ananda Bintang — Backend Engineer & Web Developer</title>
-    <meta name="description" content="Portfolio of Ananda Bintang Saputra - Backend Engineer specializing in enterprise microservices, high-throughput REST APIs, and database query optimization." />
-    <meta name="theme-color" content="#0f0d0b" />
-  </head>
-  <body>
-    <div id="root"></div>
-    <script type="module" src="/src/main.tsx"></script>
-  </body>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Ananda Bintang · Backend Engineer · One Night Only</title>
+  <meta name="description" content="Ananda Bintang Saputra, backend engineer from Sidoarjo. Go, Laravel, PostgreSQL and Redis. Currently a backend engineer intern at Meda Technology, building Meda Billing and Waras." />
+  <meta name="theme-color" content="#161412" />
+  <meta property="og:title" content="Ananda Bintang · One Night Only" />
+  <meta property="og:description" content="A backend engineer's portfolio told as one night at a show, from doors open to the encore." />
+  <meta property="og:image" content="/assets/img/ananda-bintang.png" />
+  <link rel="icon" href="assets/img/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Archivo:wdth,wght@62..125,300..900&family=IBM+Plex+Mono:wght@400;500;600&family=Caveat:wght@500;700&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="assets/css/style.css?v=2026-11-02" />
+  <script>
+    document.documentElement.classList.add("js");
+    document.documentElement.classList.add(matchMedia("(prefers-reduced-motion: reduce)").matches ? "rm" : "story", "loading");
+    // If the main script never runs, don't leave the hero half-drawn.
+    setTimeout(function () { if (!window.__heroReady) document.documentElement.classList.remove("loading"); }, 6000);
+    if ("scrollRestoration" in history) history.scrollRestoration = "manual";
+  </script>
+</head>
+<body data-tone="light">
+  <!-- ===== preloader: a few quick title cards, then the stage opens ===== -->
+  <div class="intro" id="intro" aria-hidden="true">
+    <div class="intro-slices"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+    <p class="intro-word" id="introWord"></p>
+    <span class="intro-c tl">Bintang 400 · Print run 01</span>
+    <span class="intro-c tr"><span id="introCount">000</span>%</span>
+    <span class="intro-c bl">Live from Sidoarjo</span>
+    <span class="intro-c br">2026</span>
+    <div class="intro-enter" id="introEnter" hidden>
+      <div class="intro-btns">
+        <button type="button" class="primary" data-sound="on">♪ Enter with sound</button>
+        <button type="button" data-sound="off">Enter quietly</button>
+      </div>
+      <small>Music · “Chill Wave” by Kevin MacLeod</small>
+    </div>
+  </div>
+
+  <a class="skip" href="#soundcheck">Skip to content</a>
+
+  <!-- ===== HUD ===== -->
+  <header class="hud-top">
+    <a href="#doors" class="logo" data-jump="doors"><span class="logo-star" aria-hidden="true">✺</span>Ananda Bintang</a>
+    <button class="setlist-btn" id="menuBtn" aria-expanded="false" aria-controls="menu">
+      <span data-i18n="setlist">Setlist</span><i aria-hidden="true"><b></b><b></b></i>
+    </button>
+    <div class="hud-right">
+      <button class="sound" id="soundBtn" aria-pressed="false" aria-label="Toggle soundtrack">
+        <span class="eq" aria-hidden="true"><b></b><b></b><b></b><b></b></span><span class="sound-txt" data-i18n="sound">Sound</span>
+      </button>
+      <div class="lang" role="group" aria-label="Language">
+        <button data-lang="en" aria-pressed="true">EN</button><button data-lang="id" aria-pressed="false">ID</button>
+      </div>
+    </div>
+  </header>
+
+  <nav class="menu" id="menu" aria-label="Setlist" hidden data-lenis-prevent>
+    <div class="program">
+      <p class="program-head"><span data-i18n="menu_head">Tonight's program</span><span>Sidoarjo · 2026</span></p>
+      <ol class="program-list" id="menuList"></ol>
+      <p class="program-foot" data-i18n="menu_foot">Esc to close</p>
+    </div>
+  </nav>
+
+  <div class="hud-bottom" aria-hidden="true">
+    <span class="hud-scene"><b id="hudNo">01</b>/07 · <span id="hudName">Doors open</span></span>
+    <span class="hud-line"><i id="hudFill"></i></span>
+    <span class="hud-clock" id="hudClock">18:30</span>
+  </div>
+  <div class="flash" id="flash" aria-hidden="true"></div>
+
+  <main>
+    <!-- ================= SCENE 1 · DOORS ================= -->
+    <section class="scene s1" id="doors" data-time="18:30" data-name="sc1" data-tone="light" style="--len:300">
+      <div class="stage">
+        <div class="wall" aria-hidden="true">
+          <p class="chalk"><span data-i18n="chalk1">Doors 18:30</span><br /><span data-i18n="chalk2">Show 19:00</span></p>
+          <span class="flyer f1"></span><span class="flyer f2"></span><span class="flyer f3"></span>
+        </div>
+
+        <div class="poster" id="poster">
+          <span class="pin p1" aria-hidden="true"></span><span class="pin p2" aria-hidden="true"></span>
+          <div class="poster-row top">
+            <span data-i18n="p_from">Live from Sidoarjo, East Java</span>
+            <span class="hide-sm" data-i18n="p_once">One night only</span>
+            <span data-i18n="p_since">On tour since 2022</span>
+          </div>
+          <div class="poster-main">
+            <div class="poster-left">
+              <p class="poster-kicker"><b>Backend Engineer Intern</b> <span data-i18n="p_kicker">at Meda Technology</span></p>
+              <h1 class="poster-name">
+                <span class="fit wide" data-fit>Ananda</span>
+                <span class="fit narrow" data-fit>Bintang</span>
+                <span class="hero-char" id="heroChar" aria-hidden="true">
+                  <span class="char-bubble" data-i18n="char_hi">halo!</span>
+                  <svg viewBox="0 0 300 330">
+                    <!-- coffee on the letter -->
+                    <g class="hc-cup">
+                      <g class="hc-steam" fill="none" stroke="#161412" stroke-width="2.5" stroke-linecap="round"><path d="M50 196 q-6 -8 0 -16 q6 -8 0 -16"/><path d="M62 198 q-6 -8 0 -16 q6 -8 0 -16"/></g>
+                      <path d="M36 236 L40 204 H70 L74 236 Z" fill="#fbf7ee" stroke="#161412" stroke-width="3.5" stroke-linejoin="round"/>
+                      <rect x="41" y="214" width="31" height="9" fill="#ff5a36"/>
+                      <path d="M71 210 q13 2 10 13 q-2 7 -12 7" fill="none" stroke="#161412" stroke-width="3.5"/>
+                    </g>
+                    <!-- legs hanging over the front of the letter -->
+                    <g class="hc-leg l">
+                      <path d="M138 226 h26 v62 h-26 z" fill="#3b4f9e" stroke="#161412" stroke-width="3.5" stroke-linejoin="round"/>
+                      <path d="M131 286 h36 q9 0 9 10 v9 h-51 v-9 q0 -10 6 -10z" fill="#fbf7ee" stroke="#161412" stroke-width="3.5" stroke-linejoin="round"/>
+                      <path d="M126 299 h50" stroke="#ff5a36" stroke-width="4"/>
+                    </g>
+                    <g class="hc-leg r">
+                      <path d="M178 226 h26 v62 h-26 z" fill="#3b4f9e" stroke="#161412" stroke-width="3.5" stroke-linejoin="round"/>
+                      <path d="M171 286 h36 q9 0 9 10 v9 h-51 v-9 q0 -10 6 -10z" fill="#fbf7ee" stroke="#161412" stroke-width="3.5" stroke-linejoin="round"/>
+                      <path d="M166 299 h50" stroke="#ff5a36" stroke-width="4"/>
+                    </g>
+                    <!-- body -->
+                    <path d="M118 238 C116 192 122 152 142 136 Q172 120 202 136 C222 152 226 192 224 238 Z" fill="#1d1b24" stroke="#161412" stroke-width="3.5" stroke-linejoin="round"/>
+                    <path d="M160 116 v20 q10 6 20 0 v-20 z" fill="#e8b48c" stroke="#161412" stroke-width="3.5" stroke-linejoin="round"/>
+                    <!-- head: bobs to the beat -->
+                    <g class="hc-head">
+                      <ellipse cx="170" cy="90" rx="33" ry="37" fill="#e8b48c" stroke="#161412" stroke-width="3.5"/>
+                      <path d="M135 94 C130 62 146 44 170 44 C196 44 210 62 205 94 C200 80 194 72 186 68 C178 76 164 80 150 78 C156 74 158 70 158 66 C150 74 142 82 139 94 Z" fill="#1a1719" stroke="#161412" stroke-width="3.5" stroke-linejoin="round"/>
+                      <path d="M147 81 q9 -5 18 -1 M175 80 q9 -4 18 1" fill="none" stroke="#161412" stroke-width="3" stroke-linecap="round"/>
+                      <g class="hc-eyes">
+                        <circle class="hc-pupil" cx="156" cy="96" r="3.6" fill="#161412"/>
+                        <circle class="hc-pupil" cx="184" cy="96" r="3.6" fill="#161412"/>
+                      </g>
+                      <circle cx="156" cy="95" r="11" fill="rgba(255,255,255,.18)" stroke="#161412" stroke-width="2.8"/>
+                      <circle cx="184" cy="95" r="11" fill="rgba(255,255,255,.18)" stroke="#161412" stroke-width="2.8"/>
+                      <path d="M167 94 q3 -3 6 0" fill="none" stroke="#161412" stroke-width="2.6"/>
+                      <ellipse cx="146" cy="109" rx="6" ry="3.5" fill="#ec8b78" opacity=".6"/>
+                      <ellipse cx="194" cy="109" rx="6" ry="3.5" fill="#ec8b78" opacity=".6"/>
+                      <path d="M162 113 q8 7 16 0" fill="none" stroke="#161412" stroke-width="3" stroke-linecap="round"/>
+                      <path d="M136 96 C132 52 150 38 170 38 C190 38 208 52 204 96" fill="none" stroke="#161412" stroke-width="13" stroke-linecap="round"/>
+                      <path d="M136 96 C132 52 150 38 170 38 C190 38 208 52 204 96" fill="none" stroke="#ffd23f" stroke-width="7" stroke-linecap="round"/>
+                      <rect x="123" y="80" width="17" height="32" rx="8" fill="#ffd23f" stroke="#161412" stroke-width="3"/>
+                      <rect x="200" y="80" width="17" height="32" rx="8" fill="#ffd23f" stroke="#161412" stroke-width="3"/>
+                    </g>
+                    <!-- arms reaching round the laptop -->
+                    <path d="M142 142 Q118 172 130 222 M200 142 Q224 172 212 222" fill="none" stroke="#161412" stroke-width="20" stroke-linecap="round"/>
+                    <path d="M142 142 Q118 172 130 222 M200 142 Q224 172 212 222" fill="none" stroke="#1d1b24" stroke-width="14" stroke-linecap="round"/>
+                    <!-- laptop: we see the back of the lid -->
+                    <rect x="122" y="166" width="100" height="68" rx="7" fill="#d9d4c7" stroke="#161412" stroke-width="3.5"/>
+                    <circle cx="172" cy="200" r="11" fill="#ff5a36" stroke="#161412" stroke-width="2.5"/>
+                    <path d="M172 191.5 l2.6 5.8 6.2 .6 -4.7 4.1 1.4 6 -5.5 -3.2 -5.5 3.2 1.4 -6 -4.7 -4.1 6.2 -.6z" fill="#fbf7ee"/>
+                    <rect x="131" y="175" width="24" height="10" rx="2" fill="#2f54eb"/>
+                    <path d="M136 177.5 q-2 2.5 0 5 M150 177.5 q2 2.5 0 5" fill="none" stroke="#fbf7ee" stroke-width="1.6" stroke-linecap="round"/>
+                    <circle class="hc-hand l" cx="131" cy="226" r="8" fill="#e8b48c" stroke="#161412" stroke-width="3"/>
+                    <circle class="hc-hand r" cx="212" cy="226" r="8" fill="#e8b48c" stroke="#161412" stroke-width="3"/>
+                    <!-- what comes out of the laptop -->
+                    <g font-family="IBM Plex Mono, monospace" font-size="14" font-weight="600" fill="#2f54eb">
+                      <text class="hc-glyph g1" x="226" y="168">&lt;/&gt;</text>
+                      <text class="hc-glyph g2" x="232" y="190">200</text>
+                      <text class="hc-glyph g3" x="214" y="150">{ }</text>
+                    </g>
+                  </svg>
+                </span>
+              </h1>
+              <div class="poster-foot">
+                <p class="poster-lede" data-i18n="p_lede">I build the part of an app you only notice when it breaks, and I'd like you to keep not noticing it.</p>
+                <dl class="billing">
+                  <div><dt data-i18n="p_with">Supporting acts</dt><dd>Go · Laravel · Redis</dd></div>
+                  <div><dt data-i18n="p_now">Currently playing</dt><dd>Meda Technology</dd></div>
+                  <div><dt data-i18n="p_doors">Doors</dt><dd data-i18n="p_doors_v">Open for new work</dd></div>
+                </dl>
+              </div>
+            </div>
+          </div>
+          <div class="poster-marquee" aria-hidden="true">
+            <div class="pm-track">
+              <span>Backend Engineer ✺ Go ✺ Redis ✺ Laravel ✺ PostgreSQL ✺ Payment Gateways ✺ Clean Architecture ✺ Sidoarjo, ID ✺&nbsp;</span>
+              <span>Backend Engineer ✺ Go ✺ Redis ✺ Laravel ✺ PostgreSQL ✺ Payment Gateways ✺ Clean Architecture ✺ Sidoarjo, ID ✺&nbsp;</span>
+            </div>
+          </div>
+        </div>
+
+        <div class="ticket1" id="ticket1" aria-hidden="true">
+          <div class="t1-main">
+            <span class="admit">Admit one</span>
+            <b data-i18n="tk1_what">Ananda Bintang, live from Sidoarjo</b>
+            <small data-i18n="tk1_info">Doors 18:30 · Show 19:00 · Entry free</small>
+          </div>
+          <div class="t1-stub" id="stub1">
+            <span class="barcode" data-barcode></span>
+            <small data-i18n="tk1_tear">keep scrolling to tear</small>
+          </div>
+        </div>
+
+        <p class="cue" data-i18n="cue">Scroll to walk in</p>
+      </div>
+    </section>
+
+    <!-- ================= SCENE 2 · SOUNDCHECK ================= -->
+    <section class="scene s2" id="soundcheck" data-time="19:00" data-name="sc2" data-tone="dark" style="--len:470">
+      <div class="stage">
+        <div class="spot" aria-hidden="true"></div>
+        <div class="mic-wrap" aria-hidden="true">
+          <svg class="mic" viewBox="0 0 120 420">
+            <ellipse cx="60" cy="412" rx="46" ry="8" fill="#000" opacity=".5"/>
+            <path d="M60 140 V404 M24 408 L60 380 L96 408" stroke="#efe7d6" stroke-width="6" fill="none" stroke-linecap="round" stroke-linejoin="round"/>
+            <path d="M60 140 L60 120" stroke="#efe7d6" stroke-width="10" stroke-linecap="round"/>
+            <rect x="38" y="30" width="44" height="96" rx="22" fill="#2a2724" stroke="#efe7d6" stroke-width="5"/>
+            <path d="M42 52 H78 M42 64 H78 M42 76 H78" stroke="#efe7d6" stroke-width="2" opacity=".5"/>
+            <rect x="36" y="88" width="48" height="10" fill="#ff5a36"/>
+          </svg>
+          <div class="wave" id="wave"></div>
+        </div>
+
+        <div class="s2-copy">
+          <p class="kicker" data-kicker></p>
+          <h2 class="check"><span data-i18n="ck1">Check,</span> <span data-i18n="ck2">one,</span> <span data-i18n="ck3">two.</span></h2>
+          <p class="said"><span class="line" data-i18n="sl1">Hi, I'm Bintang. I write backend code, these days mostly in <mark>Go</mark>, with a long run in Laravel and Node.js behind it.</span> <span class="line" data-i18n="sl2">Right now I'm a backend engineer intern at Meda Technology, building <mark>Meda Billing and Waras</mark>: school billing for Indonesian foundations, and a health app where your first consult is with an AI.</span> <span class="line" data-i18n="sl3">Before that I spent over a year at Weekend Inc. on Sampoerna's AYO platforms, after freelancing and mentoring at GDSC; I've been shipping code to real people since 2022.</span></p>
+          <p class="scribble small" data-i18n="sc_star">"Bintang" means star in Bahasa Indonesia. I try not to make it weird.</p>
+        </div>
+
+        <div class="leds">
+          <div class="led"><b data-to="2022" data-from="2000">2022</b><span data-i18n="st1">my first internship: a geofenced attendance system</span></div>
+          <div class="led"><b data-to="1000" data-suffix="+">1,000+</b><span data-i18n="st2">users on a game top-up store I built as a freelancer</span></div>
+          <div class="led"><b data-to="50" data-suffix="+">50+</b><span data-i18n="st3">students I mentored at Google Developer Student Club</span></div>
+          <div class="led"><b>0</b><span data-i18n="st4">N+1 queries I've knowingly left in production</span></div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SCENE 3 · LINEUP ================= -->
+    <section class="scene s3" id="lineup" data-time="19:30" data-name="sc3" data-tone="light" style="--len:400">
+      <div class="stage">
+        <div class="bulbs top" aria-hidden="true"></div>
+        <div class="board">
+          <p class="kicker" data-kicker></p>
+          <h2 class="title" data-i18n="title_lu">Tonight's Lineup</h2>
+          <p class="scribble" data-i18n="lu_note">the tools I actually reach for</p>
+          <div class="tier">
+            <p class="tier-name" data-i18n="lu_t1">Headliners</p>
+            <ul class="acts xl">
+              <li data-note="my daily driver at Meda">Go</li>
+              <li data-note="home base since my freelance days">Laravel</li>
+              <li data-note="where I go hunting for slow queries">PostgreSQL</li>
+            </ul>
+          </div>
+          <div class="tier">
+            <p class="tier-name" data-i18n="lu_t2">Main stage</p>
+            <ul class="acts lg"><li data-note="sessions, cache and the job queue">Redis</li><li data-note="when the service wants to be JavaScript">Node.js</li><li>Echo</li><li>Express.js</li><li>MySQL</li><li data-note="works on my machine, and on yours">Docker</li><li>REST API</li></ul>
+          </div>
+          <div class="tier">
+            <p class="tier-name" data-i18n="lu_t3">Side stage</p>
+            <ul class="acts md"><li data-note="two gateways, one migration">Xendit &amp; DOKU</li><li>PHP 8</li><li>Microservices</li><li>AWS EC2 &amp; S3</li><li>Jenkins</li><li>TypeScript</li><li>CodeIgniter</li><li>Git</li><li data-note="the commit police">Husky + Commitlint</li><li>Clean Architecture</li></ul>
+          </div>
+        </div>
+        <div class="bulbs bottom" aria-hidden="true"></div>
+      </div>
+    </section>
+
+    <!-- ================= SCENE 4 · ON THE ROAD ================= -->
+    <section class="scene s4" id="tour" data-time="20:00" data-name="sc4" data-tone="light" style="--len:690">
+      <div class="stage">
+        <div class="sky" aria-hidden="true"><span class="sun2"></span><span class="cloud c1"></span><span class="cloud c2"></span></div>
+        <svg class="hills far" viewBox="0 0 2880 300" preserveAspectRatio="none" aria-hidden="true"><path d="M0 300 V170 C240 90 420 160 640 120 S1060 60 1300 130 S1760 70 2000 140 S2500 80 2880 150 V300Z"/></svg>
+        <svg class="hills near" viewBox="0 0 2880 300" preserveAspectRatio="none" aria-hidden="true"><path d="M0 300 V210 C200 170 380 220 600 190 S1000 150 1260 200 S1700 160 1960 210 S2440 170 2880 200 V300Z"/></svg>
+
+        <div class="s4-head">
+          <p class="kicker" data-kicker></p>
+          <h2 class="title" data-i18n="title_tour">Tour Dates</h2>
+          <p class="sub" data-i18n="tour_sub">Every stop so far, oldest first. Keep scrolling and the van keeps driving.</p>
+        </div>
+
+        <div class="road" aria-hidden="true"><span class="dash" id="dash"></span></div>
+
+        <ol class="route" id="route">
+          <li class="stop">
+            <div class="card">
+              <p class="when">Sep – Dec 2022 · Indonesia</p>
+              <h3 data-i18n="r4">Full Stack Intern</h3>
+              <p class="co">CV. Purnama Kreatifa</p>
+              <p data-i18n="t5a">A location-based attendance system with geofencing. My first project with real users on the other end.</p>
+              <span class="stamp-s first" data-i18n="s_first">First gig</span>
+            </div>
+            <span class="post" aria-hidden="true"></span>
+          </li>
+          <li class="stop">
+            <div class="card">
+              <p class="when">Mar – Oct 2023 · Surabaya</p>
+              <h3 data-i18n="r4">Full Stack Intern</h3>
+              <p class="co">Roleplay Studio</p>
+              <p data-i18n="t4a">Company profile sites and web apps, sitting with designers and project managers and turning Figma files into pages that work.</p>
+              <span class="stamp-s" data-i18n="s_played">Played</span>
+            </div>
+            <span class="post" aria-hidden="true"></span>
+          </li>
+          <li class="stop">
+            <div class="card">
+              <p class="when">Oct 2023 – Jul 2025 · Remote</p>
+              <h3 data-i18n="r2">Web Developer</h3>
+              <p class="co">Freelance</p>
+              <p data-i18n="t2b">A game top-up store that grew past 1,000 users, with payment webhooks that check for duplicates before they touch an order.</p>
+              <span class="stamp-s" data-i18n="s_played">Played</span>
+            </div>
+            <span class="post" aria-hidden="true"></span>
+          </li>
+          <li class="stop">
+            <div class="card">
+              <p class="when">Nov 2023 – Sep 2024 · Telkom University</p>
+              <h3 data-i18n="r3">Assistant Mentor</h3>
+              <p class="co">Google Developer Student Club</p>
+              <p data-i18n="t3a">Mentored 50+ students in web development, mostly through workshops where everyone leaves with something they built.</p>
+              <span class="stamp-s" data-i18n="s_played">Played</span>
+            </div>
+            <span class="post" aria-hidden="true"></span>
+          </li>
+          <li class="stop">
+            <div class="card">
+              <p class="when">Jul 2025 – Sep 2026 · Jakarta, hybrid</p>
+              <h3 data-i18n="r1">Backend Engineer</h3>
+              <p class="co">Weekend Inc. · PT HM Sampoerna</p>
+              <p data-i18n="t1x">Staff, coach and order modules for AYO Kasir and AYO Qoncierge as Laravel microservices, plus a lot of N+1 hunting and linting pipelines that kept everyone honest.</p>
+              <span class="stamp-s" data-i18n="s_played">Played</span>
+            </div>
+            <span class="post" aria-hidden="true"></span>
+          </li>
+          <li class="stop now">
+            <div class="card">
+              <p class="when">Oct 2026 – <span data-i18n="now">now</span></p>
+              <h3 data-i18n="r5">Backend Engineer Intern</h3>
+              <p class="co">Meda Technology</p>
+              <p data-i18n="t6">Go services for Meda Billing and Waras on Echo, PostgreSQL and Redis. I wired up Xendit for payments, then moved the whole flow to DOKU myself, and had a say in the stack and architecture of both apps.</p>
+              <span class="stamp-s live" data-i18n="s_live">On tour</span>
+            </div>
+            <span class="post" aria-hidden="true"></span>
+          </li>
+          <li class="stop next">
+            <div class="sign"><span data-i18n="next">Next stop:</span><b data-i18n="next_v">your team?</b></div>
+            <span class="post" aria-hidden="true"></span>
+          </li>
+        </ol>
+
+        <svg class="van" id="van" viewBox="0 0 220 120" aria-hidden="true">
+          <g class="van-body">
+            <path d="M10 92 V40 Q10 24 26 24 H150 Q164 24 172 36 L200 70 Q208 78 208 90 V92 Z" fill="#ff5a36" stroke="#161412" stroke-width="4" stroke-linejoin="round"/>
+            <path d="M150 32 L176 64 H150 Z" fill="#bcd3ff" stroke="#161412" stroke-width="3" stroke-linejoin="round"/>
+            <rect x="24" y="36" width="44" height="26" rx="4" fill="#bcd3ff" stroke="#161412" stroke-width="3"/>
+            <rect x="76" y="36" width="44" height="26" rx="4" fill="#bcd3ff" stroke="#161412" stroke-width="3"/>
+            <text x="30" y="83" font-family="Archivo, sans-serif" font-weight="900" font-size="14" fill="#161412">BINTANG TOUR</text>
+            <rect x="198" y="80" width="10" height="6" fill="#ffd23f" stroke="#161412" stroke-width="2"/>
+          </g>
+          <g class="wheel w1"><circle cx="52" cy="94" r="16" fill="#161412"/><circle cx="52" cy="94" r="6" fill="#efe7d6"/><path d="M52 80 V108 M38 94 H66" stroke="#efe7d6" stroke-width="2"/></g>
+          <g class="wheel w2"><circle cx="166" cy="94" r="16" fill="#161412"/><circle cx="166" cy="94" r="6" fill="#efe7d6"/><path d="M166 80 V108 M152 94 H180" stroke="#efe7d6" stroke-width="2"/></g>
+        </svg>
+      </div>
+    </section>
+
+    <!-- ================= SCENE 5 · PHOTO PIT ================= -->
+    <section class="scene s5" id="releases" data-time="21:00" data-name="sc5" data-tone="dark" style="--len:420">
+      <div class="stage">
+        <div class="stripes" aria-hidden="true"><i></i><i></i><i></i><i></i><i></i><i></i></div>
+        <div class="s5-inner">
+          <div class="s5-side">
+            <p class="kicker" data-kicker></p>
+            <h2 class="title" data-i18n="title_rel">Contact Sheet</h2>
+            <p class="sub" data-i18n="rel_sub">The photographer's sheet from tonight. Every frame is something I shipped; click one for the full print, screenshots and a link to the live thing.</p>
+            <div class="filters" role="group" aria-label="Filter projects">
+              <button class="chip on" data-filter="all" aria-pressed="true"><span data-i18n="f_all">All</span><b></b></button>
+              <button class="chip" data-filter="work" aria-pressed="false"><span data-i18n="f_work">Client work</span><b></b></button>
+              <button class="chip" data-filter="freelance" aria-pressed="false"><span data-i18n="f_free">Freelance</span><b></b></button>
+              <button class="chip" data-filter="personal" aria-pressed="false"><span data-i18n="f_personal">Personal</span><b></b></button>
+            </div>
+            <p class="more"><span data-i18n="more">More B-sides on</span> <a href="https://github.com/AnandaBintang" target="_blank" rel="noopener">GitHub ↗</a></p>
+          </div>
+          <div class="sheet-view">
+            <div class="sheet" id="sheet">
+              <p class="sheet-label">Contact sheet · Roll 01 · Bintang 400</p>
+              <div class="frames" id="frames"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SCENE 6 · BACKSTAGE ================= -->
+    <section class="scene s6" id="rider" data-time="22:30" data-name="sc6" data-tone="dark" style="--len:460">
+      <div class="stage">
+        <div class="s6-grid">
+          <!-- backstage pass on a lanyard; drag it to swing -->
+          <div class="pass-wrap">
+            <div class="pass-drop">
+              <div class="pass-swing" id="passSwing">
+                <span class="lanyard" aria-hidden="true"><i></i><i></i></span>
+                <span class="clip" aria-hidden="true"></span>
+                <div class="pass" id="pass" role="img" aria-label="Backstage pass for Ananda Bintang, Backend Engineer">
+                  <span class="pass-hole" aria-hidden="true"></span>
+                  <div class="pass-band"><b>Backstage</b><span>All access</span></div>
+                  <div class="pass-photo">
+                    <img class="riso-a" src="assets/img/ananda-bintang.png" alt="" />
+                    <img class="riso-b" src="assets/img/ananda-bintang.png" alt="" aria-hidden="true" />
+                  </div>
+                  <p class="pass-name">Ananda<br />Bintang</p>
+                  <p class="pass-role">Backend Engineer · Sidoarjo</p>
+                  <dl class="pass-meta">
+                    <div><dt>Crew</dt><dd>No. 001</dd></div>
+                    <div><dt>Valid</dt><dd>22:30 – late</dd></div>
+                  </dl>
+                  <div class="pass-foot"><span class="barcode" data-barcode aria-hidden="true"></span><span class="pass-sig">Bintang</span></div>
+                </div>
+              </div>
+            </div>
+            <p class="scribble pass-hint" data-i18n="pass_hint">go on, give it a swing ↙</p>
+          </div>
+
+          <div class="s6-right">
+            <p class="kicker" data-kicker></p>
+            <h2 class="title" data-i18n="title_rider">The Rider</h2>
+            <p class="sub" data-i18n="rider_sub">Every act sends one to the venue before the show. This one's about the person more than the code.</p>
+
+            <div class="deck" id="deck" tabindex="0" role="group" aria-label="Rider cards" aria-roledescription="card deck">
+              <article class="rcard" style="--bg:#fbf7ee">
+                <div class="rc-inner">
+                  <div class="rc-top"><span>No. 01</span><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M10 40 V32 a22 22 0 0 1 44 0 V40" fill="none" stroke="currentColor" stroke-width="5"/><rect x="6" y="36" width="14" height="20" rx="6" fill="#ffd23f" stroke="currentColor" stroke-width="3"/><rect x="44" y="36" width="14" height="20" rx="6" fill="#ffd23f" stroke="currentColor" stroke-width="3"/></svg></div>
+                  <h3 data-i18n="ri1h">Headphones within reach.</h3>
+                  <p data-i18n="ri1">Music runs under most of my day, and I think better with something playing, especially when I'm debugging.</p>
+                  <span class="rc-stamp" aria-hidden="true">OK</span>
+                </div>
+              </article>
+              <article class="rcard" style="--bg:#ffd23f">
+                <div class="rc-inner">
+                  <div class="rc-top"><span>No. 02</span><svg viewBox="0 0 64 64" aria-hidden="true"><circle cx="32" cy="32" r="24" fill="#fbf7ee" stroke="currentColor" stroke-width="4"/><path d="M32 20 l11 8 -4 13 h-14 l-4 -13z" fill="currentColor"/></svg></div>
+                  <h3 data-i18n="ri2h">Time for sport.</h3>
+                  <p data-i18n="ri2">Whatever game the group is playing that week, count me in. Not picky, just competitive.</p>
+                  <span class="rc-stamp" aria-hidden="true">OK</span>
+                </div>
+              </article>
+              <article class="rcard" style="--bg:#ff8fb1">
+                <div class="rc-inner">
+                  <div class="rc-top"><span>No. 03</span><svg viewBox="0 0 64 64" aria-hidden="true"><path d="M8 14 h36 a6 6 0 0 1 6 6 v16 a6 6 0 0 1 -6 6 h-20 l-10 9 v-9 h-6 a6 6 0 0 1 -6 -6 v-16 a6 6 0 0 1 6 -6z" fill="#fbf7ee" stroke="currentColor" stroke-width="3.5" stroke-linejoin="round"/><circle cx="18" cy="28" r="3" fill="currentColor"/><circle cx="28" cy="28" r="3" fill="currentColor"/><circle cx="38" cy="28" r="3" fill="currentColor"/></svg></div>
+                  <h3 data-i18n="ri3h">People nearby.</h3>
+                  <p data-i18n="ri3">I'm easy to talk to and I settle into a new team fast, so seat me near the PM and the frontend folks rather than in a corner.</p>
+                  <span class="rc-stamp" aria-hidden="true">OK</span>
+                </div>
+              </article>
+              <article class="rcard" style="--bg:#9fd9b9">
+                <div class="rc-inner">
+                  <div class="rc-top"><span>No. 04</span><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="14" y="10" width="36" height="46" rx="4" fill="#fbf7ee" stroke="currentColor" stroke-width="3.5"/><rect x="24" y="6" width="16" height="9" rx="2" fill="currentColor"/><path d="M22 28 h20 M22 36 h20 M22 44 h12" stroke="currentColor" stroke-width="3" stroke-linecap="round"/></svg></div>
+                  <h3 data-i18n="ri4h">A clear ticket.</h3>
+                  <p data-i18n="ri4">Or ten minutes with whoever wrote it. Either works.</p>
+                  <span class="rc-stamp" aria-hidden="true">OK</span>
+                </div>
+              </article>
+              <article class="rcard" style="--bg:#a9b8ff">
+                <div class="rc-inner">
+                  <div class="rc-top"><span>No. 05</span><svg viewBox="0 0 64 64" aria-hidden="true"><rect x="6" y="12" width="52" height="40" rx="5" fill="#161412"/><path d="M14 24 l8 6 -8 6 M26 38 h14" fill="none" stroke="#fbf7ee" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+                  <h3 data-i18n="ri5h">Honest logs.</h3>
+                  <p data-i18n="ri5">I'll write them; I'd like to read them too.</p>
+                  <span class="rc-stamp" aria-hidden="true">OK</span>
+                </div>
+              </article>
+            </div>
+            <div class="deck-nav">
+              <span data-i18n="deck_hint">Tap the deck to flip through</span>
+              <div class="deck-dots" id="deckDots"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ================= SCENE 7 · ENCORE ================= -->
+    <section class="scene s7" id="tickets" data-time="23:45" data-name="sc7" data-tone="dark" style="--len:320">
+      <div class="stage">
+        <div class="beams" aria-hidden="true"><i></i><i></i><i></i></div>
+        <div class="lights" id="lights" aria-hidden="true"></div>
+        <svg class="crowd" viewBox="0 0 1440 160" preserveAspectRatio="none" aria-hidden="true"><path id="crowdPath"/></svg>
+
+        <div class="s7-inner">
+          <p class="kicker" data-kicker></p>
+          <h2 class="encore" data-i18n="tk_title">Let's talk.</h2>
+          <p class="sub" data-i18n="tk_sub">Got a backend that needs a steady pair of hands, or a team with one empty chair? Grab a ticket.</p>
+
+          <div class="ticket" id="ticket">
+            <div class="ticket-main">
+              <span class="admit">Admit one</span>
+              <p class="ticket-what" data-i18n="tk_what">A conversation with Ananda Bintang</p>
+              <dl class="ticket-info">
+                <div><dt data-i18n="tk_venue">Venue</dt><dd data-i18n="tk_venue_v">Email, WhatsApp or a call</dd></div>
+                <div><dt data-i18n="tk_date">Date</dt><dd data-i18n="tk_date_v">You pick</dd></div>
+                <div><dt data-i18n="tk_price">Price</dt><dd data-i18n="tk_price_v">A good problem</dd></div>
+              </dl>
+              <p class="ticket-email">anandabintang4@gmail.com</p>
+            </div>
+            <button class="stub" id="stub" data-email="anandabintang4@gmail.com">
+              <span class="barcode" data-barcode aria-hidden="true"></span>
+              <span class="tear" data-i18n="tk_tear">Tear here to copy my email</span>
+            </button>
+          </div>
+          <p class="copied" id="copied" aria-live="polite"></p>
+
+          <ul class="contact-links">
+            <li><a href="mailto:anandabintang4@gmail.com">Email</a></li>
+            <li><a href="https://wa.me/6285330632334" target="_blank" rel="noopener">WhatsApp</a></li>
+            <li><a href="https://www.linkedin.com/in/ananda-bintang-7a7400229/" target="_blank" rel="noopener">LinkedIn</a></li>
+            <li><a href="https://github.com/AnandaBintang" target="_blank" rel="noopener">GitHub</a></li>
+            <li><a href="https://instagram.com/bn.tang" target="_blank" rel="noopener">Instagram</a></li>
+            <li><a href="Ananda_Bintang_Saputra_CV.pdf" download data-i18n="cv">Download CV</a></li>
+          </ul>
+        </div>
+      </div>
+    </section>
+  </main>
+
+  <footer class="footer">
+    <p class="footer-big" data-i18n="ft_big">See you at the next show</p>
+    <div class="footer-row">
+      <span>© 2026 Ananda Bintang Saputra</span>
+      <span id="clock">Sidoarjo · --:-- WIB</span>
+      <span class="credit">Music: “<a href="https://incompetech.com" target="_blank" rel="noopener">Chill Wave</a>” by Kevin MacLeod (incompetech.com), licensed under <a href="https://creativecommons.org/licenses/by/4.0/" target="_blank" rel="noopener">CC BY 4.0</a></span>
+      <a href="#doors" data-jump="doors" data-i18n="ft_top">Rewind to doors ↺</a>
+    </div>
+  </footer>
+
+  <!-- Project print (modal) -->
+  <dialog class="print" id="print" aria-labelledby="printTitle" data-lenis-prevent>
+    <div class="print-head">
+      <div>
+        <p class="print-meta" id="printMeta"></p>
+        <h3 id="printTitle"></h3>
+        <p class="print-role" id="printRole"></p>
+      </div>
+      <button class="print-close" id="printClose" aria-label="Close">×</button>
+    </div>
+    <div class="print-body">
+      <div class="gallery">
+        <figure class="gallery-main" id="galleryMain"></figure>
+        <div class="thumbs" id="thumbs"></div>
+      </div>
+      <div class="print-text">
+        <h4 data-i18n="m_about">About the project</h4>
+        <p id="printAbout"></p>
+        <h4 data-i18n="m_did">What I did</h4>
+        <ul id="printDid"></ul>
+        <h4 data-i18n="m_stack">Stack</h4>
+        <ul class="chips" id="printStack"></ul>
+        <div class="print-links" id="printLinks"></div>
+      </div>
+    </div>
+    <div class="print-nav">
+      <button id="printPrev">← <span data-i18n="m_prev">Previous</span></button>
+      <span id="printCount"></span>
+      <button id="printNext"><span data-i18n="m_next">Next</span> →</button>
+    </div>
+  </dialog>
+
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+  <script src="assets/js/projects.js?v=2026-11-02"></script>
+  <script src="assets/js/main.js?v=2026-11-02"></script>
+</body>
 </html>

@@ -1,32 +1,32 @@
-# React + TypeScript + Vite
+# Ananda Bintang · One Night Only
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+Portfolio of Ananda Bintang Saputra, backend engineer from Sidoarjo. The site tells one night at a show in seven scenes: doors open, soundcheck, lineup, the road (experience), the photo pit (projects), backstage and the encore.
 
-Currently, two official plugins are available:
+Live: https://ananda-bintang.netlify.app
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Stack
 
-## React Compiler
+Plain HTML, CSS and JavaScript. No build step.
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+- [GSAP](https://gsap.com) + ScrollTrigger for the scroll-driven scenes
+- [Lenis](https://lenis.darkroom.engineering) for smooth scrolling
+- Fonts: Archivo, IBM Plex Mono and Caveat from Google Fonts
 
-## Expanding the Oxlint configuration
+## Run locally
 
-If you are developing a production application, we recommend enabling type-aware lint rules by installing `oxlint-tsgolint` and editing `.oxlintrc.json`:
-
-```json
-{
-  "$schema": "./node_modules/oxlint/configuration_schema.json",
-  "plugins": ["react", "typescript", "oxc"],
-  "options": {
-    "typeAware": true
-  },
-  "rules": {
-    "react/rules-of-hooks": "error",
-    "react/only-export-components": ["warn", { "allowConstantExport": true }]
-  }
-}
+```bash
+python3 -m http.server 5173
 ```
 
-See the [Oxlint rules documentation](https://oxc.rs/docs/guide/usage/linter/rules) for the full list of rules and categories.
+Then open http://localhost:5173.
+
+## Editing content
+
+- **Projects** live in `assets/js/projects.js`. Copy a block, fill in the English (`en`) and Indonesian (`id_`) copy, drop screenshots in `assets/img/projects/` and list them in `images`. Frames, filters and the project modal build themselves.
+- **Other copy** is in `index.html` (English) and the `ID` dictionary at the top of `assets/js/main.js` (Indonesian).
+- **CV**: `Ananda_Bintang_Saputra_CV.pdf`, printed from https://github.com/AnandaBintang/curriculum-vitae.
+- After changing CSS or JS, bump the `?v=` value on their links in `index.html` so browsers fetch the new files.
+
+## Credits
+
+Music: "Chill Wave" by Kevin MacLeod (incompetech.com), licensed under [Creative Commons: By Attribution 4.0](https://creativecommons.org/licenses/by/4.0/).
