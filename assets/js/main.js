@@ -1,7 +1,7 @@
 /* ==========================================================
    Ananda Bintang — "One Night Only" story portfolio
    ========================================================== */
-(() => {
+(async () => {
   const $ = (s, el = document) => el.querySelector(s);
   const $$ = (s, el = document) => [...el.querySelectorAll(s)];
   const rand = (a, b) => a + Math.random() * (b - a);
@@ -13,6 +13,54 @@
     set(k, v) { try { localStorage.setItem(k, v); } catch { /* private mode */ } },
   };
   const scenes = $$(".scene");
+
+  /* ---------------- content (edited through the CMS at /admin) ---------------- */
+  const loadJSON = (url) => fetch(url, { cache: "no-cache" }).then((r) => (r.ok ? r.json() : null)).catch(() => null);
+  const [projectData, careerData] = await Promise.all([loadJSON("content/projects.json"), loadJSON("content/experience.json")]);
+  const CAREER = ((careerData && careerData.experience) || []).slice().sort((a, b) => (a.start || "").localeCompare(b.start || ""));
+  const MONTHS = {
+    en: ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"],
+    id: ["Jan", "Feb", "Mar", "Apr", "Mei", "Jun", "Jul", "Agu", "Sep", "Okt", "Nov", "Des"],
+  };
+  const TOUR_UI = {
+    en: { now: "now", live: "On tour", played: "Played", first: "First gig", at: "at" },
+    id: { now: "sekarang", live: "Sedang tur", played: "Selesai", first: "Gig pertama", at: "di" },
+  };
+  // "2023-03" + "2023-10" → "Mar – Oct 2023"; no end date → "Oct 2026 – now".
+  const span = (job, l) => {
+    const m = (v) => { const [y, mo] = (v || "").split("-"); return { y, mo: MONTHS[l][(+mo || 1) - 1] }; };
+    const a = m(job.start);
+    if (!job.end) return `${a.mo} ${a.y} – ${TOUR_UI[l].now}`;
+    const b = m(job.end);
+    return a.y === b.y ? `${a.mo} – ${b.mo} ${a.y}` : `${a.mo} ${a.y} – ${b.mo} ${b.y}`;
+  };
+  // One stop per job, oldest first, in front of the "Next stop" sign.
+  const tourStops = CAREER.map((job) => {
+    const li = document.createElement("li");
+    li.className = `stop${job.end ? "" : " now"}`;
+    li.innerHTML = '<div class="card"><p class="when"></p><h3></h3><p class="co"></p><p class="desc"></p><span class="stamp-s"></span></div><span class="post" aria-hidden="true"></span>';
+    $("#route").insertBefore(li, $("#route .stop.next"));
+    return li;
+  });
+  function fillCareer(l) {
+    CAREER.forEach((job, i) => {
+      const li = tourStops[i];
+      $(".when", li).textContent = [span(job, l), job.place].filter(Boolean).join(" · ");
+      $("h3", li).textContent = l === "id" ? job.role_id || job.role_en : job.role_en;
+      $(".co", li).textContent = [job.company, job.client].filter(Boolean).join(" · ");
+      $(".desc", li).textContent = l === "id" ? job.summary_id || job.summary_en : job.summary_en;
+      const st = $(".stamp-s", li), kind = !job.end ? "live" : i === 0 ? "first" : "played";
+      st.className = `stamp-s ${kind === "played" ? "" : kind}`;
+      st.textContent = TOUR_UI[l][kind];
+    });
+    // The hero says where you're playing right now.
+    const now = CAREER.filter((j) => !j.end).pop();
+    if (now) {
+      $("#nowRole").textContent = now.role_en;
+      $("#nowAt").textContent = `${TOUR_UI[l].at} ${now.company}`;
+      $("#nowCompany").textContent = now.company;
+    }
+  }
 
   /* ---------------- fluid layer: smooth scroll + scroll locks ---------------- */
   const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -127,6 +175,7 @@
     $$("[data-note]").forEach((el) => (el.dataset.note = l === "id" ? NOTES_ID[el.dataset.noteEn] || el.dataset.noteEn : el.dataset.noteEn));
     $$(".lang button").forEach((b) => b.setAttribute("aria-pressed", String(b.dataset.lang === l)));
     renderSheetText();
+    fillCareer(l);
     if (print.open) fillPrint(curProj);
     scenes.forEach((s) => { const k = $("[data-kicker]", s); if (k) k.innerHTML = `<b>${s.dataset.time}</b>${sceneName(s)}`; });
     buildMenu();
@@ -222,7 +271,7 @@
 
   /* ---------------- interactions ---------------- */
   /* ---------------- contact sheet (projects) ---------------- */
-  const PROJECTS = window.PROJECTS || [];
+  const PROJECTS = (projectData && projectData.projects) || [];
   const TYPE = {
     en: { work: "Client work", freelance: "Freelance", personal: "Personal" },
     id: { work: "Kerja klien", freelance: "Freelance", personal: "Pribadi" },
@@ -666,7 +715,7 @@
     const seen = session.get("seen");
     session.set("seen", "1");
     const words = BEATS[lang], looks = LOOKS, n = words.length;
-    const BEAT = seen ? 190 : 300;
+    const BEAT = seen ? 300 : 460;
 
     const fitWord = (look) => {
       word.style.fontVariationSettings = `"wdth" ${look.wd}`;
@@ -686,7 +735,7 @@
       fitWord(look);
       word.animate(
         [{ transform: "translateY(-50%) scale(1.22) skewX(-8deg)", opacity: 0 }, { transform: "translateY(-50%) scale(1) skewX(0deg)", opacity: 1 }],
-        { duration: 240, easing: "cubic-bezier(.2,.9,.2,1)" },
+        { duration: 320, easing: "cubic-bezier(.2,.9,.2,1)" },
       );
     };
 
@@ -726,9 +775,9 @@
       const strips = $$(".intro-slices i", stage);
       gsap.timeline({ onComplete: () => stage.classList.add("gone") })
         .to([word, enter, ...$$(".intro-c", stage)], { opacity: 0, duration: .2, ease: "power1.in" }, 0)
-        .to(strips, { xPercent: (i) => (i % 2 ? 101 : -101), duration: .8, ease: "power4.inOut", stagger: .05 }, .1)
-        .to({ p: 0 }, { p: 1, duration: 1, ease: "power2.inOut", onUpdate() { paint(this.targets()[0].p); } }, .45)
-        .call(reveal, null, 1.35);
+        .to(strips, { xPercent: (i) => (i % 2 ? 101 : -101), duration: 1.1, ease: "power4.inOut", stagger: .07 }, .15)
+        .to({ p: 0 }, { p: 1, duration: 1.3, ease: "power2.inOut", onUpdate() { paint(this.targets()[0].p); } }, .6)
+        .call(reveal, null, 1.85);
     };
     const tick = (now) => {
       const dt = Math.min(500, now - last);

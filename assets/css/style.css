@@ -575,7 +575,7 @@ html.lenis, html.lenis body { height: auto; }
 @keyframes intro-failsafe { to { visibility: hidden; pointer-events: none; } }
 html:not(.js) .intro, .rm .intro, .intro.gone { display: none; }
 .intro-slices { position: absolute; inset: 0; display: flex; flex-direction: column; }
-.intro-slices i { flex: 1; margin-bottom: -1px; background: var(--bg); }
+.intro-slices i { flex: 1; margin-bottom: -1px; background: var(--bg); box-shadow: 0 0 0 1px var(--bg); }
 .intro-word { position: absolute; left: 0; right: 0; top: 50%; margin: 0; transform: translateY(-50%); text-align: center; font-weight: 900; text-transform: uppercase; line-height: .8; white-space: nowrap; color: var(--fg); }
 .intro-c { position: absolute; font-family: var(--f-mono); font-size: 11px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg); opacity: .85; font-variant-numeric: tabular-nums; }
 .intro-c.tl { top: 18px; left: 20px; } .intro-c.tr { top: 18px; right: 20px; }
@@ -612,6 +612,83 @@ html:not(.js) .intro, .rm .intro, .intro.gone { display: none; }
 
 /* setlist menu */
 
+/* ---------------- portrait screens (tablets and phones) ---------------- */
+@media (orientation: portrait) {
+  /* tall screens: centre the name in the free space instead of leaving a gap under it */
+  .poster-name { margin-block: auto; }
+}
+
+/* ---------------- tablets in portrait ---------------- */
+@media (min-width: 761px) and (max-width: 1180px) and (orientation: portrait) {
+  .s2-copy { left: var(--gutter); right: var(--gutter); top: 13vh; }
+  .mic-wrap, .spot { opacity: .3; }
+  .mic-wrap { left: -4%; }
+  .wave { display: none; }
+  .said { max-width: none; }
+  .leds { left: var(--gutter); }
+
+  .s5-inner { grid-template-columns: 1fr; grid-template-rows: auto minmax(0, 1fr); gap: 20px; padding-top: 80px; }
+  .s5-side { align-self: start; }
+  .s5-side .sub { max-width: 560px; }
+  .frames { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+
+  .s6-grid { grid-template-columns: minmax(0, 1fr) auto; grid-template-rows: auto auto auto 1fr auto auto; align-items: start; align-content: start; gap: 0 24px; padding: 80px var(--gutter) 60px; }
+  .s6-right { display: contents; }
+  .s6 .kicker { grid-column: 1; grid-row: 1; margin-top: 30px; }
+  .s6-right .title { grid-column: 1; grid-row: 2; }
+  .s6-right .sub { grid-column: 1; grid-row: 3; }
+  .pass-wrap { grid-column: 2; grid-row: 1 / 5; align-self: start; }
+  .pass-drop { margin-top: -80px; }
+  .pass-hint { display: none; }
+  .pass { width: 210px; }
+  .lanyard { height: 70px; }
+  .deck { grid-column: 1 / -1; grid-row: 5; width: 100%; max-width: 620px; height: 300px; }
+  .deck-nav { grid-column: 1 / -1; grid-row: 6; width: 100%; max-width: 620px; }
+}
+
+/* ---------------- phones held sideways: very little height ---------------- */
+@media (max-height: 500px) and (orientation: landscape) {
+  :root { --gutter: 16px; }
+  .hud-top { top: 6px; }
+  .logo, .setlist-btn, .hud-right { transform: scale(.85); transform-origin: left center; }
+  .hud-bottom { bottom: 6px; font-size: 10px; }
+  .poster { inset: 46px 10px 40px; }
+  .poster-row.top { padding: 6px 12px; font-size: 10px; }
+  .poster-foot { display: none; }
+  .pm-track { padding: 5px 0; font-size: 13px; }
+  .s2-copy { top: 54px; left: 30%; }
+  .check { font-size: 40px; }
+  .said { font-size: 13px; margin-top: 8px; }
+  .s2-copy .scribble, .wave { display: none; }
+  .leds { display: none; }
+  .title, .s3 .title, .s4-head .title, .s5-side .title, .s6-right .title { font-size: 40px; }
+  .acts.xl { font-size: 30px; } .acts.lg { font-size: 18px; } .acts.md { font-size: 12px; }
+  .tier { margin-top: 6px; }
+  .s4-head { top: 48px; } .s4-head .sub { display: none; }
+  .stop .card { padding: 10px 12px; }
+  .card h3 { font-size: 20px; } .card p:last-of-type { font-size: 12px; }
+  .s5-inner { padding: 52px 16px 40px; }
+  .s5-side .sub, .s5-side .more { display: none; }
+  .frames { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .s6-grid { padding: 48px 16px 40px; }
+  .pass { width: 120px; } .pass-meta, .pass-foot, .pass-hint, .s6-right .sub { display: none; }
+  .deck { height: 190px; margin-top: 8px; }
+  .rcard h3 { font-size: 22px; } .rcard p { font-size: 12.5px; }
+  .encore { font-size: 54px; }
+  .s7-inner .sub, .contact-links { display: none; }
+  .ticket { margin-top: 10px; }
+  .intro-word { top: 44%; }
+  .intro-enter { bottom: 10%; }
+}
+
 @media (prefers-reduced-motion: reduce) {
   *, *::before, *::after { animation-duration: .001ms !important; animation-iteration-count: 1 !important; transition-duration: .001ms !important; }
+}
+
+/* Small phones: the company already shows under "Currently playing", so the kicker keeps only the role
+   and stays clear of the character's head. */
+@media (max-width: 560px) {
+  .poster-kicker { font-size: 11px; }
+  .poster-kicker #nowAt { display: none; }
+  .char-bubble { font-size: 15px; }
 }

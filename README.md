@@ -22,7 +22,10 @@ Then open http://localhost:5173.
 
 ## Editing content
 
-- **Projects** live in `assets/js/projects.js`. Copy a block, fill in the English (`en`) and Indonesian (`id_`) copy, drop screenshots in `assets/img/projects/` and list them in `images`. Frames, filters and the project modal build themselves.
+- **Projects** live in `content/projects.json` and **career history** in `content/experience.json`. Frames, filters, the project modal and the tour stops all build themselves from these files. A job with an empty `end` counts as the current one and fills the hero ("Backend Engineer Intern at …").
+- **CMS**: open `/admin` on the live site to add, edit or remove projects and jobs from a form (Decap CMS). Each save is a commit to `master`, and Netlify redeploys. Screenshots uploaded there land in `assets/img/projects/`.
+  - One-time setup: create a GitHub OAuth App (homepage `https://ananda-bintang.netlify.app`, callback `https://api.netlify.com/auth/done`), then add its client ID and secret in Netlify under Site configuration → Access & security → OAuth → GitHub.
+  - Local editing without logging in: run `npx decap-server` next to the static server, then open http://localhost:5173/admin/.
 - **Other copy** is in `index.html` (English) and the `ID` dictionary at the top of `assets/js/main.js` (Indonesian).
 - **CV**: `Ananda_Bintang_Saputra_CV.pdf`, printed from https://github.com/AnandaBintang/curriculum-vitae.
 - After changing CSS or JS, bump the `?v=` value on their links in `index.html` so browsers fetch the new files.

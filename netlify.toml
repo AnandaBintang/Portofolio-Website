@@ -1,7 +1,7 @@
 # Static site. Netlify won't publish the repository root when a framework plugin is attached,
 # so the "build" just copies the site files into dist/ and publishes that.
 [build]
-  command = "rm -rf dist && mkdir dist && cp -R index.html assets Ananda_Bintang_Saputra_CV.pdf dist/"
+  command = "rm -rf dist && mkdir dist && cp -R index.html assets content admin Ananda_Bintang_Saputra_CV.pdf dist/"
   publish = "dist"
 
 [build.environment]
@@ -18,3 +18,8 @@
   for = "/assets/img/*"
   [headers.values]
     Cache-Control = "public, max-age=604800"
+
+[[headers]]
+  for = "/content/*"
+  [headers.values]
+    Cache-Control = "no-cache"
