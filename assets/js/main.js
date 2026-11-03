@@ -165,6 +165,7 @@
   let lang = "en";
   const sceneName = (s) => NAMES[lang][s.dataset.name];
   const setLang = (l) => {
+    if (l !== lang) window.track?.("language", { to: l });
     lang = l;
     root.lang = l;
     const dict = l === "id" ? ID : EN;
@@ -355,6 +356,7 @@
   }
   // The print grows out of the frame you clicked, and shrinks away when closed.
   function openPrint(i, from) {
+    window.track?.("project-open", { project: PROJECTS[i] && PROJECTS[i].id });
     fillPrint(i);
     print.showModal();
     lock("print", true);
@@ -550,6 +552,7 @@
     $("#soundBtn").setAttribute("aria-pressed", String(Mixtape.on));
   }
   const setSound = (val) => {
+    window.track?.("sound", { state: val ? "on" : "off" });
     val ? Mixtape.start() : Mixtape.stop();
     store.set("sound", val ? "on" : "off");
     syncSoundUI();
@@ -599,6 +602,7 @@
     if (idx === current && !force) return;
     current = idx;
     const s = scenes[idx];
+    window.track?.("scene-view", { scene: s.dataset.name }, true);
     hudNo.textContent = String(idx + 1).padStart(2, "0");
     hudName.textContent = sceneName(s);
     hudClock.textContent = s.dataset.time;

@@ -30,6 +30,12 @@ Then open http://localhost:5173.
 - **CV**: `Ananda_Bintang_Saputra_CV.pdf`, printed from https://github.com/AnandaBintang/curriculum-vitae.
 - After changing CSS or JS, bump the `?v=` value on their links in `index.html` so browsers fetch the new files.
 
+## Analytics
+
+[Umami Cloud](https://umami.is), cookieless. Create a website there, then paste its Website ID into `WEBSITE_ID` at the top of `assets/js/analytics.js`. Until then nothing loads. It stays off on localhost and for visitors with Do Not Track.
+
+Beyond the standard Umami reports (visitors, country/region/city, device, browser, referrer, bounce rate, visit duration), the site sends these events: `scene-view`, `scroll-depth`, `engaged-seconds`, `project-open`, `project-demo`, `project-source`, `cv-download`, `contact`, `language` and `sound`. Visit `/?notrack` once on your own devices to exclude yourself (`/?notrack=0` undoes it).
+
 ## Credits
 
 Music: "Chill Wave" by Kevin MacLeod (incompetech.com), licensed under [Creative Commons: By Attribution 4.0](https://creativecommons.org/licenses/by/4.0/).
