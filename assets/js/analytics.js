@@ -2,7 +2,7 @@
    device, browser, referrer, bounce and visit duration. This file adds the custom events.
    Paste your Website ID below. While it is empty nothing loads and window.track is a no-op. */
 (() => {
-  const WEBSITE_ID = "";
+  const WEBSITE_ID = "dcc0861a-0755-4666-b64f-ddfc6c821df0";
   const SRC = "https://cloud.umami.is/script.js";
 
   window.track = () => {};
