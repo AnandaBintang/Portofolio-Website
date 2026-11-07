@@ -1,76 +1,76 @@
 {
   "experience": [
     {
-      "id": "purnama",
-      "role_en": "Full Stack Intern",
-      "role_id": "Magang Full Stack",
-      "company": "CV. Purnama Kreatifa",
-      "client": "",
-      "place": "Indonesia",
       "start": "2022-09",
-      "end": "2022-12",
       "summary_en": "A location-based attendance system with geofencing. My first project with real users on the other end.",
-      "summary_id": "Sistem absensi berbasis lokasi dengan geofencing. Proyek pertama saya yang dipakai orang sungguhan."
-    },
-    {
-      "id": "roleplay",
-      "role_en": "Full Stack Intern",
       "role_id": "Magang Full Stack",
-      "company": "Roleplay Studio",
+      "place": "Indonesia",
       "client": "",
-      "place": "Surabaya",
+      "role_en": "Full Stack Intern",
+      "summary_id": "Sistem absensi berbasis lokasi dengan geofencing. Proyek pertama saya yang dipakai orang sungguhan.",
+      "end": "2022-12",
+      "id": "purnama",
+      "company": "CV. Purnama Kreatifa"
+    },
+    {
       "start": "2023-03",
-      "end": "2023-10",
       "summary_en": "Company profile sites and web apps, sitting with designers and project managers and turning Figma files into pages that work.",
-      "summary_id": "Website company profile dan web app; saya duduk bareng desainer dan project manager untuk mengubah file Figma jadi halaman yang benar-benar jalan."
+      "role_id": "Magang Full Stack",
+      "place": "Surabaya",
+      "client": "",
+      "role_en": "Full Stack Intern",
+      "summary_id": "Website company profile dan web app; saya duduk bareng desainer dan project manager untuk mengubah file Figma jadi halaman yang benar-benar jalan.",
+      "end": "2023-10",
+      "id": "roleplay",
+      "company": "Roleplay Studio"
     },
     {
-      "id": "freelance",
-      "role_en": "Web Developer",
-      "role_id": "Web Developer",
-      "company": "Freelance",
-      "client": "",
-      "place": "Remote",
       "start": "2023-10",
-      "end": "2025-07",
       "summary_en": "Synn Store, a game top-up store that grew past 1,000 users, with payment webhooks that check for duplicates before they touch an order.",
-      "summary_id": "Synn Store, toko top-up game yang tumbuh sampai lebih dari 1.000 pengguna, dengan webhook pembayaran yang mengecek duplikat sebelum menyentuh order."
+      "role_id": "Web Developer",
+      "place": "Remote",
+      "client": "",
+      "role_en": "Web Developer",
+      "summary_id": "Synn Store, toko top-up game yang tumbuh sampai lebih dari 1.000 pengguna, dengan webhook pembayaran yang mengecek duplikat sebelum menyentuh order.",
+      "end": "2025-07",
+      "id": "freelance",
+      "company": "Freelance"
     },
     {
-      "id": "gdsc",
-      "role_en": "Assistant Mentor",
-      "role_id": "Asisten Mentor",
-      "company": "Google Developer Student Club",
-      "client": "",
-      "place": "",
       "start": "2023-11",
-      "end": "2024-09",
       "summary_en": "Mentored 50+ students in web development, mostly through workshops where everyone leaves with something they built.",
-      "summary_id": "Membimbing 50+ mahasiswa belajar web development, kebanyakan lewat workshop yang selesai dengan sesuatu yang mereka bangun sendiri."
-    },
-    {
-      "id": "weekend",
-      "role_en": "Backend Engineer",
-      "role_id": "Backend Engineer",
-      "company": "Weekend Inc.",
-      "client": "PT HM Sampoerna",
-      "place": "Jakarta, hybrid",
-      "start": "2025-07",
-      "end": "2026-09",
-      "summary_en": "Staff, coach and order modules for AYO Kasir and AYO Qoncierge as Laravel microservices, plus a lot of N+1 hunting and linting pipelines that kept everyone honest.",
-      "summary_id": "Modul staf, coach, dan order untuk AYO Kasir dan AYO Qoncierge sebagai microservice Laravel, ditambah banyak perburuan query N+1 dan pipeline linting yang menjaga semua orang tetap jujur."
-    },
-    {
-      "id": "meda",
-      "role_en": "Backend Engineer Intern",
-      "role_id": "Magang Backend Engineer",
-      "company": "Meda Technology",
-      "client": "",
+      "role_id": "Asisten Mentor",
       "place": "",
+      "client": "",
+      "role_en": "Assistant Mentor",
+      "summary_id": "Membimbing 50+ mahasiswa belajar web development, kebanyakan lewat workshop yang selesai dengan sesuatu yang mereka bangun sendiri.",
+      "end": "2024-09",
+      "id": "gdsc",
+      "company": "Google Developer Student Club"
+    },
+    {
+      "start": "2025-07",
+      "summary_en": "Staff, coach and order modules for AYO Kasir and AYO Qoncierge as Laravel microservices, plus a lot of N+1 hunting and linting pipelines that kept everyone honest.",
+      "role_id": "Backend Engineer",
+      "place": "Jakarta, hybrid",
+      "client": "PT HM Sampoerna",
+      "role_en": "Backend Engineer",
+      "summary_id": "Modul staf, coach, dan order untuk AYO Kasir dan AYO Qoncierge sebagai microservice Laravel, ditambah banyak perburuan query N+1 dan pipeline linting yang menjaga semua orang tetap jujur.",
+      "end": "2026-09",
+      "id": "weekend",
+      "company": "Weekend Inc."
+    },
+    {
       "start": "2026-10",
-      "end": "",
       "summary_en": "Go services for Meda Billing and Waras on Echo, PostgreSQL and Redis. I wired up Xendit for payments, then moved the whole flow to DOKU myself, and had a say in the stack and architecture of both apps.",
-      "summary_id": "Service Go untuk Meda Billing dan Waras dengan Echo, PostgreSQL, dan Redis. Saya memasang Xendit untuk pembayaran, lalu memindahkan seluruh alurnya ke DOKU sendiri, dan ikut menentukan stack serta arsitektur kedua aplikasi."
+      "role_id": "Backend Engineer",
+      "place": "",
+      "client": "",
+      "role_en": "Backend Engineer",
+      "summary_id": "Service Go untuk Meda Billing dan Waras dengan Echo, PostgreSQL, dan Redis. Saya memasang Xendit untuk pembayaran, lalu memindahkan seluruh alurnya ke DOKU sendiri, dan ikut menentukan stack serta arsitektur kedua aplikasi.",
+      "end": "",
+      "id": "meda",
+      "company": "Meda Technology"
     }
   ]
 }
